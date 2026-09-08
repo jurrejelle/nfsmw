@@ -890,10 +890,10 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
         eIdentity(&this->mTireMatrices[i]);
         eIdentity(&this->mBrakeMatrices[i]);
 
-        float dW = UMath::Clamp((data.mWheelSpeed[i] / this->mTireRadius[i]) * dT, -this->mMaxWheelRenderDeltaAngle, this->mMaxWheelRenderDeltaAngle);
+        float dW = (data.mWheelSpeed[i] / this->mTireRadius[i]) * dT;
         float compression = data.mCompressions[i] + (this->mTireRadius[i] - this->mPhysicsRadius[i]);
 
-        state->mRoll += dW;
+        state->mRoll += UMath::Clamp(dW, -this->mMaxWheelRenderDeltaAngle, this->mMaxWheelRenderDeltaAngle);
 
         if (static_cast<float>(M_TWOPI) <= state->mRoll) {
             state->mRoll -= static_cast<float>(M_TWOPI);
