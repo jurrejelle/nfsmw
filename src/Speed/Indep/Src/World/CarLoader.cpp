@@ -1929,11 +1929,12 @@ int CarLoader::DefragmentPool() {
     int ticks = bGetTicker();
     void *allocation_table[1152];
     int num_allocations = bMemoryGetAllocations(CarLoaderMemoryPoolNumber, allocation_table, NUM_ELEMENTS(allocation_table));
-    int allocation_num = 0;
+    int allocation_num;
 
     bMemSet(&DefragmentParams, 0, sizeof(DefragmentParams));
     DefragmentParams.LargestAllocationSize = 0;
 
+    allocation_num = 0;
     while (allocation_num < num_allocations) {
         void *allocation = allocation_table[allocation_num];
 
