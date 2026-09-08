@@ -75,9 +75,9 @@ class VisualLookEffect {
         return this->StartTime != 0.0f;
     }
 
-    // UNSOLVED float scheduling
     float UpdateActive(float heatMeter) {
-        float secondsElapsed;
+        float secondsElapsed = 0.0f;
+
         if (this->UseWorldTime) {
             secondsElapsed = WorldTimer.GetSeconds() - this->StartTime;
         } else {
