@@ -870,22 +870,14 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
 
     this->mWheelHop = UMath::Vector3::kZero;
     bool is_view_anchor = this->IsViewAnchor();
-    bool candofx = this->TestVisibility(renderModifier * Tweak_MaxDistanceForVehicleEffects);
+    bool candofx = this->TestVisibility(Tweak_MaxDistanceForVehicleEffects);
     CarRenderInfo *car_render_info = this->GetRenderInfo();
 
     for (unsigned int i = 0; i < 4; i++) {
         unsigned int axle = i >> 1;
-        bool onground = false;
-        bool is_flat = false;
+        bool onground = (data.mGroundState & (1U << i)) != 0;
+        bool is_flat = (data.mBlowOuts & (1U << i)) != 0;
         TireState *state = this->mTireState[i];
-
-        if (((data.mGroundState >> i) & 1U) != 0) {
-            onground = true;
-        }
-
-        if (((data.mBlowOuts >> i) & 1U) != 0) {
-            is_flat = true;
-        }
 
         eIdentity(&this->mTireMatrices[i]);
         eIdentity(&this->mBrakeMatrices[i]);
