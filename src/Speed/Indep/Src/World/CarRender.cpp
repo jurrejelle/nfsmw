@@ -3045,7 +3045,7 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
         body_render_flags = 0x8000;
     }
 
-    if ((static_cast<unsigned int>(view->GetID() - EVIEW_PLAYER1) <= 1) && WorldTimeElapsed > lbl_8040AD4C) {
+    if ((static_cast<unsigned int>(view->ID - EVIEW_PLAYER1) <= 1) && WorldTimeElapsed > lbl_8040AD4C) {
         if (this->mDamageBehaviour != nullptr) {
             this->mDamageBehaviour->Update(biased_local_world);
         }
