@@ -418,7 +418,6 @@ void IVisualTreatment::UpdateHeat(eView *view, float targetHeat, bool isBeingPur
     }
 }
 
-// UNSOLVED, just scheduling
 void IVisualTreatment::Update(eView *view) {
     IGameState *gamestate = UTL::Collections::Singleton<IGameState>::Get();
     bool in_pursuit_breaker = false;
@@ -429,7 +428,7 @@ void IVisualTreatment::Update(eView *view) {
 
     IPerpetrator *iperp = nullptr;
     IEngine *iengine = nullptr;
-    const IPlayer::List &playerList = IPlayer::GetList(PLAYER_ALL);
+    const IPlayer::List &playerList = IPlayer::GetList(PLAYER_LOCAL);
 
     for (IPlayer::List::const_iterator iter = playerList.begin(); iter != playerList.end(); ++iter) {
         IPlayer *ip = *iter;
@@ -476,6 +475,7 @@ void IVisualTreatment::Update(eView *view) {
         return;
     }
 
-    bool nos = iengine->IsNOSEngaged();
-    this->SetNosEngaged(nos);
+    bool nos;
+
+    this->SetNosEngaged(iengine->IsNOSEngaged());
 }
