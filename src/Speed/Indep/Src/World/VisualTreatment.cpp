@@ -268,7 +268,7 @@ inline void AddBlend(bVector4 *result, bVector4 *v, float scale) {
     result->w += scale * v->w;
 }
 
-// UNSOLVED missing AddBlend call causing issues
+
 void IVisualTreatment::BlendVisualLookAttribute(bMatrix4 &result, float defaultUves, float uves,
                                                 const UMath::Matrix4 &(Attrib::Gen::visuallook::*funcPtr)() const) {
     bMemSet(&result, 0, sizeof(bMatrix4));
@@ -277,12 +277,18 @@ void IVisualTreatment::BlendVisualLookAttribute(bMatrix4 &result, float defaultU
         if (defaultUves != 0.0f) {
             AddBlend(&result, (bMatrix4 *)&(this->MiddayVisualLook.*funcPtr)(), defaultUves);
         }
-    } else if (defaultUves != 0.0f) {
-        AddBlend(&result, (bMatrix4 *)&(this->SunsetVisualLook.*funcPtr)(), defaultUves);
-    }
 
-    if (uves != 0.0f) {
-        AddBlend(&result, (bMatrix4 *)&(this->UvesVisualLook.*funcPtr)(), uves);
+        if (uves != 0.0f) {
+            AddBlend(&result, (bMatrix4 *)&(this->UvesVisualLook.*funcPtr)(), uves);
+        }
+    } else {
+        if (defaultUves != 0.0f) {
+            AddBlend(&result, (bMatrix4 *)&(this->SunsetVisualLook.*funcPtr)(), defaultUves);
+        }
+
+        if (uves != 0.0f) {
+            AddBlend(&result, (bMatrix4 *)&(this->UvesVisualLook.*funcPtr)(), uves);
+        }
     }
 }
 
