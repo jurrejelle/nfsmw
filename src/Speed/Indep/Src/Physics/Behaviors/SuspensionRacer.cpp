@@ -1927,7 +1927,9 @@ void SuspensionRacer::DoWheelForces(Chassis::State &state) {
                 damp = 0.0f;
             }
 
-            float springForce = UMath::Max(damp + spring + sway_stiffness[i], 0.0f);
+            float springForce = damp + spring + sway_stiffness[i];
+
+            springForce = UMath::Max(springForce, 0.0f);
 
             UVector3 verticalForce(vUp * springForce);
 
