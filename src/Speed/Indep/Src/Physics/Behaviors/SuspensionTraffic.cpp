@@ -522,7 +522,6 @@ void SuspensionTraffic::DoDriveForces(State &state) {
 
 static const float TrafficRollAdjust = 0.3f;
 
-// UNSOLVED, float math
 void SuspensionTraffic::DoWheelForces(State &state) {
     const float dT = state.time;
     UVector3 steerR;
@@ -621,8 +620,7 @@ void SuspensionTraffic::DoWheelForces(State &state) {
                 damp = 0.0f;
             }
 
-            springForce = damp + springForce;
-            springForce += sway_stiffness[i];
+            springForce = damp + springForce + sway_stiffness[i];
             springForce = UMath::Max(springForce, 0.0f);
 
             UVector3 verticalForce = vUp * springForce;
