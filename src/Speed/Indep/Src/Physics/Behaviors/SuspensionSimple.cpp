@@ -451,7 +451,7 @@ float SuspensionSimple::Tire::UpdateLoaded(float lat_vel, float fwd_vel, float b
     }
 
     if (this->mBrakeLocked && skid_speed > 1.0f) {
-        float friction = this->mLoad * this->mTractionBoost * this->mSpecs->DYNAMIC_GRIP().At(this->mAxleIndex);
+        float friction = this->mLoad * this->mSpecs->DYNAMIC_GRIP().At(this->mAxleIndex) * this->mTractionBoost;
         this->mLongitudeForce = (this->mSlip * friction) / (skid_speed * Tweak_SimpleBrakeLockSkidRatio);
         this->mLateralForce = ((-lat_vel * friction) * Tweak_SimpleBrakeLockSkidRatio) / skid_speed;
     } else if (is_slipping) {
