@@ -613,9 +613,9 @@ void SuspensionTraffic::DoWheelForces(State &state) {
             const float diff = newCompression - wheel.GetCompression();
             const float rise = diff / dT;
             float spring = newCompression * spring_specs[axle];
-            float damp = rise * shock_specs[axle];
 
             springForce = spring * (newCompression * progression[axle] + 1.0f);
+            float damp = rise * shock_specs[axle];
 
             if (damp > this->mSuspensionInfo.SHOCK_BLOWOUT() * 9.81f * mass) {
                 damp = 0.0f;
