@@ -2482,7 +2482,7 @@ void CarRenderInfo::RenderFlaresOnCar(eView *view, const bVector3 *position, con
         return;
     }
 
-    float base_headlight_intensity;
+    float base_headlight_intensity = 0.0f;
     float base_brakelight_intensity;
     CarTypeInfo *car_type_info = GetCarTypeInfo(this->pRideInfo->Type);
     int is_traffic_car = static_cast<int>(car_type_info->GetCarUsageType() == CAR_USAGE_TYPE_TRAFFIC);
