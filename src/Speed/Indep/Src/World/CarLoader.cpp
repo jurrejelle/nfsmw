@@ -1967,6 +1967,8 @@ int CarLoader::DefragmentPool() {
         int movement = 0;
 
         if (reinterpret_cast<intptr_t>(allocation) > reinterpret_cast<intptr_t>(first_hole)) {
+            extern int ChunkMovementOffset;
+
             DefragmentParams.pAllocation = allocation;
             bStrNCpy(DefragmentParams.AllocationName, bGetMallocName(allocation), 0x3F);
 
