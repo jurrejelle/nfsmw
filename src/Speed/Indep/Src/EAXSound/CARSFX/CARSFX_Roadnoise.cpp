@@ -390,7 +390,8 @@ void CARSFX_RoadNoise::GenerateRoadNoise() {
 
     fLeftVol = fLeftVol + fLeftVol * ftemp;
 
-    ftemp = ((this->m_pWheelCtl->m_fWheelTractionMag[0] + this->m_pWheelCtl->m_fWheelTractionMag[3]) / 2.0f) * 0.1f;
+    ftemp = (this->m_pWheelCtl->m_fWheelTractionMag[0] + this->m_pWheelCtl->m_fWheelTractionMag[3]) / 2.0f;
+    ftemp = ftemp * 0.1f;
     if (ftemp > 0.1f) {
         ftemp = 0.1f;
     }
@@ -414,7 +415,8 @@ void CARSFX_RoadNoise::GenerateRoadNoise() {
 
     fLeftPitch = fLeftPitch + fLeftPitch * ftemp;
 
-    ftemp = ((this->m_pWheelCtl->m_fWheelTractionMag[0] + this->m_pWheelCtl->m_fWheelTractionMag[3]) / 2.0f) * 0.15f;
+    ftemp = (this->m_pWheelCtl->m_fWheelTractionMag[0] + this->m_pWheelCtl->m_fWheelTractionMag[3]) / 2.0f;
+    ftemp = ftemp * 0.15f;
     if (ftemp > 0.15f) {
         ftemp = 0.15f;
     }
@@ -431,7 +433,8 @@ void CARSFX_RoadNoise::GenerateRoadNoise() {
 
     fRightPitch = fRightPitch + fRightPitch * ftemp;
 
-    ftemp = ((this->m_pWheelCtl->m_fWheelTractionMag[1] + this->m_pWheelCtl->m_fWheelTractionMag[2]) / 2.0f) * 0.15f;
+    ftemp = (this->m_pWheelCtl->m_fWheelTractionMag[1] + this->m_pWheelCtl->m_fWheelTractionMag[2]) / 2.0f;
+    ftemp = ftemp * 0.15f;
     if (ftemp > 0.15f) {
         ftemp = 0.15f;
     }
