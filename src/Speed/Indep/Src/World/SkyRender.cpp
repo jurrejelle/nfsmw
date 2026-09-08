@@ -322,9 +322,10 @@ void StuffSpecular(eView *view) {
 
     GetSunPos(view, &SunPos.x, &SunPos.y, &SunPos.z);
     SunPos.z = 0.0f;
+    SkydomeLocalWorld->v2.z = -1.0f;
     SkydomeLocalWorld->v0.x *= RefSkyScale;
     SkydomeLocalWorld->v1.y *= RefSkyScale;
-    SkydomeLocalWorld->v2.z = -RefSkyScale;
+    SkydomeLocalWorld->v2.z *= RefSkyScale;
     SkydomeLocalWorld->v3.z += SKY_ENVMAP_HEIGHT_ADJUST;
 
     {
