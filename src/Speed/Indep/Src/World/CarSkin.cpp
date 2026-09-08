@@ -831,7 +831,7 @@ int CompositeSkin(RideInfo *ride_info) {
             }
         }
 
-        cur_layer = total_layer_colours;
+        cur_layer++;
     }
 
     eWaitUntilRenderingDone();
