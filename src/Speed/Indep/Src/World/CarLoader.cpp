@@ -1921,8 +1921,8 @@ int CarLoader::DefragmentPool() {
 
     int ticks = bGetTicker();
     void *allocation_table[1152];
-    int allocation_num = 0;
     int num_allocations = bMemoryGetAllocations(CarLoaderMemoryPoolNumber, allocation_table, NUM_ELEMENTS(allocation_table));
+    int allocation_num = 0;
 
     bMemSet(&DefragmentParams, 0, sizeof(DefragmentParams));
     DefragmentParams.LargestAllocationSize = 0;
@@ -1943,7 +1943,7 @@ int CarLoader::DefragmentPool() {
     eWaitUntilRenderingDone();
     gDefragFixer.Init();
 
-    void *first_hole = bMalloc(128, (CarLoaderMemoryPoolNumber & 0xF) | 0x2000);
+    void *first_hole = bMalloc(128, "CarLoaderDefrag", 0, (CarLoaderMemoryPoolNumber & 0xF) | 0x2000);
     int num_hole_filling_allocations = 0;
 
     bFree(first_hole);
@@ -1963,7 +1963,7 @@ int CarLoader::DefragmentPool() {
             bStrNCpy(DefragmentParams.AllocationName, bGetMallocName(allocation), 0x3F);
 
             while (true) {
-                void *hole = bMalloc(1, (CarLoaderMemoryPoolNumber & 0xF) | 0x2000);
+                void *hole = bMalloc(1, "CarLoaderDefrag", 0, (CarLoaderMemoryPoolNumber & 0xF) | 0x2000);
 
                 if (reinterpret_cast<intptr_t>(hole) < reinterpret_cast<intptr_t>(first_hole) - 128) {
                     hole_filling_allocations[num_hole_filling_allocations] = hole;
