@@ -219,8 +219,8 @@ int CompositeSkin32(SkinCompositeParams *composite_params) {
         while (dest < dest_end) {
             for (int i = 0; i < 4; i++) {
                 if (*dest == swatch_lookup_colours[i]) {
+                    swatch_offset_cache[i][swatch_offset_count[i]] = dest - dest_image_data;
                     swatch_offset_count[i] = swatch_offset_count[i] + 1;
-                    swatch_offset_cache[i][swatch_offset_count[i] - 1] = dest - dest_image_data;
                     break;
                 }
             };
@@ -396,8 +396,8 @@ int CompositeSkin(SkinCompositeParams *composite_params) {
             for (i = 0; i < 4; i++) {
                 if (static_cast<unsigned int>(*dest) == static_cast<unsigned int>(swatch_indices[i])) {
                     *dest = static_cast<unsigned char>(i + 1);
+                    swatch_offset_cache[i][swatch_offset_count[i]] = dest - dest_image_data;
                     swatch_offset_count[i] = swatch_offset_count[i] + 1;
-                    swatch_offset_cache[i][swatch_offset_count[i] - 1] = dest - dest_image_data;
                     break;
                 }
             }
@@ -407,8 +407,8 @@ int CompositeSkin(SkinCompositeParams *composite_params) {
             }
         }
 
-        swatch_offset_init = 1;
         dest = dest_image_data;
+        swatch_offset_init = 1;
     } else {
         bMemSet(dest_image_data, 0, dest_width * dest_height);
     }
