@@ -1107,11 +1107,12 @@ void CarLoader::CompositeSkin(LoadedSkin *loaded_skin) {
             int required_size = CarInfo_GetMaxCompositingBufferSize();
 
             if (required_size > bCountFreeMemory(CarLoaderMemoryPoolNumber)) {
-                do {
-                    if (!this->RemoveSomethingFromCarMemoryPool(false)) {
+                while (required_size > bCountFreeMemory(CarLoaderMemoryPoolNumber)) {
+                    bool force_unload = false;
+                    if (!this->RemoveSomethingFromCarMemoryPool(force_unload)) {
                         break;
                     }
-                } while (required_size > bCountFreeMemory(CarLoaderMemoryPoolNumber));
+                }
 
                 this->DefragmentPool();
             }
