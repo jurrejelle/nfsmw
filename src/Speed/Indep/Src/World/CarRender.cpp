@@ -3191,9 +3191,11 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                                     this->RenderPart(view, model_lod_base, finalmat, light_context,
                                                      disable_env_flag | extra_render_flags | body_render_flags);
                                 } else if (model_part_id <= CARSLOTID_BODY) {
-                                    bMatrix4 *damage_matrix = this->mDamageBehaviour->GetPartMatrix(model_part_id);
-                                    bCopy(finalmat, damage_matrix);
+                                    *finalmat = *this->mDamageBehaviour->GetPartMatrix(model_part_id);
+
                                     if (!this->mDamageBehaviour->IsPartHidden(model_part_id)) {
+                                        eModel *model = model_lod_base->GetModel();
+
                                         this->RenderPart(view, model_lod_base, finalmat, light_context,
                                                          disable_env_flag | extra_render_flags | body_render_flags);
                                     }
