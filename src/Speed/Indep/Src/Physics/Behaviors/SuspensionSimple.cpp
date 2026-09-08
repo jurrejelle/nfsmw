@@ -999,8 +999,7 @@ void SuspensionSimple::DoWheelForces(State &state) {
                 damp = 0.0f;
             }
 
-            float load = damp + spring + sway_stiffness[i];
-            load = UMath::Max(load, 0.0f);
+            float load = UMath::Max(damp + spring + sway_stiffness[i], 0.0f);
 
             const UMath::Vector3 &pointVelocity = wheel.GetVelocity();
             float xspeed = UMath::Dot(pointVelocity, lateralNormal);

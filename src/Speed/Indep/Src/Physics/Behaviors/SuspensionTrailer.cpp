@@ -494,7 +494,6 @@ void SuspensionTrailer::DoSimpleAero(State &state) {
     this->mRB->ResolveForce(drag_vector);
 }
 
-// UNSOLVED, float math
 void SuspensionTrailer::DoWheelForces(State &state) {
     const float dT = state.time;
 
@@ -578,8 +577,7 @@ void SuspensionTrailer::DoWheelForces(State &state) {
                 damp = 0.0f;
             }
 
-            springForce = damp + spring + sway_stiffness[i];
-            springForce = UMath::Max(springForce, 0.0f);
+            springForce = UMath::Max(damp + spring + sway_stiffness[i], 0.0f);
 
             UVector3 verticalForce = UVector3(vUp) * springForce;
             UVector3 driveForce;
