@@ -837,7 +837,7 @@ void RigidBody::DoInstanceCollision2d(const float dT) {
 
             UMath::Add(world_arm, data.position, world_point);
 
-            float y_vel = (world_arm.x - world_cog.x) * data.angularVel.z + data.linearVel.y;
+            float y_vel = data.angularVel.z * (world_arm.x - world_cog.x) + data.linearVel.y;
             y_vel = data.angularVel.x * (world_arm.z - world_cog.z) - y_vel;
 
             float tolerance = speedXZ * dT + depth;
