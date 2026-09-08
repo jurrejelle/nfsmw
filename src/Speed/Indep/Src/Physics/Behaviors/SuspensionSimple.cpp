@@ -451,9 +451,10 @@ float SuspensionSimple::Tire::UpdateLoaded(float lat_vel, float fwd_vel, float b
     }
 
     if (this->mBrakeLocked && skid_speed > 1.0f) {
-        float friction = this->mLoad * this->mSpecs->DYNAMIC_GRIP().At(this->mAxleIndex) * this->mTractionBoost;
-        this->mLateralForce = -lat_vel * (friction * Tweak_SimpleBrakeLockSkidRatio) / skid_speed;
-        this->mLongitudeForce = (this->mSlip * friction) / (skid_speed * Tweak_SimpleBrakeLockSkidRatio);
+        float friction = this->mSpecs->DYNAMIC_GRIP().At(this->mAxleIndex);
+
+        this->mLateralForce = -lat_vel * this->mLoad * this->mTractionBoost * friction * Tweak_SimpleBrakeLockSkidRatio / skid_speed;
+        this->mLongitudeForce = this->mSlip * this->mLoad * this->mTractionBoost * friction / (skid_speed * Tweak_SimpleBrakeLockSkidRatio);
     } else if (is_slipping) {
         float PilotFactor = 0.85f;
         float speed_factor = UMath::Ramp(body_speed, MPH2MPS(30.0f), MPH2MPS(50.0f));
