@@ -555,13 +555,13 @@ void SuspensionTrailer::DoWheelForces(State &state) {
         float max_compression = travel_specs[axle];
 
         if (wheel.GetCompression() == 0.0f) {
-            float delta = newCompression - max_compression;
-            maxDelta = UMath::Max(maxDelta, delta);
+            maxDelta = UMath::Max(maxDelta, newCompression - max_compression);
         }
 
         newCompression = UMath::Max(newCompression, 0.0f);
         if (newCompression > max_compression) {
-            maxDelta = UMath::Max(maxDelta, newCompression - max_compression);
+            float delta = newCompression - max_compression;
+            maxDelta = UMath::Max(maxDelta, delta);
             newCompression = max_compression;
         }
 
