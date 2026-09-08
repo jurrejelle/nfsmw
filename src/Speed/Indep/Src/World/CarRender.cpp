@@ -2958,6 +2958,8 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
         return false;
     }
 
+    this->pRideInfo->GetCarRenderUsage();
+
     if (this->pRideInfo != nullptr) {
         CarTypeInfo *car_type_info = this->pCarTypeInfo;
         if (GetCarTypeInfo(this->pRideInfo->Type)->GetCarUsageType() != CAR_USAGE_TYPE_RACING) {
