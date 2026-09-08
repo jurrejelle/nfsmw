@@ -875,9 +875,17 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
 
     for (unsigned int i = 0; i < 4; i++) {
         unsigned int axle = i >> 1;
-        bool onground = (data.mGroundState & (1U << i)) != 0;
-        bool is_flat = (data.mBlowOuts & (1U << i)) != 0;
+        bool onground = false;
+        bool is_flat = false;
         TireState *state = this->mTireState[i];
+
+        if (((data.mGroundState >> i) & 1U) != 0) {
+            onground = true;
+        }
+
+        if (((data.mBlowOuts >> i) & 1U) != 0) {
+            is_flat = true;
+        }
 
         eIdentity(&this->mTireMatrices[i]);
         eIdentity(&this->mBrakeMatrices[i]);
