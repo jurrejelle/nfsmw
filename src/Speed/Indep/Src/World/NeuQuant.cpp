@@ -366,8 +366,8 @@ void learn() {
         rad = 0;
     }
 
-    for (j = 0; j < rad; j++) {
-        radpower[j] = (((rad * rad - j * j) * 256) / (rad * rad)) << 10;
+    for (i = 0; i < rad; i++) {
+        radpower[i] = (((rad * rad - i * i) * 256) / (rad * rad)) << 10;
     }
 
     if (lengthcount != lengthcount / 499 * 499) {
