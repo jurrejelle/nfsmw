@@ -51,7 +51,7 @@ bool IsWorldDataStreaming(uintptr_t strmhandle) {
 
 int GN_HACK_STREAM_TYPE = -1; // size: 0x4, address: 0xFFFFFFFF, Decl: 253
 
-// UNSOLVED, the empty branch doesn't get emitted
+// UNSOLVED, retail's body spans ~45 lines that all fold away; only its load+compare survive
 void AssignAudioStreamHandle(uintptr_t realstrmhandle) {
     uintptr_t nStartAudioMemPool = reinterpret_cast<uintptr_t>(gAudioMemoryManager.GetMemoryPoolStart());
     uintptr_t nEndAudioMemPool = nStartAudioMemPool + gAudioMemoryManager.GetMemoryPoolSize();
