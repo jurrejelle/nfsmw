@@ -3858,14 +3858,13 @@ int cmph(const void *a, const void *b) {
 }
 
 static inline bool ccw(float **P, int i, int j, int k) {
-    float a = P[i][0] - P[j][0];
-    float b = P[i][1] - P[j][1];
-    float c = P[k][0] - P[j][0];
-    float d = P[k][1] - P[j][1];
+    float a = P[k][0] - P[j][0];
+    float b = P[k][1] - P[j][1];
+    float c = P[i][0] - P[j][0];
+    float d = P[i][1] - P[j][1];
     return a * d - b * c > 0.0f;
 }
 
-// UNSOLVED
 int make_chain(float **V, int n, int (*cmp)(const void *, const void *)) {
     int i;
     int j;
