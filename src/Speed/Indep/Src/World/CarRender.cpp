@@ -3186,6 +3186,7 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                                 model->ReplaceLightMaterial(STRINGHASH_CARSKIN, light_material_body);
                                 model = model_lod_base->GetModel();
                                 model->ReplaceLightMaterial(STRINGHASH_WINDSHIELD, light_material_tint);
+                                model = model_lod_base->GetModel();
 
                                 if (this->mDamageBehaviour == nullptr || model_part_id == 0x2b) {
                                     this->RenderPart(view, model_lod_base, finalmat, light_context,
