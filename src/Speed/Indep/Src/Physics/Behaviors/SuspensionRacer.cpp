@@ -2000,7 +2000,7 @@ void SuspensionRacer::DoWheelForces(Chassis::State &state) {
     }
 
     if (maxDelta > 0.0f) {
-        for (int i = 0; i < this->GetNumWheels(); ++i) {
+        for (unsigned int i = 0; i < this->GetNumWheels(); ++i) {
             Wheel &wheel = this->GetWheel(i);
             wheel.SetY(wheel.GetPosition().y + maxDelta);
         }
