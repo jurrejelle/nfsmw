@@ -343,7 +343,7 @@ void NFSMixMapState::CreateEvtMixCtls() {
 
         this->m_MixStateParams.pEvtMixCtlProc = this->m_pNFSMixMap->GetNextEvtMixCtlProc(false);
 
-        for (int n = 0; n < this->m_pEvtMixCtlHdr->NumEvents; n++) {
+        for (int n = 0; n < this->m_pEvtMixCtlHdr->NumEvents;) {
             stEvtMixCtlProc *pEVP;
             stEvtMixCtlSharedData *pEVS;
             stEvtMixCtlUniqueData *pEVU;
