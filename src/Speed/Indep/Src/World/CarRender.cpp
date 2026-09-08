@@ -4354,11 +4354,8 @@ void CarRenderInfo::DrawAmbientShadow(eView *view, const bVector3 *position, flo
         ps = 0.0f;
 
         for (int x = 0; x < 4; x++) {
-            pp->x = px;
-            pp->y = py;
-            pp->z = 0.0f;
-            puv->x = ps;
-            puv->y = pt;
+            bFill(pp, px, py, 0.0f);
+            bFill(puv, ps, pt);
             eMulVector(pp, localWorld, pp);
             px += sunDX;
             px += dx;
