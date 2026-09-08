@@ -511,16 +511,18 @@ void CarLoader::SetLoadingMode(eLoadingMode mode, int two_player_flag) {
 // UNSOLVED, scheduling
 // TODO dwarf
 void CarLoader::SetMemoryPoolSize(int size) {
+    bool success;
+
     if (this->MemoryPoolSize != size) {
         if (this->MemoryPoolSize != 0) {
-            for (int i = 0; i < this->NumSpongeAllocations; i++) {
-                bFree(this->SpongeAllocations[i]);
+            for (int n = 0; n < this->NumSpongeAllocations; n++) {
+                bFree(this->SpongeAllocations[n]);
             }
 
             this->NumSpongeAllocations = 0;
             this->UnloadUnallocatedRideInfos(0);
 
-            if (this->LoadedRideInfoList.GetHead() != this->LoadedRideInfoList.EndOfList()) {
+            if (!this->LoadedRideInfoList.IsEmpty()) {
                 return;
             }
 
