@@ -275,7 +275,6 @@ static void altersingle(int alpha, int i, int b, int g, int r, int aa) {
     *n -= (alpha * (*n - aa)) / 1024;
 }
 
-// UNSOLVED regswaps
 static void alterneigh(int rad, int i, int b, int g, int r, int aa) {
     int j;
     int k;
@@ -305,64 +304,33 @@ static void alterneigh(int rad, int i, int b, int g, int r, int aa) {
         if (j < hi) {
             p = &network[j][0];
 
-            rad = a * (*p - b);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
+            *p -= (a * (*p - b)) / 262144;
+            ++p;
+            *p -= (a * (*p - g)) / 262144;
+            ++p;
+            *p -= (a * (*p - r)) / 262144;
+            ++p;
+            *p -= (a * (*p - aa)) / 262144;
 
-            rad = a * (*++p - g);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
-
-            rad = a * (*++p - r);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
-
-            rad = a * (*++p - aa);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
             j++;
-            *p -= rad >> 18;
         }
 
         if (k > lo) {
             p = &network[k][0];
 
-            rad = a * (*p - b);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
+            *p -= (a * (*p - b)) / 262144;
+            ++p;
+            *p -= (a * (*p - g)) / 262144;
+            ++p;
+            *p -= (a * (*p - r)) / 262144;
+            ++p;
+            *p -= (a * (*p - aa)) / 262144;
 
-            rad = a * (*++p - g);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
-
-            rad = a * (*++p - r);
-            if (rad < 0) {
-                rad += 0x3FFFF;
-            }
-            *p -= rad >> 18;
-
-            a *= *++p - aa;
-            if (a < 0) {
-                a += 0x3FFFF;
-            }
             k--;
-            *p -= a >> 18;
         }
     }
 }
 
-// UNSOLVED regswaps
 void learn() {
     int i;
     int j;
