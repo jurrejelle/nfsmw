@@ -436,8 +436,8 @@ float SuspensionSimple::Tire::UpdateLoaded(float lat_vel, float fwd_vel, float b
 
     if (this->mAllowSlip && abs_slip > this->mMaxSlip) {
         slip_ratio = this->mMaxSlip / abs_slip;
-        is_slipping = true;
         this->mTraction = this->mTraction * slip_ratio;
+        is_slipping = true;
     }
 
     float skid_speed = UMath::Sqrt(this->mSlip * this->mSlip + lat_vel * lat_vel);
