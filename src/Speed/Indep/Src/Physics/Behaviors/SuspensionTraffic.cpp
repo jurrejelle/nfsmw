@@ -520,7 +520,7 @@ void SuspensionTraffic::DoDriveForces(State &state) {
     }
 }
 
-static const float TrafficRollAdjust = 0.0f; // TODO value and use
+static const float TrafficRollAdjust = 0.3f;
 
 // UNSOLVED, float math
 void SuspensionTraffic::DoWheelForces(State &state) {
@@ -634,7 +634,7 @@ void SuspensionTraffic::DoWheelForces(State &state) {
             UMath::Cross(c, forwardNormal, c);
 
             float d2 = UMath::Dot(c, groundNormal);
-            float load = UMath::Max(d2 * 4.0f - 3.0f, 0.0f) * springForce;
+            float load = UMath::Max(d2 * 4.0f - 3.0f, TrafficRollAdjust) * springForce;
 
             const UMath::Vector3 &pointVelocity = wheel.GetVelocity();
             UVector3 vNorm(pointVelocity);
