@@ -15,13 +15,13 @@ float twkVisualTreatmentTargetHeat = -1.0f;
 float twkVisualTreatmentRadialBlur = -1.0f;
 float twkVisualTreatmentPulseBrightness = -1.0f;
 
-// UNSOLVED
 float GetValueFromSpline(float value, bMatrix4 *curve) {
     float tm1 = 1.0f - value;
     float tm13 = tm1 * tm1 * tm1;
     float t3 = value * value * value;
 
-    return tm13 * curve->v0.y + value * (tm1 * 3.0f) * tm1 * curve->v1.y + value * (value * 3.0f) * tm1 * curve->v2.y + t3 * curve->v3.y;
+    return tm13 * curve->v0.y + 3.0f * value * tm1 * tm1 * curve->v1.y +
+           3.0f * value * value * tm1 * curve->v2.y + t3 * curve->v3.y;
 }
 
 void SetMiddleGrayValue(float val) {}
