@@ -1927,10 +1927,6 @@ void CarRenderInfo::UpdateWheelYRenderOffset() {
     int rear_upgrade_level;
     if (this->pRideInfo != nullptr) {
         front_wheel = this->pRideInfo->GetPart(CARSLOTID_FRONT_WHEEL);
-
-        if (front_wheel != nullptr) {
-            front_upgrade_level = front_wheel->GetUpgradeLevel();
-        }
     }
     if (this->pRideInfo != nullptr) {
         rear_wheel = this->pRideInfo->GetPart(CARSLOTID_REAR_WHEEL);
@@ -1938,6 +1934,10 @@ void CarRenderInfo::UpdateWheelYRenderOffset() {
         if (rear_wheel != nullptr) {
             rear_upgrade_level = rear_wheel->GetUpgradeLevel();
         }
+    }
+
+    if (front_wheel != nullptr) {
+        front_upgrade_level = front_wheel->GetUpgradeLevel();
     }
 
     UMath::Vector4 tire_offset;
