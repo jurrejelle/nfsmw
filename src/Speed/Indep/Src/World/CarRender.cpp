@@ -4319,7 +4319,7 @@ void CarRenderInfo::DrawAmbientShadow(eView *view, const bVector3 *position, flo
     bNormalize(&sunpos_in_car_space, &sunpos_in_car_space);
 
     float sunAdjX = -sunpos_in_car_space.x * SunScale;
-    float sunAdjY = -sunpos_in_car_space.y * SunScale;
+    float sunAdjY = SunScale * -sunpos_in_car_space.y;
     float sunDX = bAbs(sunAdjX * 0.33333334f);
     float sunDY = bAbs(sunAdjY * 0.33333334f);
 
