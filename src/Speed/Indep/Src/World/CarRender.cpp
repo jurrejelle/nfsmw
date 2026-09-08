@@ -3223,22 +3223,22 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
     }
 
     if (car_body_lod <= this->pRideInfo->GetMaxLicenseLodLevel() || reflexion == 0) {
-        bMatrix4 license_rotate;
-        eIdentity(&license_rotate);
-        eRotateY(&license_rotate, &license_rotate, 0x4000);
+        bMatrix4 local_rot;
+        eIdentity(&local_rot);
+        eRotateY(&local_rot, &local_rot, 0x4000);
 
         for (CarEmitterPosition *emitter_position = this->EmitterPositionList[27].GetHead();
              emitter_position != this->EmitterPositionList[27].EndOfList(); emitter_position = emitter_position->GetNext()) {
             ePositionMarker *position_marker = emitter_position->PositionMarker;
-            bMatrix4 *license_local_world = eFrameMallocMatrix(1);
-            if (license_local_world != nullptr) {
-                eMulMatrix(license_local_world, &license_rotate, &position_marker->Matrix);
-                eMulMatrix(license_local_world, license_local_world, biased_local_world);
+
+            if (bMatrix4 *part_local_world = eFrameMallocMatrix(1)) {
+                eMulMatrix(part_local_world, &local_rot, &position_marker->Matrix);
+                eMulMatrix(part_local_world, part_local_world, biased_local_world);
 
                 for (int i = 0; i < 1; i++) {
-                    eModel *license_model = this->mCarPartModels[i + CARSLOTID_LICENSE_PLATE][0][this->mMinLodLevel].GetModel();
-                    if (license_model != nullptr) {
-                        view->Render(license_model, license_local_world, light_context, disable_env_flag | extra_render_flags | body_render_flags,
+                    eModel *plate_model = this->mCarPartModels[i + CARSLOTID_LICENSE_PLATE][0][this->mMinLodLevel].GetModel();
+                    if (plate_model != nullptr) {
+                        view->Render(plate_model, part_local_world, light_context, disable_env_flag | extra_render_flags | body_render_flags,
                                      nullptr);
                     }
                 }
@@ -3321,9 +3321,11 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
 
     if (car_body_lod <= CARPART_LOD_B) {
         float camber_amount_front = this->mAttributes.CamberFront();
-        float camber_amount_rear = this->mAttributes.CamberRear();
         wheel_camber_angle_front = bDegToAng(camber_amount_front * 7.0f);
+
+        float camber_amount_rear = this->mAttributes.CamberRear();
         wheel_camber_angle_rear = bDegToAng(camber_amount_rear * 7.0f);
+
         wheel_camber_push_down_front = camber_amount_front * 0.03f;
         wheel_camber_push_down_rear = camber_amount_rear * 0.03f;
     }
@@ -3447,8 +3449,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 bMatrix4 tire_matrix_for_camber;
 
                 if (wheel_camber_angle_front != 0) {
-                    bVector3 wheel_offset;
                     bCopy(&tire_matrix_for_camber, starting_tire_matrix);
+
+                    bVector3 wheel_offset;
+
                     bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&tire_matrix_for_camber.v3));
                     bFill(&tire_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                     eRotateX(&tire_matrix_for_camber, &tire_matrix_for_camber, wheel_camber_angle_front);
@@ -3476,8 +3480,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 bMatrix4 tire_matrix_for_camber;
 
                 if (wheel_camber_angle_front != 0) {
-                    bVector3 wheel_offset;
                     bCopy(&tire_matrix_for_camber, starting_tire_matrix);
+
+                    bVector3 wheel_offset;
+
                     bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&tire_matrix_for_camber.v3));
                     bFill(&tire_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                     eRotateX(&tire_matrix_for_camber, &tire_matrix_for_camber, -wheel_camber_angle_front);
@@ -3505,8 +3511,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 bMatrix4 tire_matrix_for_camber;
 
                 if (wheel_camber_angle_rear != 0) {
-                    bVector3 wheel_offset;
                     bCopy(&tire_matrix_for_camber, starting_tire_matrix);
+
+                    bVector3 wheel_offset;
+
                     bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&tire_matrix_for_camber.v3));
                     bFill(&tire_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                     eRotateX(&tire_matrix_for_camber, &tire_matrix_for_camber, -wheel_camber_angle_rear);
@@ -3553,8 +3561,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 bMatrix4 tire_matrix_for_camber;
 
                 if (wheel_camber_angle_rear != 0) {
-                    bVector3 wheel_offset;
                     bCopy(&tire_matrix_for_camber, starting_tire_matrix);
+
+                    bVector3 wheel_offset;
+
                     bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&tire_matrix_for_camber.v3));
                     bFill(&tire_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                     eRotateX(&tire_matrix_for_camber, &tire_matrix_for_camber, wheel_camber_angle_rear);
@@ -3643,8 +3653,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                     bMatrix4 brake_matrix_for_camber;
 
                     if (wheel_camber_angle_front != 0) {
-                        bVector3 wheel_offset;
                         bCopy(&brake_matrix_for_camber, starting_brake_matrix);
+
+                        bVector3 wheel_offset;
+
                         bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&brake_matrix_for_camber.v3));
                         bFill(&brake_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                         eRotateX(&brake_matrix_for_camber, &brake_matrix_for_camber, wheel_camber_angle_front);
@@ -3684,8 +3696,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                     bMatrix4 brake_matrix_for_camber;
 
                     if (wheel_camber_angle_front != 0) {
-                        bVector3 wheel_offset;
                         bCopy(&brake_matrix_for_camber, starting_brake_matrix);
+
+                        bVector3 wheel_offset;
+
                         bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&brake_matrix_for_camber.v3));
                         bFill(&brake_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                         eRotateX(&brake_matrix_for_camber, &brake_matrix_for_camber, -wheel_camber_angle_front);
@@ -3764,8 +3778,10 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                     bMatrix4 brake_matrix_for_camber;
 
                     if (wheel_camber_angle_rear != 0) {
-                        bVector3 wheel_offset;
                         bCopy(&brake_matrix_for_camber, starting_brake_matrix);
+
+                        bVector3 wheel_offset;
+
                         bCopy(&wheel_offset, reinterpret_cast<bVector3 *>(&brake_matrix_for_camber.v3));
                         bFill(&brake_matrix_for_camber.v3, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD4C, lbl_8040AD3C);
                         eRotateX(&brake_matrix_for_camber, &brake_matrix_for_camber, wheel_camber_angle_rear);
