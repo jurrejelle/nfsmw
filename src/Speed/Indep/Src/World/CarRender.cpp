@@ -3628,7 +3628,6 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 eModel *front_brake_models[CARPART_MODEL_NUM];
                 eModel *rear_brake_models[CARPART_MODEL_NUM];
                 eLightMaterial *light_material_caliper = this->LightMaterial_Caliper;
-                bMatrix4 mirror;
 
                 for (int i = 0; i < CARPART_MODEL_NUM; i++) {
                     if (this->mCarPartModels[CARSLOTID_FRONT_BRAKE + i][0][brakes_lod].GetModel() != nullptr) {
@@ -3651,6 +3650,8 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                         rear_brake_models[i] = nullptr;
                     }
                 }
+
+                bMatrix4 mirror;
 
                 eIdentity(&mirror);
                 mirror.v0.x = lbl_8040AD3C; // TODO BrakeMirrorX?
