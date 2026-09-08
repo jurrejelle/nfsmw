@@ -431,7 +431,7 @@ int CompositeSkin(SkinCompositeParams *composite_params) {
 
             if (info->m_LayerHash != 0) {
                 src_pixel = info->m_LayerImagePaletteData[*image_src[i]];
-                src_mask = static_cast<uint8>(reinterpret_cast<unsigned short *>(info->m_LayerMaskPaletteData)[*mask_src[i] * 2]);
+                src_mask = reinterpret_cast<unsigned short *>(info->m_LayerMaskPaletteData)[*mask_src[i] * 2] & 0xFF;
 
                 if (info->m_RemapPalette != 0 && src_mask != 0) {
                     src_pixel = RemapColour(src_pixel, info->m_RemapColours);
