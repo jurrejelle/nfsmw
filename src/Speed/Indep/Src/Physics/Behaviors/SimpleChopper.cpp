@@ -140,12 +140,14 @@ void SimpleChopper::SetTorqueToMatchPitchAndRoll(UMath::Vector3 &localXZAccel, U
 
     float adjustedForwardAccel = -(localXZAccel.z * (9.0f / Max_Chopper_Accel)) * this->mChopperSpecs->PITCH_ANG();
 
+    float pitchAng = adjustedForwardAccel;
+
     if (0.0f < localXZAccel.y && 15.0f < this->mIrigidBody->GetSpeed() && 0.0f < this->mIrigidBody->GetLinearVelocity().y) {
         float pAdj = localXZAccel.y * 0.035f;
-        adjustedForwardAccel += pAdj;
+        pitchAng += pAdj;
     }
 
-    float pitchAng = UMath::Clamp(adjustedForwardAccel, -0.1f, 0.1f);
+    pitchAng = UMath::Clamp(pitchAng, -0.1f, 0.1f);
 
     UMath::Vector3 idealForwardV;
     this->mIrigidBody->GetForwardVector(idealForwardV);
@@ -167,7 +169,9 @@ void SimpleChopper::SetTorqueToMatchPitchAndRoll(UMath::Vector3 &localXZAccel, U
     angVel.x = UMath::Clamp(angVel.x, -1.0f, 1.0f);
 
     float adjustedSideAccel = -(localXZAccel.x * (12.0f / Max_Chopper_Accel)) * this->mChopperSpecs->ROLL_ANG();
-    float rollAng = UMath::Clamp(adjustedSideAccel, -0.1f, 0.1f);
+    float rollAng = adjustedSideAccel;
+
+    rollAng = UMath::Clamp(rollAng, -0.1f, 0.1f);
 
     UMath::Vector3 rightVec;
     this->mIrigidBody->GetRightVector(rightVec);
