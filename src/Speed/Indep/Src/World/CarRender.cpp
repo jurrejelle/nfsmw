@@ -3872,9 +3872,9 @@ int make_chain(float **V, int n, int (*cmp)(const void *, const void *)) {
     int s;
     float *t;
 
-    qsort(V, n, 4, cmp);
-
     s = 1;
+
+    qsort(V, n, 4, cmp);
     for (i = 2; i < n; i++) {
         for (j = s; j >= 1 && !ccw(V, j - 1, j, i); j--) {
         }
