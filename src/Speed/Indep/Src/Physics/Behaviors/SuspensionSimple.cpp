@@ -978,7 +978,7 @@ void SuspensionSimple::DoWheelForces(State &state) {
         if (newCompression > UMath::Epsilon && upness > VehicleSystem::ENABLE_ROLL_STOPS_THRESHOLD) {
             ++wheelsOnGround;
 
-            // TODO DWARF in this whole block
+            float springForce;
             const float diff = newCompression - wheel.GetCompression();
             float rise = diff / dT;
 
@@ -991,7 +991,8 @@ void SuspensionSimple::DoWheelForces(State &state) {
                 }
             }
 
-            float springForce = newCompression * spring_specs[axle];
+            springForce = newCompression * spring_specs[axle];
+
             float spring = springForce * (newCompression * progression[axle] + 1.0f);
             float damp = rise > 0.0f ? rise * shock_specs[axle] : rise * shock_ext_specs[axle];
 
