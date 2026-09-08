@@ -3226,7 +3226,7 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
         }
     }
 
-    if (car_body_lod <= this->pRideInfo->GetMaxLicenseLodLevel() || reflexion == 0) {
+    if (car_body_lod <= this->pRideInfo->GetMaxLicenseLodLevel() || reflexion != 0) {
         bMatrix4 local_rot;
         eIdentity(&local_rot);
         eRotateY(&local_rot, &local_rot, 0x4000);
