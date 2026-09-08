@@ -574,7 +574,7 @@ void SuspensionTrailer::DoWheelForces(State &state) {
             float spring = springForce * (newCompression * progression[axle] + 1.0f);
             float damp = rise * shock_specs[axle];
 
-            if (damp > this->mSuspensionInfo->SHOCK_BLOWOUT() * 9.81f * mass) {
+            if (damp > this->mSuspensionInfo.SHOCK_BLOWOUT() * 9.81f * mass) {
                 damp = 0.0f;
             }
 
