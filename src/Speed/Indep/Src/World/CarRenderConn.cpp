@@ -927,7 +927,7 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
             this->mFlatTireAngle.z += Tweak_TireBlowOffset * 0.25f;
         }
 
-        if (i > 1 && hop_wheels && onground) {
+        if (i > 1 && onground && hop_wheels) {
             float hop_speed_scale;
 
             if (0.0f < data.mTireSlip[i]) {
