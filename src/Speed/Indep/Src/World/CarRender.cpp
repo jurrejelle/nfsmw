@@ -4166,17 +4166,17 @@ void CarRenderInfo::DrawKeithProjShadow(eView *view, const bVector3 *position, b
         mid = v;
         mid *= 0.5f;
 
-        float alpha_min;
+        float alpha_min = 0.0f;
         float alpha_max = 27.0f;
-        float shadow_alpha = (1.0f - car_elevation_scale) * alpha_max;
+        float shadow_alpha;
         FancyCarShadowEdgeMult = car_elevation_scale * -0.29999995f + 1.4f;
-        i = static_cast<int>(shadow_alpha);
+        i = static_cast<int>((1.0f - car_elevation_scale) * alpha_max);
         unsigned int colour = static_cast<unsigned int>(bClamp(i, 0, 0xFE) << 24) | 0x00808080;
 
         if (dshad != 0) {
-            int nMax = (nVert & ~1) - 1; // TODO doesn't exist
+            int nv = (nVert & ~1) - 1;
 
-            for (i = 0; i < nMax; i += 2) {
+            for (i = 0; i < nv; i += 2) {
                 if (eBeginStrip(this->ShadowRampTexture, 4, biasedIdentity)) {
                     eAddVertex(p[i]);
                     eAddVertex(mid);
@@ -4207,12 +4207,11 @@ void CarRenderInfo::DrawKeithProjShadow(eView *view, const bVector3 *position, b
                 eEndStrip(view);
             }
 
-            int fake = nVert / 3;
             int nStart = 0;
-            int nStep;
+            int nStep = nVert / 3;
 
             for (int j = 0; j < 3; j++) {
-                int nSubVerts = (j + 1 > 2) ? nVert - nStart : fake;
+                int nSubVerts = (j + 1 > 2) ? nVert - nStart : nStep;
 
                 if (exBeginStrip(this->ShadowRampTexture, (nSubVerts + 1) * 2, biasedIdentity)) {
                     int nMax = nStart + nSubVerts;
@@ -4241,7 +4240,7 @@ void CarRenderInfo::DrawKeithProjShadow(eView *view, const bVector3 *position, b
                     exEndStrip(view);
                 }
 
-                nStart += fake;
+                nStart += nStep;
             }
         }
     }
