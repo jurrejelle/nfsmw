@@ -460,8 +460,8 @@ void CARSFX_RoadNoise::Play(FXROADNOISE_LOOP ID, int side) {
         m_pStitchLoopControl[side] = new ("Stitch Loop", 0) cStitchLoop(attribID);
     } else {
         g_pEAXSound->SetCsisName(this);
-        m_pRoadNoiseControl[side] = new Csis::FX_ROADNOISE(ID, 0, 0x1000, 0, Csis::FXROADNOISETYPETYPE_LOOP, 0, 0, 25000, 0, 0x7FFF, 0);
         {
+            m_pRoadNoiseControl[side] = new Csis::FX_ROADNOISE(ID, 0, 0x1000, 0, Csis::FXROADNOISETYPETYPE_LOOP, 0, 0, 25000, 0, 0x7FFF, 0);
             int refcnt = m_pRoadNoiseControl[side]->GetRefCount();
         }
     }
