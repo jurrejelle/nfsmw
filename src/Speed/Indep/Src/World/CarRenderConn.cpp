@@ -903,8 +903,8 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
         if (flatten_tires && is_flat) {
             compression += Tweak_TireBlowOffset;
 
-            float x_angle = UMath::Atan2r(-Tweak_TireBlowOffset, UMath::Abs(this->mTirePositions[i].y)) * -static_cast<float>(M_PI);
-            float y_angle = UMath::Atan2r(-Tweak_TireBlowOffset, UMath::Abs(this->mTirePositions[i].x)) * static_cast<float>(M_PI);
+            float x_angle = UMath::Atan2r(-Tweak_TireBlowOffset, UMath::Abs(this->mTirePositions[i].y)) * -0.5f;
+            float y_angle = UMath::Atan2r(-Tweak_TireBlowOffset, UMath::Abs(this->mTirePositions[i].x)) * 0.5f;
 
             if (this->mTirePositions[i].y < 0.0f) {
                 x_angle = -x_angle;
