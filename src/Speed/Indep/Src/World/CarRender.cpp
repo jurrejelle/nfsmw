@@ -4300,16 +4300,16 @@ void CarRenderInfo::DrawAmbientShadow(eView *view, const bVector3 *position, flo
 
     bVector3 SunCarVector;
     bVector3 light_pos;
-    SunChunkInfo *sun_info = SunInfo;
+    SunChunkInfo *sun_info;
 
-    if (sun_info == nullptr) {
+    if (SunInfo == nullptr) {
         light_pos.x = TweakCarShadowSunX;
         light_pos.y = TweakCarShadowSunY;
         light_pos.z = TweakCarShadowSunZ;
     } else {
-        light_pos.x = sun_info->CarShadowPositionX;
-        light_pos.y = sun_info->CarShadowPositionY;
-        light_pos.z = sun_info->CarShadowPositionZ;
+        light_pos.x = SunInfo->CarShadowPositionX;
+        light_pos.y = SunInfo->CarShadowPositionY;
+        light_pos.z = SunInfo->CarShadowPositionZ;
     }
 
     SunCarVector = light_pos - *position;
