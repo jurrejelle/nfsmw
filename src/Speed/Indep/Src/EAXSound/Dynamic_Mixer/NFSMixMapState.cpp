@@ -618,8 +618,7 @@ void NFSMixMapState::InitializeMasterChannels() {
             }
         }
 
-        pPresetTable += nTotalPresets;
-        pPresetTable++;
+        pPresetTable = pPresetTable + nTotalPresets + 1;
         n = nchanneltype;
     }
 }
