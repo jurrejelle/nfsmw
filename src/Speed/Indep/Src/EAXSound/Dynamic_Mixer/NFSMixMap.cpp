@@ -1212,7 +1212,6 @@ NFSMixMap *NFSMixMap::GetSecondaryMap() {}
 
 float F_DT_FRAME_LOCK = 0.0333667f; // size: 0x4, address: 0x80418A28, Decl: 2611
 
-// UNSOLVED
 void NFSMixMap::ProcessMixMap(float dt, eCamStates camstate) {
     this->m_msDeltaTime = dt * 1000.0f;
     this->m_fDeltaTimeRatio[1] = this->m_fDeltaTimeRatio[0];
@@ -1242,8 +1241,7 @@ void NFSMixMap::ProcessMixMap(float dt, eCamStates camstate) {
         int scale;
 
         {
-            int Q15Val = 0x7FFF - pmxdp->pudata->pstCurveData->Q15Output;
-            Q15Val = (Q15Val * pmxdp->psdata->nRatio) >> 15;
+            int Q15Val = ((0x7FFF - pmxdp->pudata->pstCurveData->Q15Output) * pmxdp->psdata->nRatio) >> 15;
             nout = 0x7FFF - Q15Val;
         }
 
