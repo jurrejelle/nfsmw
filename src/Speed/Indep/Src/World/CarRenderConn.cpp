@@ -586,50 +586,51 @@ void CarRenderConn::UpdateParts(float dT, const RenderConn::Pkt_Car_Service &dat
     this->mPartState = data.mPartState;
 }
 
-// TODO the multification by M_TWOPI inside Sinr is getting optimized out I think
 void CarRenderConn::AddRoadNoise(float speed, unsigned int tires, const RoadNoiseRecord &noise) {
-    if (noise.Frequency * noise.Amplitude * noise.MaxSpeed > 0.0f) {
-        float intensity = UMath::Ramp(speed, noise.MinSpeed, noise.MaxSpeed);
-        float frequency = noise.Frequency * intensity;
-        float amplitude = this->GetAttributes().RoadNoise() * DEG2RAD(noise.Amplitude) * intensity;
-
-        unsigned int front = 3;
-        unsigned int rear = 12;
-        unsigned int right = 9;
-        unsigned int left = 6;
-
-        unsigned int do_front = tires & front;
-        unsigned int do_rear = tires & rear;
-        unsigned int do_left = tires & left;
-        unsigned int do_right = tires & right;
-        unsigned int do_pitch;
-        unsigned int do_roll = do_front | do_rear;
-
-        float noise_pitch = 0.0f;
-        if (do_roll) {
-            noise_pitch = amplitude * UMath::Sinr(this->mAnimTime * frequency) * 0.5f;
-            if (!do_front) {
-                noise_pitch = UMath::Abs(noise_pitch);
-            }
-            if (!do_rear) {
-                noise_pitch = -UMath::Abs(noise_pitch);
-            }
-        }
-
-        float noise_roll = 0.0f;
-        if (do_roll) {
-            noise_roll = amplitude * UMath::Sinr((this->mAnimTime + 0.33f) * frequency);
-            if (!do_right) {
-                noise_roll = UMath::Abs(noise_roll);
-            }
-            if (!do_left) {
-                noise_roll = -UMath::Abs(noise_roll);
-            }
-        }
-
-        this->mRoadNoise.y += noise_pitch;
-        this->mRoadNoise.x += noise_roll;
+    if (noise.Frequency * noise.Amplitude * noise.MaxSpeed <= 0.0f) {
+        return;
     }
+
+    float intensity = UMath::Ramp(speed, noise.MinSpeed, noise.MaxSpeed);
+    float frequency = noise.Frequency * intensity;
+    float amplitude = this->GetAttributes().RoadNoise() * DEG2RAD(noise.Amplitude) * intensity;
+
+    unsigned int front = 3;
+    unsigned int rear = 12;
+    unsigned int right = 9;
+    unsigned int left = 6;
+
+    unsigned int do_front = tires & front;
+    unsigned int do_rear = tires & rear;
+    unsigned int do_left = tires & left;
+    unsigned int do_right = tires & right;
+    unsigned int do_pitch;
+    unsigned int do_roll = do_front | do_rear;
+
+    float noise_pitch = 0.0f;
+    if (do_roll) {
+        noise_pitch = amplitude * UMath::Sinr(this->mAnimTime * frequency) * 0.5f;
+        if (!do_front) {
+            noise_pitch = UMath::Abs(noise_pitch);
+        }
+        if (!do_rear) {
+            noise_pitch = -UMath::Abs(noise_pitch);
+        }
+    }
+
+    float noise_roll = 0.0f;
+    if (do_roll) {
+        noise_roll = amplitude * UMath::Sinr((this->mAnimTime + 0.33f) * frequency);
+        if (!do_right) {
+            noise_roll = UMath::Abs(noise_roll);
+        }
+        if (!do_left) {
+            noise_roll = -UMath::Abs(noise_roll);
+        }
+    }
+
+    this->mRoadNoise.y += noise_pitch;
+    this->mRoadNoise.x += noise_roll;
 }
 
 static const RoadNoiseRecord Tweak_BlowOutNoise(4.0f, 1.0f, 0.0f, 10.0f);
