@@ -544,6 +544,10 @@ void CarLoader::SetMemoryPoolSize(int size) {
             bSetMemoryPoolDebugFill(CarLoaderMemoryPoolNumber, false);
             bSetMemoryPoolTopDirection(CarLoaderMemoryPoolNumber, true);
             this->NumSpongeAllocations = 0;
+
+            for (int n = 0; n < this->NumSpongeAllocations; n++) {
+                this->SpongeAllocations[n] = bMalloc(0, "CarLoaderSponge", 0, CarLoaderMemoryPoolNumber);
+            }
         }
     }
 }
