@@ -4335,12 +4335,9 @@ void CarRenderInfo::DrawAmbientShadow(eView *view, const bVector3 *position, flo
     bVector2 *puv;
     int bad_points[4];
 
-    pp = p;
-    puv = uv;
-
-    float py = min.y + sunStartY;
     scaleW = (max.y - min.y) * 0.33333334f;
     scaleL = (max.x - min.x) * 0.33333334f;
+    float py = min.y + sunStartY;
     float px;
     float dy = scaleW;
     float dx = scaleL;
@@ -4348,6 +4345,9 @@ void CarRenderInfo::DrawAmbientShadow(eView *view, const bVector3 *position, flo
     float pt = 0.0f;
     float ds = 0.33333334f;
     float dt = 0.33333334f;
+
+    pp = p;
+    puv = uv;
 
     for (int y = 0; y < 4; y++) {
         px = min.x + sunStartX;
