@@ -39,7 +39,7 @@ template <typename T> class ScratchPtr {
 
 // UNSOLVED
 template <typename T> T **ScratchPtr<T>::_Alloc() {
-    for (int i = 0; i < sizeof(mPointer) / sizeof(T *); ++i) {
+    for (unsigned int i = 0; i < sizeof(mPointer) / sizeof(T *); ++i) {
         if (mPointer[i] == nullptr) {
             T *spbuffer;
             if (mWorkSpace == nullptr) {
