@@ -188,20 +188,17 @@ IVisualTreatment::IVisualTreatment()
       CameraFlash(new ("VisualLookEffect", 0) VisualLookEffect(new Attrib::Gen::visuallookeffect(0x30656612, 0, nullptr))),                //
       PursuitBreaker(new ("VisualLookEffectTarget", 0) VisualLookEffectTarget(new Attrib::Gen::visuallookeffect(0x90D06C71, 0, nullptr))), //
       NosRadialBlur(new ("VisualLookEffectTarget", 0) VisualLookEffectTarget(new Attrib::Gen::visuallookeffect(0x6B40EB80, 0, nullptr))) {
-    this->State = HEAT_LOOK;
-    this->HeatMeter = 0.0f;
     this->PulseBrightness = 1.0f;
+    this->RadialBlur = 0.0f;
+    this->NosRadialBlurAmount = 0.0f;
+    this->PursuitBreakerBlend = 0.0f;
+
     this->CurrentTarget = -1.0f;
     this->DesaturationTarget = -1.0f;
+
+    this->State = HEAT_LOOK;
+    this->HeatMeter = 0.0f;
     this->IsBeingPursued = -1;
-
-    this->NosRadialBlur->Current = 0.0f;
-    this->NosRadialBlur->StartWorldTime = 0.0f;
-    this->NosRadialBlur->Target = 0.0f;
-
-    this->RadialBlur = 0.0f;
-    this->PursuitBreakerBlend = 0.0f;
-    this->NosRadialBlurAmount = 0.0f;
 }
 
 IVisualTreatment::~IVisualTreatment() {
