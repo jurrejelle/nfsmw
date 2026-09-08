@@ -63,7 +63,7 @@ Behavior *RigidBody::Construct(const BehaviorParams &params) {
 
 RigidBody::Volatile::Volatile() {}
 
-// UNSOLVED but functionally matching
+
 RigidBody::Mesh::Mesh(const SimSurface &material, const UMath::Vector4 *verts, unsigned int count, UCrc32 name, bool persistant)
     : mVerts(nullptr),                          //
       mNumVertices(count),                      //
@@ -74,8 +74,8 @@ RigidBody::Mesh::Mesh(const SimSurface &material, const UMath::Vector4 *verts, u
         this->mVerts = const_cast<UMath::Vector4 *>(verts);
     } else {
         this->mVerts =
-            reinterpret_cast<UMath::Vector4 *>(gFastMem.Alloc(static_cast<unsigned short>(count) * sizeof(*this->mVerts), "RigidBody::Mesh::Verts"));
-        bMemCpy(this->mVerts, verts, static_cast<unsigned short>(count) * sizeof(*this->mVerts));
+            reinterpret_cast<UMath::Vector4 *>(gFastMem.Alloc(this->mNumVertices * sizeof(*this->mVerts), "RigidBody::Mesh::Verts"));
+        bMemCpy(this->mVerts, verts, this->mNumVertices * sizeof(*this->mVerts));
         this->mFlags |= Mesh::FREEABLE;
     }
 }
