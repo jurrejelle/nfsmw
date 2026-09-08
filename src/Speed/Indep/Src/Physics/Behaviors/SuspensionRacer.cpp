@@ -1949,7 +1949,7 @@ void SuspensionRacer::DoWheelForces(Chassis::State &state) {
 
             UMath::Vector3 force;
             UMath::UnitCross(lateralNormal, groundNormal, driveForce);
-            UMath::Scale(driveForce, wheel.GetLongitudeForce(), driveForce);
+            UMath::Scale(driveForce, wheel.GetLongitudeForce());
             UMath::Add(lateralForce, driveForce, force);
             UMath::Add(force, verticalForce, force);
 
