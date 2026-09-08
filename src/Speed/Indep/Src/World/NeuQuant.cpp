@@ -263,33 +263,16 @@ static int contest(int b, int g, int r, int aa) {
     return bestbiaspos;
 }
 
-// UNSOLVED regswapsd
 static void altersingle(int alpha, int i, int b, int g, int r, int aa) {
     int *n = &network[i][0];
 
-    b = alpha * (*n - b);
-    if (b < 0) {
-        b += 0x3ff;
-    }
-    *n -= b >> 10;
-
-    g = alpha * (*++n - g);
-    if (g < 0) {
-        g += 0x3ff;
-    }
-    *n -= g >> 10;
-
-    r = alpha * (*++n - r);
-    if (r < 0) {
-        r += 0x3ff;
-    }
-    *n -= r >> 10;
-
-    aa = alpha * (*++n - aa);
-    if (aa < 0) {
-        aa += 0x3ff;
-    }
-    *n -= aa >> 10;
+    *n -= (alpha * (*n - b)) / 1024;
+    ++n;
+    *n -= (alpha * (*n - g)) / 1024;
+    ++n;
+    *n -= (alpha * (*n - r)) / 1024;
+    ++n;
+    *n -= (alpha * (*n - aa)) / 1024;
 }
 
 // UNSOLVED regswaps
