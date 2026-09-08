@@ -3009,21 +3009,22 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
         eMulMatrix(biased_identity, &pre_translate, biased_identity);
     }
 
-    unsigned short steerAngleR = this->mSteeringR;
+    unsigned short tangR = this->mSteeringR;
     unsigned short tangL = this->mSteeringL;
-    unsigned short tangR = steerAngleR;
     unsigned short steerAngle;
-    if (steerAngleR > 0x8000) {
-        tangR = static_cast<unsigned short>(-steerAngleR);
+
+    if (tangR > 0x8000) {
+        tangR = static_cast<unsigned short>(-tangR);
     }
+
     if (tangL > 0x8000) {
         tangL = static_cast<unsigned short>(-tangL);
     }
+
     steerAngle = this->mSteeringL;
-    int tangR_compare = tangR;
-    int tangL_compare = tangL;
-    if (tangR_compare > tangL_compare) {
-        steerAngle = steerAngleR;
+
+    if (tangR > tangL) {
+        steerAngle = this->mSteeringR;
     }
     this->TheCarPartCuller.CullParts(&camera_eye_in_car_space, steerAngle);
 
@@ -3079,161 +3080,144 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
             int model_part_id = model_index;
             eLightMaterial *model_light_material = light_material_carskin;
 
-            // TODO get rid of gotos, there are probably switch statements here
             if (model_lod_base->GetModel() != nullptr && !model_lod_base->IsHidden()) {
-                if (model_part_id == CARSLOTID_RIGHT_SIDE_MIRROR) {
-                    goto render_side_mirror;
-                }
+                switch (model_part_id) {
+                    default: {
+                        int draw_part = this->pRideInfo->IsPartEnabled(model_part_id);
 
-                {
-                    if (model_part_id < CARSLOTID_DRIVER) {
-                        if (model_part_id == CARSLOTID_LEFT_SIDE_MIRROR) {
-                            goto render_side_mirror;
-                        } else if (model_part_id < CARSLOTID_REAR_BRAKE) {
-                            if (model_part_id == CARSLOTID_FRONT_BRAKE) {
-                                continue;
-                            }
-                        } else if (model_part_id == CARSLOTID_REAR_BRAKE) {
-                            continue;
-                        }
-                    } else if (model_part_id != CARSLOTID_ROOF) {
-                        if (model_part_id < CARSLOTID_HOOD) {
-                            if (model_part_id == CARSLOTID_SPOILER) {
-                                continue;
-                            }
-                        } else if (model_part_id <= CARSLOTID_LICENSE_PLATE) {
-                            if (-1 < model_part_id - CARSLOTID_FRONT_WHEEL) {
-                                continue;
-                            }
-                        }
-                    } else {
-                        continue;
-                    }
-
-                    int draw_part = this->pRideInfo->IsPartEnabled(model_part_id);
-
-                    switch (model_part_id) {
-                        case CARSLOTID_DAMAGE_FRONT_WINDOW:
-                        case CARSLOTID_DAMAGE_REAR_LEFT_WINDOW:
-                        case CARSLOTID_DAMAGE_FRONT_LEFT_WINDOW:
-                        case CARSLOTID_DAMAGE_FRONT_RIGHT_WINDOW:
-                        case CARSLOTID_DAMAGE_REAR_RIGHT_WINDOW:
-                        case CARSLOTID_FRONT_LEFT_WINDOW:
-                        case CARSLOTID_FRONT_RIGHT_WINDOW:
-                        case CARSLOTID_FRONT_WINDOW:
-                        case CARSLOTID_REAR_LEFT_WINDOW:
-                        case CARSLOTID_REAR_RIGHT_WINDOW:
-                        case CARSLOTID_REAR_WINDOW:
-                            if (!AlphaWritesEnabled) {
-                                goto done_model_part;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-
-                    switch (model_part_id) {
-                        case CARSLOTID_HOOD:
-                            if (this->CarbonHood != 0) {
-                                model_light_material = this->LightMaterial_Carbon;
-                            }
-                            break;
-                        case CARSLOTID_HEADLIGHT:
-                            draw_part &= 1;
-                            break;
-                        case CARSLOTID_BRAKELIGHT:
-                            draw_part &= 1;
-                            break;
-                        case CARSLOTID_LEFT_SIDE_MIRROR:
-                        case CARSLOTID_RIGHT_SIDE_MIRROR:
-                            draw_part = 1;
-                            break;
-                        case CARSLOTID_INTERIOR:
-                            draw_part &= 1;
-                            break;
-                        case CARSLOTID_DAMAGE_LEFT_DOOR:
-                        case CARSLOTID_DAMAGE_LEFT_REAR_DOOR:
-                        case CARSLOTID_DAMAGE_RIGHT_DOOR:
-                        case CARSLOTID_DAMAGE_RIGHT_REAR_DOOR:
-                            if (IsNISCopCar(this->pRideInfo->Type)) {
-                                int door_index = 0;
-                                if (model_part_id == CARSLOTID_DAMAGE_RIGHT_DOOR) {
-                                    door_index = 1;
-                                } else if (model_part_id == CARSLOTID_DAMAGE_RIGHT_REAR_DOOR) {
-                                    door_index = 2;
-                                } else if (model_part_id == CARSLOTID_DAMAGE_LEFT_REAR_DOOR) {
-                                    door_index = 3;
+                        switch (model_part_id) {
+                            case CARSLOTID_DAMAGE_FRONT_WINDOW:
+                            case CARSLOTID_DAMAGE_REAR_LEFT_WINDOW:
+                            case CARSLOTID_DAMAGE_FRONT_LEFT_WINDOW:
+                            case CARSLOTID_DAMAGE_FRONT_RIGHT_WINDOW:
+                            case CARSLOTID_DAMAGE_REAR_RIGHT_WINDOW:
+                            case CARSLOTID_FRONT_LEFT_WINDOW:
+                            case CARSLOTID_FRONT_RIGHT_WINDOW:
+                            case CARSLOTID_FRONT_WINDOW:
+                            case CARSLOTID_REAR_LEFT_WINDOW:
+                            case CARSLOTID_REAR_RIGHT_WINDOW:
+                            case CARSLOTID_REAR_WINDOW:
+                                if (!AlphaWritesEnabled) {
+                                    continue;
                                 }
+                                break;
+                            default:
+                                break;
+                        }
 
-                                if (NISCopCarDoorOpenAmount[door_index] == lbl_8040AD4C) {
-                                    eMulMatrix(finalmat, &NISCopCarDoorClosedMarkers[door_index], biased_local_world);
-                                } else if (NISCopCarDoorOpenAmount[door_index] == lbl_8040AD3C) {
-                                    eMulMatrix(finalmat, &NISCopCarDoorOpenMarkers[door_index], biased_local_world);
+                        switch (model_part_id) {
+                            case CARSLOTID_HOOD:
+                                if (this->CarbonHood != 0) {
+                                    model_light_material = this->LightMaterial_Carbon;
+                                }
+                                break;
+                            case CARSLOTID_HEADLIGHT:
+                                draw_part &= 1;
+                                break;
+                            case CARSLOTID_BRAKELIGHT:
+                                draw_part &= 1;
+                                break;
+                            case CARSLOTID_LEFT_SIDE_MIRROR:
+                            case CARSLOTID_RIGHT_SIDE_MIRROR:
+                                draw_part = 1;
+                                break;
+                            case CARSLOTID_INTERIOR:
+                                draw_part &= 1;
+                                break;
+                            case CARSLOTID_DAMAGE_LEFT_DOOR:
+                            case CARSLOTID_DAMAGE_LEFT_REAR_DOOR:
+                            case CARSLOTID_DAMAGE_RIGHT_DOOR:
+                            case CARSLOTID_DAMAGE_RIGHT_REAR_DOOR:
+                                if (IsNISCopCar(this->pRideInfo->Type)) {
+                                    int door_index = 0;
+                                    if (model_part_id == CARSLOTID_DAMAGE_RIGHT_DOOR) {
+                                        door_index = 1;
+                                    } else if (model_part_id == CARSLOTID_DAMAGE_RIGHT_REAR_DOOR) {
+                                        door_index = 2;
+                                    } else if (model_part_id == CARSLOTID_DAMAGE_LEFT_REAR_DOOR) {
+                                        door_index = 3;
+                                    }
+
+                                    if (NISCopCarDoorOpenAmount[door_index] == lbl_8040AD4C) {
+                                        eMulMatrix(finalmat, &NISCopCarDoorClosedMarkers[door_index], biased_local_world);
+                                    } else if (NISCopCarDoorOpenAmount[door_index] == lbl_8040AD3C) {
+                                        eMulMatrix(finalmat, &NISCopCarDoorOpenMarkers[door_index], biased_local_world);
+                                    } else {
+                                        bQuaternion open_quaternion(NISCopCarDoorOpenMarkers[door_index]);
+                                        bQuaternion closed_quaternion(NISCopCarDoorClosedMarkers[door_index]);
+                                        bQuaternion blend_quaternion;
+                                        closed_quaternion.Slerp(blend_quaternion, open_quaternion, NISCopCarDoorOpenAmount[door_index]);
+
+                                        bVector4 blend_translation(NISCopCarDoorOpenMarkers[door_index].v3);
+                                        bScale(&blend_translation, &blend_translation, NISCopCarDoorOpenAmount[door_index]);
+                                        bScaleAdd(&blend_translation, &blend_translation, &NISCopCarDoorClosedMarkers[door_index].v3,
+                                                  lbl_8040AD3C - NISCopCarDoorOpenAmount[door_index]);
+
+                                        bMatrix4 blend_matrix;
+                                        blend_quaternion.GetMatrix(&blend_matrix);
+                                        blend_matrix.v3 = blend_translation;
+                                        eMulMatrix(finalmat, &blend_matrix, biased_local_world);
+                                    }
+                                }
+                                break;
+                            case CARSLOTID_DRIVER:
+                                draw_part &= 1;
+                                if (IsGameFlowInFrontEnd()) {
+                                    draw_part = 0;
+                                }
+                                if (IsNISCopCar(this->pRideInfo->Type)) {
+                                    draw_part &= NISCopCarDriverVisible;
                                 } else {
-                                    bQuaternion open_quaternion(NISCopCarDoorOpenMarkers[door_index]);
-                                    bQuaternion closed_quaternion(NISCopCarDoorClosedMarkers[door_index]);
-                                    bQuaternion blend_quaternion;
-                                    closed_quaternion.Slerp(blend_quaternion, open_quaternion, NISCopCarDoorOpenAmount[door_index]);
-
-                                    bVector4 blend_translation(NISCopCarDoorOpenMarkers[door_index].v3);
-                                    bScale(&blend_translation, &blend_translation, NISCopCarDoorOpenAmount[door_index]);
-                                    bScaleAdd(&blend_translation, &blend_translation, &NISCopCarDoorClosedMarkers[door_index].v3,
-                                              lbl_8040AD3C - NISCopCarDoorOpenAmount[door_index]);
-
-                                    bMatrix4 blend_matrix;
-                                    blend_quaternion.GetMatrix(&blend_matrix);
-                                    blend_matrix.v3 = blend_translation;
-                                    eMulMatrix(finalmat, &blend_matrix, biased_local_world);
+                                    draw_part &= NISRaceDriverVisible;
                                 }
-                            }
-                            break;
-                        case CARSLOTID_DRIVER:
-                            draw_part &= 1;
-                            if (IsGameFlowInFrontEnd()) {
-                                draw_part = 0;
-                            }
-                            if (IsNISCopCar(this->pRideInfo->Type)) {
-                                draw_part &= NISCopCarDriverVisible;
-                            } else {
-                                draw_part &= NISRaceDriverVisible;
-                            }
-                            break;
-                        default:
-                            draw_part &= 1;
-                            break;
-                    }
+                                break;
+                            default:
+                                draw_part &= 1;
+                                break;
+                        }
 
-                    if (draw_part != 0) {
-                        eLightMaterial *light_material_body = model_light_material;
-                        eModel *model = model_lod_base->GetModel();
+                        if (draw_part != 0) {
+                            eLightMaterial *light_material_body = model_light_material;
+                            eModel *model = model_lod_base->GetModel();
 
-                        model->ReplaceLightMaterial(STRINGHASH_CARSKIN, light_material_body);
-                        model = model_lod_base->GetModel();
-                        model->ReplaceLightMaterial(STRINGHASH_WINDSHIELD, light_material_tint);
+                            model->ReplaceLightMaterial(STRINGHASH_CARSKIN, light_material_body);
+                            model = model_lod_base->GetModel();
+                            model->ReplaceLightMaterial(STRINGHASH_WINDSHIELD, light_material_tint);
 
-                        if (this->mDamageBehaviour == nullptr || model_part_id == 0x2b) {
-                            this->RenderPart(view, model_lod_base, finalmat, light_context,
-                                             disable_env_flag | extra_render_flags | body_render_flags);
-                        } else if (model_part_id <= CARSLOTID_BODY) {
-                            bMatrix4 *damage_matrix = this->mDamageBehaviour->GetPartMatrix(model_part_id);
-                            bCopy(finalmat, damage_matrix);
-                            if (!this->mDamageBehaviour->IsPartHidden(model_part_id)) {
+                            if (this->mDamageBehaviour == nullptr || model_part_id == 0x2b) {
                                 this->RenderPart(view, model_lod_base, finalmat, light_context,
                                                  disable_env_flag | extra_render_flags | body_render_flags);
+                            } else if (model_part_id <= CARSLOTID_BODY) {
+                                bMatrix4 *damage_matrix = this->mDamageBehaviour->GetPartMatrix(model_part_id);
+                                bCopy(finalmat, damage_matrix);
+                                if (!this->mDamageBehaviour->IsPartHidden(model_part_id)) {
+                                    this->RenderPart(view, model_lod_base, finalmat, light_context,
+                                                     disable_env_flag | extra_render_flags | body_render_flags);
+                                }
                             }
                         }
-                    }
-                }
-                goto done_model_part;
+                    } break;
 
-            render_side_mirror:
-                if (reflexion == 0) {
-                    eModel *model = model_lod_base->GetModel();
-                    model->ReplaceLightMaterial(STRINGHASH_CARSKIN, this->LightMaterial_CarSkin);
-                    view->Render(model, biased_local_world, light_context, disable_env_flag | extra_render_flags | body_render_flags, nullptr);
-                }
+                    case CARSLOTID_FRONT_BRAKE:
+                    case CARSLOTID_REAR_BRAKE:
+                    case CARSLOTID_SPOILER:
+                    case CARSLOTID_ROOF:
+                    case CARSLOTID_FRONT_WHEEL:
+                    case CARSLOTID_REAR_WHEEL:
+                    case CARSLOTID_SPINNER:
+                    case CARSLOTID_LICENSE_PLATE:
+                        break;
 
-            done_model_part:;
+                    case CARSLOTID_LEFT_SIDE_MIRROR:
+                    case CARSLOTID_RIGHT_SIDE_MIRROR:
+                        if (reflexion == 0) {
+                            eModel *model = model_lod_base->GetModel();
+                            model->ReplaceLightMaterial(STRINGHASH_CARSKIN, this->LightMaterial_CarSkin);
+                            view->Render(model, biased_local_world, light_context, disable_env_flag | extra_render_flags | body_render_flags,
+                                         nullptr);
+                        }
+                        break;
+                }
             }
         }
     }
