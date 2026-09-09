@@ -1931,8 +1931,8 @@ void WRoadNav::UpdateOccludedPosition(bool occlude_avoidables) {
 
     this->nRoadOcclusion = 0;
     this->nAvoidableOcclusion = 0;
-    this->fOccludingTrailSpeed = 0.0f;
     this->bOccludedFromBehind = false;
+    this->fOccludingTrailSpeed = 0.0f;
 
     ISimable *simable = this->pAIVehicle ? this->pAIVehicle->GetSimable() : nullptr;
     IRigidBody *car = simable ? simable->GetRigidBody() : nullptr;
@@ -1957,10 +1957,10 @@ void WRoadNav::UpdateOccludedPosition(bool occlude_avoidables) {
     float out_scale = 2.0f;
     float out_bounds = traffic ? 1.5f : 1.0f;
 
-    int n = this->nCookieIndex;
+    int n;
     float current_dot = 0.0f;
     float look_ahead = look_min;
-    for (; n < num_cookies; n++) {
+    for (n = this->nCookieIndex; n < num_cookies; n++) {
         const NavCookie &cookie = this->pCookieTrail->NthOldest(n);
         bVector2 cookie_to_car = car_position - bVector2(cookie.Centre.x, cookie.Centre.z);
         float dot = bDot(reinterpret_cast<const bVector2 *>(&cookie.Forward), &cookie_to_car);
@@ -2436,8 +2436,8 @@ void WRoadNav::InitAtSegment(short segInd, char laneInd, float timeStep) {
     WRoadNetwork &roadNetwork = WRoadNetwork::Get();
 
     this->fValid = true;
-    this->fSegmentInd = segInd;
     this->fDeadEnd = 0;
+    this->fSegmentInd = segInd;
 
     const WRoadSegment *segment = roadNetwork.GetSegment(segInd);
 
