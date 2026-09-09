@@ -2000,7 +2000,7 @@ void WRoadNav::UpdateOccludedPosition(bool occlude_avoidables) {
         int next_segment_number = next_cookie.SegmentNumber;
         int current_segment_number = current_cookie.SegmentNumber;
 
-        if (next_segment_number == current_segment_number) {
+        if (current_segment_number == next_segment_number) {
             this->mCurrentCookie.SegmentNumber = next_segment_number;
             this->mCurrentCookie.SegmentNodeInd = current_cookie.SegmentNodeInd;
             this->mCurrentCookie.SetSegmentParameter(
