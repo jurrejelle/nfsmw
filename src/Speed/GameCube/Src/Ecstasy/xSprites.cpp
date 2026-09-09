@@ -44,6 +44,8 @@ struct XSpriteManager {
 void RenderViewPolyEx(eView *view, ePoly *poly, TextureInfo *texture_info, bMatrix4 *matrix, int flags, float z_bias)
     __asm__("Render__18eViewPlatInterfaceP5ePolyP11TextureInfoP8bMatrix4if");
 
+XSpriteManager NGSpriteManager;
+
 void XSpriteManager::AddSpark(const NGParticle &particle, TextureInfo *CurrentTexture) {
     if (this->position < 300) {
         UMath::Vector3 startPos;
