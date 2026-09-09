@@ -105,8 +105,8 @@ struct Force {
     void SetOverallForceGain(unsigned long &handle, int value);
     int GetOverallForceGain(unsigned long &handle);
 
-    bool Playing[8][4];                // offset 0x0, size 0x20
-    unsigned long EffectID[8][4];      // offset 0x20, size 0x80
+    int Playing[4][8];                 // offset 0x0, size 0x80
+    unsigned long EffectID[4][8];      // offset 0x80, size 0x80
 };
 
 struct Condition : public Force {

@@ -14,14 +14,6 @@ static const char kStopForceInvalidEffectId[] = "ERROR: Trying to stop force eff
 static const char kDestroyForceError[] = "ERROR: Failed to destroy force effect on channel %d\n";
 static const char kDestroyForceInvalidEffectId[] = "ERROR: Trying to destroy force effect on channel %d but we have an invalid effectid\n";
 
-static inline int &ForceGetPlaying(Force *self, int channel, int forceNumber) {
-    return reinterpret_cast<int *>(self)[channel * 8 + forceNumber];
-}
-
-static inline unsigned long &ForceGetEffectID(Force *self, int channel, int forceNumber) {
-    return reinterpret_cast<unsigned long *>(reinterpret_cast<char *>(self) + 0x80)[channel * 8 + forceNumber];
-}
-
 Force::Force() {
     InitVars();
 }
@@ -33,8 +25,8 @@ void Force::InitVars() {
         int forceNumber;
 
         for (forceNumber = 0; forceNumber < 8; forceNumber++) {
-            ForceGetPlaying(this, channel, forceNumber) = 0;
-            ForceGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+            Playing[channel][forceNumber] = 0;
+            EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
         }
     }
 }
@@ -43,12 +35,12 @@ int Force::Start(long channel, long forceNumber) {
     int ret;
 
     ret = 0;
-    if (ForceGetEffectID(this, channel, forceNumber) != static_cast<unsigned long>(-1)) {
-        ret = LGStartForceEffect(ForceGetEffectID(this, channel, forceNumber));
+    if (EffectID[channel][forceNumber] != static_cast<unsigned long>(-1)) {
+        ret = LGStartForceEffect(EffectID[channel][forceNumber]);
         if (ret < 0) {
             OSReport(kStartForceError, channel);
         } else {
-            ForceGetPlaying(this, channel, forceNumber) = 1;
+            Playing[channel][forceNumber] = 1;
         }
     } else {
         OSReport(kStartForceInvalidEffectId, channel);
@@ -61,12 +53,12 @@ int Force::Stop(long channel, long forceNumber) {
     int ret;
 
     ret = 0;
-    if (ForceGetEffectID(this, channel, forceNumber) != static_cast<unsigned long>(-1)) {
-        ret = LGStopForceEffect(ForceGetEffectID(this, channel, forceNumber));
+    if (EffectID[channel][forceNumber] != static_cast<unsigned long>(-1)) {
+        ret = LGStopForceEffect(EffectID[channel][forceNumber]);
         if (ret < 0) {
             OSReport(kStopForceError, channel);
         } else {
-            ForceGetPlaying(this, channel, forceNumber) = 0;
+            Playing[channel][forceNumber] = 0;
         }
     } else {
         OSReport(kStopForceInvalidEffectId, channel);
@@ -79,13 +71,13 @@ int Force::Destroy(long channel, long forceNumber) {
     int ret;
 
     ret = 0;
-    if (ForceGetEffectID(this, channel, forceNumber) != static_cast<unsigned long>(-1)) {
-        ret = LGDestroyForceEffect(ForceGetEffectID(this, channel, forceNumber));
+    if (EffectID[channel][forceNumber] != static_cast<unsigned long>(-1)) {
+        ret = LGDestroyForceEffect(EffectID[channel][forceNumber]);
         if (ret < 0) {
             OSReport(kDestroyForceError, channel);
         } else {
-            ForceGetPlaying(this, channel, forceNumber) = 0;
-            ForceGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+            Playing[channel][forceNumber] = 0;
+            EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
         }
     } else {
         OSReport(kDestroyForceInvalidEffectId, channel);
