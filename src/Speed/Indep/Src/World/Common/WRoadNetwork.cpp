@@ -3291,7 +3291,7 @@ float WRoadNav::CookieTrailCurvature(const UMath::Vector3 &car_position, const U
                         sina = static_cast<float>(M_PI) - sina;
                     }
 
-                    float div = UMath::Max(1.0f, apex_width);
+                    apex_width = UMath::Max(1.0f, apex_width);
                     apex = sina * UMath::Sinr(UMath::Min(sina, static_cast<float>(M_PI_2)));
 
                     if (this->nAvoidableOcclusion != 0) {
@@ -3304,7 +3304,7 @@ float WRoadNav::CookieTrailCurvature(const UMath::Vector3 &car_position, const U
                         apex *= ratio * ratio;
                     }
 
-                    apex = UMath::Clamp(apex, 0.0f, static_cast<float>(M_PI)) / div;
+                    apex = UMath::Clamp(apex, 0.0f, static_cast<float>(M_PI)) / apex_width;
                 }
             }
         }
