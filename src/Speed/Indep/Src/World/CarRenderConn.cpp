@@ -958,29 +958,27 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
         state->UpdateWorld(this->GetWCollider(), this->GetFlag(CF_ISRAINING), is_flat);
 
         if (onground && candofx) {
-            {
-                float skid = UMath::Max(UMath::Abs(data.mTireSkid[i] * 0.05f) - 0.1f, 0.0f);
-                float slip = UMath::Max(UMath::Abs(data.mTireSlip[i] * 0.2f) - 0.1f, 0.0f);
-                float skidmark_intensity = UMath::Sqrt(skid * skid + slip * slip);
+            float skid = UMath::Max(UMath::Abs(data.mTireSkid[i] * 0.05f) - 0.1f, 0.0f);
+            float slip = UMath::Max(UMath::Abs(data.mTireSlip[i] * 0.2f) - 0.1f, 0.0f);
+            float skidmark_intensity = UMath::Sqrt(skid * skid + slip * slip);
 
-                if (0.0f < skidmark_intensity) {
-                    bVector4 delta_pos;
-                    float SkidWidth;
+            if (0.0f < skidmark_intensity) {
+                bVector4 delta_pos;
+                float SkidWidth;
 
-                    bSub(&delta_pos, &state->mTirePos, &state->mPrevTirePos);
-                    SkidWidth = this->GetAttributes().TireSkidWidth(i);
+                bSub(&delta_pos, &state->mTirePos, &state->mPrevTirePos);
+                SkidWidth = this->GetAttributes().TireSkidWidth(i);
 
-                    state->DoSkids(skidmark_intensity, reinterpret_cast<const bVector3 *>(&delta_pos), &this->mTireMatrices[i], &this->mRenderMatrix,
-                                   SkidWidth);
-                } else {
-                    state->KillSkids();
-                }
-
-                float slipfx_ratio = data.mTireSlip[i] * this->GetAttributes().SlipFX(axle);
-                float skidfx_ratio = data.mTireSkid[i] * this->GetAttributes().SkidFX(axle);
-
-                state->DoFX(slipfx_ratio, skidfx_ratio, carspeed, this->GetVelocity(), &this->mRenderMatrix, dT);
+                state->DoSkids(skidmark_intensity, reinterpret_cast<const bVector3 *>(&delta_pos), &this->mTireMatrices[i], &this->mRenderMatrix,
+                               SkidWidth);
+            } else {
+                state->KillSkids();
             }
+
+            float slipfx_ratio = data.mTireSlip[i] * this->GetAttributes().SlipFX(axle);
+            float skidfx_ratio = data.mTireSkid[i] * this->GetAttributes().SkidFX(axle);
+
+            state->DoFX(slipfx_ratio, skidfx_ratio, carspeed, this->GetVelocity(), &this->mRenderMatrix, dT);
         } else {
             state->KillSkids();
         }
