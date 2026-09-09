@@ -493,9 +493,8 @@ bool CAnimScene::Init() {
     bMulMatrix(&scene_transform_matrix, &scene_translation_matrix, &scene_rotation_matrix);
     SetSceneTransformMatrix(scene_transform_matrix);
 
-    SpaceNode *space_node = CreateSpaceNode(nullptr);
-    mSpaceNode = space_node;
-    space_node->SetLocalMatrix(&scene_transform_matrix);
+    mSpaceNode = CreateSpaceNode(nullptr);
+    mSpaceNode->SetLocalMatrix(&scene_transform_matrix);
 
     ClearCarAnimationControllers();
     SetCarAnimationPositions();
@@ -687,8 +686,7 @@ void CAnimScene::AnimatedCars_SetMainAndWheels(int current_car, CAnimCtrl *main_
         animated_car_matrix.v3.y = ground_elevation + 5.0f;
     }
 
-    int haveLastPos = gCarAnimationStates[current_car].HaveLastCarPosition;
-    bool initial = haveLastPos == 0;
+    bool initial = gCarAnimationStates[current_car].HaveLastCarPosition == 0;
     INISCarControl *iniscar;
     if (gCarAnimationStates[current_car].mIVehicle->QueryInterface(&iniscar)) {
         if (!iniscar->SetNISPosition(reinterpret_cast<UMath::Matrix4 &>(animated_car_matrix), initial, time_step)) {
@@ -807,7 +805,7 @@ void CAnimScene::CreateAnimEntities() {
     bTList<CAnimEntityData> *aed_list = mAnimSceneData->GetAnimEntityDataList();
     CAnimEntityData *anim_entity_data = aed_list->GetHead();
 
-    while (anim_entity_data != aed_list->EndOfList()) {
+    for (; anim_entity_data != aed_list->EndOfList(); anim_entity_data = anim_entity_data->GetNext()) {
         int type = anim_entity_data->GetType();
         void *data = anim_entity_data->GetData();
 
@@ -818,7 +816,6 @@ void CAnimScene::CreateAnimEntities() {
             iae->Purge();
             delete iae;
         }
-        anim_entity_data = anim_entity_data->GetNext();
     }
 }
 

@@ -41,7 +41,7 @@ class NisScene {
 // total size: 0x14
 class CAnimEntityData : public bTNode<CAnimEntityData> {
   public:
-    CAnimEntityData(int32 type, void *data, int size) : mType(type), mData(data), mSize(size) {}
+    CAnimEntityData(uint32 type, void *data, int size) : mType(type), mData(data), mSize(size) {}
     ~CAnimEntityData() {}
     int GetType() {
         return mType;

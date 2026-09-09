@@ -263,9 +263,10 @@ int CAnimCtrl::UpdateAnimPose(bool force_calc) {
     world_skel->PoseSQTToGlobal(sqtBuffer, skinningMatrices, nullptr);
 
     if (m_flags & 1) {
-        bMatrix4 *blended_matrices = reinterpret_cast<bMatrix4 *>(m_animPart.GetGlobalMatrices());
+        bMatrix4 *blended_matrices;
         EAGL4Anim::Skeleton *pSkeleton = m_animPart.GetSkeleton()->GetEAGLSkeleton();
         int number_of_bones = pSkeleton->GetNumBones();
+        blended_matrices = reinterpret_cast<bMatrix4 *>(m_animPart.GetGlobalMatrices());
 
         for (int bone_index = 0; bone_index < number_of_bones; bone_index++) {
             EAGL4Anim::BoneData *bone_data = &pSkeleton->GetBoneData(bone_index);

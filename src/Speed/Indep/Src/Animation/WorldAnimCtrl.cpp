@@ -316,7 +316,8 @@ int CWorldAnimCtrl::UpdateAnimPose() {
     EAGL4Anim::Skeleton *world_skel = m_animPart.GetSkeleton()->GetEAGLSkeleton();
     float *sqtBuffer = m_animPart.GetSQTptr();
     EAGL4::Transform *skinningMatrices = m_animPart.GetGlobalMatrices();
-    float eval_time = GetEvalTime();
+    CWorldAnimCtrl *anim_ctrl = this;
+    float eval_time = anim_ctrl->GetEvalTime();
 
     if (GetFnAnim(1)) {
         GetFnAnim(1)->EvalSQT(eval_time, sqtBuffer, nullptr);
@@ -331,9 +332,10 @@ int CWorldAnimCtrl::UpdateAnimPose() {
     world_skel->PoseSQTToGlobal(sqtBuffer, skinningMatrices, nullptr);
 
     if (m_flags & 1) {
+        bMatrix4 *blended_matrices;
         EAGL4Anim::Skeleton *pSkeleton = m_animPart.GetSkeleton()->GetEAGLSkeleton();
         int number_of_bones = pSkeleton->GetNumBones();
-        bMatrix4 *blended_matrices = reinterpret_cast<bMatrix4 *>(m_animPart.GetGlobalMatrices());
+        blended_matrices = reinterpret_cast<bMatrix4 *>(m_animPart.GetGlobalMatrices());
 
         for (int bone_index = 0; bone_index < number_of_bones; bone_index++) {
             EAGL4Anim::BoneData *bone_data = &pSkeleton->GetBoneData(bone_index);

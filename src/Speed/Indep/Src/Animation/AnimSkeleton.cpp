@@ -97,6 +97,7 @@ void CAnimSkeleton::DynamicLoadResolve() {
     if (m_pDynLoader) {
         EAGL4::DynamicLoader::Symbol sym;
         int idx = 0;
+        void *addr;
 
         if (m_pDynLoader->GetNextSymbol(EAGL4::DynamicLoader::SkeletonType, idx, sym)) {
             EAGL4Anim::Skeleton *skeleton = reinterpret_cast<EAGL4Anim::Skeleton *>(sym.data);
@@ -131,11 +132,11 @@ CAnimSkeleton *GetSkeletonFromList(uint32 namehash) {
 int LoaderEAGLSkeletons(bChunk *chunk) {
     if (chunk->GetID() == BCHUNK_EAGL_SKELETONS) {
         int size = chunk->GetAlignedSize(0x10); // unused
-        CAnimSkeleton *skeleton = new ("NFS CAnimSkeleton") CAnimSkeleton();
+        CAnimSkeleton *anim_skel = new ("NFS CAnimSkeleton") CAnimSkeleton();
 
-        skeleton->Initialize(chunk->GetAlignedData(0x10), chunk->GetAlignedSize(0x10));
-        skeleton->SetAssociatedChunk(chunk);
-        g_loadedSkeletonList.AddTail(skeleton);
+        anim_skel->Initialize(chunk->GetAlignedData(0x10), chunk->GetAlignedSize(0x10));
+        anim_skel->SetAssociatedChunk(chunk);
+        g_loadedSkeletonList.AddTail(anim_skel);
 
         return 1;
     }

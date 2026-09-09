@@ -533,7 +533,8 @@ int UnloaderWorldAnimDirectoryData(bChunk *chunk) {
             return 1;
         }
         WorldAnimInstance *wai = &reinterpret_cast<WorldAnimInstance *>(chunk->GetAlignedData(16))[n];
-        TheWorldAnimInstanceDirectory.RemoveAnimInstance(wai);
+        WorldAnimInstance *wai_to_unload = wai;
+        TheWorldAnimInstanceDirectory.RemoveAnimInstance(wai_to_unload);
     }
     return 1;
 }
