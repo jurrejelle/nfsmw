@@ -58,13 +58,13 @@ int Periodic::UpdateForce(long channel, long forceNumber, unsigned char type, un
 
     memset(&force, 0, sizeof(force));
     force.type = type;
-    force.p.periodic.offset = offset;
     force.duration = duration;
     force.startDelay = startDelay;
     force.p.periodic.magnitude = magnitude;
     force.p.periodic.direction = direction;
     force.p.periodic.period = period;
     force.p.periodic.phase = phase;
+    force.p.periodic.offset = offset;
     force.p.periodic.envelope.attackTime = attackTime;
     force.p.periodic.envelope.fadeTime = fadeTime;
     force.p.periodic.envelope.attackLevel = attackLevel;
