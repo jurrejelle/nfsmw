@@ -273,7 +273,7 @@ void StuffSkyLayer(eView *view, SKY_LAYER layer) {
             SkydomeLocalWorld->v0.x *= MainSkyScale * ScaleFactor;
             SkydomeLocalWorld->v1.y *= MainSkyScale * ScaleFactor;
             SkydomeLocalWorld->v2.z *= MainSkyScale * ScaleFactor;
-            SkydomeLocalWorld->v3.z = CamPosWORLD.z + heightAdjust;
+            SkydomeLocalWorld->v3.z += heightAdjust;
 
             if (MoveMent) {
                 bMatrix4 LocalRot;
@@ -293,7 +293,7 @@ void StuffSkyLayer(eView *view, SKY_LAYER layer) {
         SkydomeLocalWorld->v0.x *= ScaleFactor;
         SkydomeLocalWorld->v1.y *= ScaleFactor;
         SkydomeLocalWorld->v2.z *= ScaleFactor;
-        SkydomeLocalWorld->v3.z = CamPosWORLD.z + heightAdjust;
+        SkydomeLocalWorld->v3.z += heightAdjust;
 
         view->Render(&SkydomeModel, SkydomeLocalWorld, nullptr, 0x20000, nullptr);
     }
