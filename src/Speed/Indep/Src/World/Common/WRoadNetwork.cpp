@@ -53,6 +53,7 @@ static const int selectable_lanes[8] = {
 };
 
 BIND_SIM_SUBSYSTEM(WRoadNetwork, WRoadNetwork::Init, WRoadNetwork::Shutdown);
+BIND_ACTIVITY_FACTORY(PathFinder);
 
 void WRoadNetwork::Init() {
     if (fgRoadNetwork != nullptr) {
