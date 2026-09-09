@@ -236,7 +236,6 @@ void LGWheels::PlaySpringForce(long channel, signed char offset, unsigned char s
     }
 
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel] != 0) {
             return;
         }
@@ -347,7 +346,6 @@ void LGWheels::PlayDamperForce(long channel, short coefficient) {
     }
 
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel] != 0) {
             return;
         }
