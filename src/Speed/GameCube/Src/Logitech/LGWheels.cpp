@@ -289,8 +289,8 @@ bool LGWheels::SameSpringForceParams(long channel, signed char offset, unsigned 
 void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short direction) {
     int ret;
 
+    ret = 0;
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel]) {
             return;
         }
@@ -394,8 +394,8 @@ bool LGWheels::SameDamperForceParams(long channel, short coefficient) {
 void LGWheels::PlayFrontalCollisionForce(long channel, unsigned char magnitude) {
     int ret;
 
+    ret = 0;
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (periodic.Playing[channel][0] != 0) {
             if (!SameFrontalCollisionForceParams(channel, magnitude)) {
                 ret = periodic.UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
@@ -434,7 +434,6 @@ void LGWheels::PlayDirtRoadEffect(long channel, unsigned char magnitude) {
 
     ret = 0;
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel]) {
             return;
         }
@@ -485,8 +484,8 @@ bool LGWheels::SameDirtRoadEffectParams(long channel, short magnitude) {
 void LGWheels::PlayBumpyRoadEffect(long channel, unsigned char magnitude) {
     int ret;
 
+    ret = 0;
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel]) {
             return;
         }
@@ -549,8 +548,8 @@ void LGWheels::PlaySlipperyRoadEffect(long channel, short magnitude) {
         springWasPlaying[channel] = 1;
     }
 
+    ret = 0;
     if (wheels.IsConnected(channel)) {
-        ret = 0;
         if (IsAirborne[channel] != 0) {
             return;
         }
