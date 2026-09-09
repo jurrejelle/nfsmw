@@ -230,8 +230,7 @@ int CAnimScene::GetSceneType() {
 }
 
 void CAnimScene::GetSceneName(char *ret_name) {
-    uint32 scene_hash = GetSceneHash();
-    TheAnimDirectory->GetNameOfSceneHash(scene_hash, ret_name);
+    TheAnimDirectory->GetNameOfSceneHash(GetSceneHash(), ret_name);
 }
 
 int CAnimScene::GetCameraTrackNumber() {
