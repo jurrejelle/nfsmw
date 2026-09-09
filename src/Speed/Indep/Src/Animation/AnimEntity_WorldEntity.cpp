@@ -136,8 +136,7 @@ bool CWorldAnimEntity::Init(void *init_data, SpaceNode *parent_space_node) {
         lods[1] = info->mLODB;
         lods[2] = 0;
         lods[3] = info->mLODZ;
-        WorldModel *model = new WorldModel(mSpaceNode, lods, false);
-        mWorldModel = model;
+        mWorldModel = new WorldModel(mSpaceNode, lods, false);
     } else {
         mWorldModel = nullptr;
     }
@@ -154,6 +153,9 @@ bool CWorldAnimEntity::Init(void *init_data, SpaceNode *parent_space_node) {
 
     CAnimPart *anim_part = mAnimCtrl->GetAnimPart();
     CAnimSkeleton *skel = GetSkeletonFromList(bStringHash("ROOT"));
+    uint32 TransAnimNameHash;
+    uint32 QuatsAnimNameHash;
+    uint32 ScaleAnimNameHash;
     play_flags = info->instance_data->play_flags;
     anim_part->Init(skel);
 
@@ -164,19 +166,23 @@ bool CWorldAnimEntity::Init(void *init_data, SpaceNode *parent_space_node) {
     }
 
     if (info->mAnimContentFlags & 1) {
-        uint32 TransAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 0);
-        mAnimCtrl->CreateFnAnimFromNamehash(TransAnimNameHash, 0);
+        int res;
+        TransAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 0);
+        res = mAnimCtrl->CreateFnAnimFromNamehash(TransAnimNameHash, 0);
     }
     if (info->mAnimContentFlags & 2) {
-        uint32 QuatsAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 1);
-        mAnimCtrl->CreateFnAnimFromNamehash(QuatsAnimNameHash, 1);
+        int res;
+        QuatsAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 1);
+        res = mAnimCtrl->CreateFnAnimFromNamehash(QuatsAnimNameHash, 1);
     }
     if (info->mAnimContentFlags & 4) {
-        uint32 ScaleAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 2);
-        mAnimCtrl->CreateFnAnimFromNamehash(ScaleAnimNameHash, 2);
+        int res;
+        ScaleAnimNameHash = GetAnimChannelHash(info->mAnimNameHash, 2);
+        res = mAnimCtrl->CreateFnAnimFromNamehash(ScaleAnimNameHash, 2);
     }
 
     if (mAnimCtrl->GetAllocated() == 0 || !skel) {
+        int res = mAnimCtrl->GetAllocated();
         mAnimCtrl->GetAnimPart()->Purge();
         mAnimCtrl->Cleanup();
         if (mAnimCtrl) {
@@ -193,12 +199,12 @@ bool CWorldAnimEntity::Init(void *init_data, SpaceNode *parent_space_node) {
             unsigned int seed = 0x69babe69;
             float anim_len_sec = mAnimCtrl->GetAnimLengthInSeconds();
             float rand_delay = bRandom(anim_len_sec * 0.5f, &seed);
-            CWorldAnimCtrl *ctrl = mAnimCtrl;
-            ctrl->SetLocalDelayTime(rand_delay);
+            mAnimCtrl->SetLocalDelayTime(rand_delay);
         }
         if (info->instance_data->play_flags & 0x400) {
             unsigned int seed = 0x69babe69;
-            float rand_start = bRandom(mAnimCtrl->GetAnimLength(), &seed);
+            float anim_len_frames = mAnimCtrl->GetAnimLength();
+            float rand_start = bRandom(anim_len_frames, &seed);
             mAnimCtrl->SetEvalTime(rand_start);
         }
         if (info->instance_data->start_trigger_hash != 0 || info->instance_data->stop_trigger_hash != 0) {
