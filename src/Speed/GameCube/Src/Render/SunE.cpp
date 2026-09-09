@@ -45,11 +45,11 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     float intensity;
     float center_x;
     float center_y;
-    unsigned int alpha;
     unsigned short angle;
-    unsigned char c0;
-    unsigned char c1;
-    unsigned char c2;
+    int a;
+    int r;
+    int g;
+    int b;
     float sum;
     float diff;
 
@@ -79,13 +79,13 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     sum = sin_angle + cos_angle;
     diff = cos_angle - sin_angle;
     intensity = intensity * SunVisibility * SunMaxIntensity;
-    c0 = layer->Colour[0];
+    r = layer->Colour[0];
     center_x = x + layer->OffsetX;
-    c1 = layer->Colour[1];
+    g = layer->Colour[1];
     center_y = y + layer->OffsetY;
-    c2 = layer->Colour[2];
+    b = layer->Colour[2];
 
-    alpha = static_cast<unsigned int>(intensity);
+    a = static_cast<unsigned int>(intensity);
 
     poly->Vertices[3].x = center_x - diff;
     poly->Vertices[0].x = center_x - sum;
@@ -96,22 +96,22 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Vertices[2].x = center_x + sum;
     poly->Vertices[2].y = center_y + diff;
 
-    poly->Colours[0][0] = c0;
-    poly->Colours[0][1] = c1;
-    poly->Colours[0][2] = c2;
-    poly->Colours[0][3] = alpha;
-    poly->Colours[1][0] = c0;
-    poly->Colours[1][1] = c1;
-    poly->Colours[1][2] = c2;
-    poly->Colours[1][3] = alpha;
-    poly->Colours[2][0] = c0;
-    poly->Colours[2][1] = c1;
-    poly->Colours[2][2] = c2;
-    poly->Colours[2][3] = alpha;
-    poly->Colours[3][0] = c0;
-    poly->Colours[3][1] = c1;
-    poly->Colours[3][2] = c2;
-    poly->Colours[3][3] = alpha;
+    poly->Colours[0][0] = r;
+    poly->Colours[0][1] = g;
+    poly->Colours[0][2] = b;
+    poly->Colours[0][3] = a;
+    poly->Colours[1][0] = r;
+    poly->Colours[1][1] = g;
+    poly->Colours[1][2] = b;
+    poly->Colours[1][3] = a;
+    poly->Colours[2][0] = r;
+    poly->Colours[2][1] = g;
+    poly->Colours[2][2] = b;
+    poly->Colours[2][3] = a;
+    poly->Colours[3][0] = r;
+    poly->Colours[3][1] = g;
+    poly->Colours[3][2] = b;
+    poly->Colours[3][3] = a;
 }
 
 void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
@@ -124,11 +124,11 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     float intensity;
     float center_x;
     float center_y;
-    unsigned int alpha;
     unsigned short angle;
-    unsigned char c0;
-    unsigned char c1;
-    unsigned char c2;
+    int a;
+    int r;
+    int g;
+    int b;
     float sum;
     float diff;
 
@@ -160,12 +160,12 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     sun_vis_poly_fix_ini[2].z = poly->Vertices[2].z;
     intensity = intensity * SunVisibility * SunMaxIntensity;
     sun_vis_poly_fix_ini[3].z = poly->Vertices[3].z;
-    c0 = layer->Colour[0];
+    r = layer->Colour[0];
     center_x = x + layer->OffsetX;
-    c1 = layer->Colour[1];
+    g = layer->Colour[1];
     center_y = y + layer->OffsetY;
-    c2 = layer->Colour[2];
-    alpha = static_cast<unsigned int>(intensity);
+    b = layer->Colour[2];
+    a = static_cast<unsigned int>(intensity);
 
     poly->Vertices[3].x = center_x - diff;
     poly->Vertices[3].y = center_y + sum;
@@ -185,22 +185,22 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     sun_vis_poly_fix_ini[2].y = poly->Vertices[2].y;
     sun_vis_poly_fix_ini[3].y = poly->Vertices[3].y;
 
-    poly->Colours[0][0] = c0;
-    poly->Colours[0][1] = c1;
-    poly->Colours[0][2] = c2;
-    poly->Colours[0][3] = alpha;
-    poly->Colours[1][0] = c0;
-    poly->Colours[1][1] = c1;
-    poly->Colours[1][2] = c2;
-    poly->Colours[1][3] = alpha;
-    poly->Colours[2][0] = c0;
-    poly->Colours[2][1] = c1;
-    poly->Colours[2][2] = c2;
-    poly->Colours[2][3] = alpha;
-    poly->Colours[3][0] = c0;
-    poly->Colours[3][1] = c1;
-    poly->Colours[3][2] = c2;
-    poly->Colours[3][3] = alpha;
+    poly->Colours[0][0] = r;
+    poly->Colours[0][1] = g;
+    poly->Colours[0][2] = b;
+    poly->Colours[0][3] = a;
+    poly->Colours[1][0] = r;
+    poly->Colours[1][1] = g;
+    poly->Colours[1][2] = b;
+    poly->Colours[1][3] = a;
+    poly->Colours[2][0] = r;
+    poly->Colours[2][1] = g;
+    poly->Colours[2][2] = b;
+    poly->Colours[2][3] = a;
+    poly->Colours[3][0] = r;
+    poly->Colours[3][1] = g;
+    poly->Colours[3][2] = b;
+    poly->Colours[3][3] = a;
 }
 
 void eUpdateSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
