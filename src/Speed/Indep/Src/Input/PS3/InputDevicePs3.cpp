@@ -38,35 +38,23 @@ inline struct UTL::COM::IUnknown* GameDevice::GetSecondaryDevice() { return mWhe
 
 int GameDevice::mCount; // size: 0x4, address: 0x8041E4B0, Decl: 734
 
-// DWARF Unmatched
-// UNSOLVED
-void GameDevice::Initialize() { // Decl: 735
-  const DeviceScalarInfo *info;
-  const char *name;
-  int i;
+ void GameDevice::Initialize() { // Decl: 735
+    int i;
+    const DeviceScalarInfo *info;
 
-  i = 0;
-  this->mNumScalars = i;
-  info = device_infos;
-  name = info->name;
+    i = 0;
+    this->mNumScalars = i;
+    info = device_infos;
 
-  if (name == nullptr) {
-    return;
-  }
-
-  do {
-    this->fDeviceScalar[i].InitializeDeviceScalar(
-        info->type, name, &this->fPrevValues[i],
-        &this->fCurrentValues[i]);
-    info = info + 1;
-    i = i + 1;
-    this->mNumScalars = this->mNumScalars + 1;
-    name = info->name;
-    if (name == nullptr) {
-      return;
+    while (info->name != nullptr && i <= 0x24) {
+        this->fDeviceScalar[i].InitializeDeviceScalar(
+        info->type, info->name, &this->fPrevValues[i],
+            &this->fCurrentValues[i]);
+        info = info + 1;
+        i = i + 1;
+        this->mNumScalars = this->mNumScalars + 1;
     }
-  } while (i <= 0x24);
-}
+ }
 
 // I am unsure where this is defined?
 // UNSOLVED
@@ -76,20 +64,20 @@ bool gShowPortInfo;
 // void calls are likely from a debug build that are stripped out.
 // TODO figure out using undercover
 bool GameDevice::IsConnected() { // Decl: 755
-  if ((this->mWheelDevice != nullptr) && this->mWheelDevice->IsConnected()) {
-    (void)this->GetDeviceIndex();
-    (void)this->GetDeviceIndex();
-    return true;
-  }
-  if (gShowPortInfo) {
-    PADStatus HardwarePadStatus[4];
-    PADRead(HardwarePadStatus);
-    (void)this->GetDeviceIndex();
-    (void)this->GetDeviceIndex();
-    (void)this->GetDeviceIndex();
-    (void)this->GetDeviceIndex();
-  }
-  return input_connected[this->GetDeviceIndex()];
+    if ((this->mWheelDevice != nullptr) && this->mWheelDevice->IsConnected()) {
+        (void)this->GetDeviceIndex();
+        (void)this->GetDeviceIndex();
+        return true;
+    }
+    if (gShowPortInfo) {
+        PADStatus HardwarePadStatus[4];
+        PADRead(HardwarePadStatus);
+        (void)this->GetDeviceIndex();
+        (void)this->GetDeviceIndex();
+        (void)this->GetDeviceIndex();
+        (void)this->GetDeviceIndex();
+    }
+    return input_connected[this->GetDeviceIndex()];
 }
 
 void GameDevice::StartVibration() { // Decl: 775
