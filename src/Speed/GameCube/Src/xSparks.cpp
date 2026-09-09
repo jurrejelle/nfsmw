@@ -270,13 +270,17 @@ void ParticleList::AgeParticles(float dt) {
 
         if (i < static_cast<int>(mNumParticles)) {
             do {
-                if (static_cast<float>(inParticle->life) >= dt * 8191.0f) {
-                    numOutParticles++;
-                    *outParticle = *inParticle;
-                    outParticle->age += dt;
-                    outParticle->life = static_cast<uint16>(static_cast<float>(inParticle->life) - dt * 8191.0f);
-                    outParticle++;
+                if (static_cast<float>(static_cast<int>(inParticle->life)) < dt * 8191.0f) {
+                    inParticle++;
+                    i++;
+                    continue;
                 }
+
+                numOutParticles++;
+                *outParticle = *inParticle;
+                outParticle->age += dt;
+                outParticle->life = static_cast<uint16>(static_cast<float>(static_cast<int>(inParticle->life)) - dt * 8191.0f);
+                outParticle++;
                 inParticle++;
                 i++;
             } while (i < static_cast<int>(mNumParticles));
