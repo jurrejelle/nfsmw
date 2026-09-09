@@ -41,11 +41,15 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     float screen_widthf = static_cast<float>(eGetScreenWidth());
     float screen_heightf = static_cast<float>(eGetScreenHeight());
     float layer_intensity;
+    float main_intensity;
+    float delta_center_x;
+    float delta_center_y;
     unsigned short angle;
     float max_sweep_angle;
     float scale_x;
     float sweep_angle;
     float rx;
+    float ry;
     float angle_sin;
     float angle_cos;
     float dx;
