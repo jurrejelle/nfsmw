@@ -176,7 +176,6 @@ class VisualLookEffectTarget {
     float Target;                                // offset 0xC, size 0x4
 };
 
-// UNSOLVED float assignment order
 IVisualTreatment::IVisualTreatment()
     : MiddayVisualLook(0xEEC2271A, 0, nullptr),                                                                                            //
       SunsetVisualLook(0xCEDA4E4F, 0, nullptr),                                                                                            //

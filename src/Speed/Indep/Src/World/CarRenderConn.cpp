@@ -878,11 +878,11 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
         bool onground = false;
         bool is_flat = false;
 
-        if (((data.mGroundState >> i) & 1U) != 0) {
+        if (((data.mGroundState >> i) & 1) != 0) {
             onground = true;
         }
 
-        if (((data.mBlowOuts >> i) & 1U) != 0) {
+        if (((data.mBlowOuts >> i) & 1) != 0) {
             is_flat = true;
         }
 

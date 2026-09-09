@@ -214,7 +214,6 @@ void ReplaceSkyTextures(SKY_LAYER layer) {
 
 int deblayer[5] = {1, 1, 1, 1, 1};
 
-// UNSOLVED
 void StuffSkyLayer(eView *view, SKY_LAYER layer) {
     if (!deblayer[layer]) {
         return;
@@ -352,9 +351,9 @@ void StuffSpecular(eView *view) {
         SkydomeLocalWorld2->v3.y = CamPosWORLD.y;
         SkydomeLocalWorld2->v3.z = CamPosWORLD.z;
 
-        SkydomeLocalWorld2->v0.x *= 0.035f;
-        SkydomeLocalWorld2->v1.y *= 0.035f;
-        SkydomeLocalWorld2->v2.z *= 0.035f;
+        SkydomeLocalWorld2->v0.x *= RefSkyScale;
+        SkydomeLocalWorld2->v1.y *= RefSkyScale;
+        SkydomeLocalWorld2->v2.z *= RefSkyScale;
         SkydomeLocalWorld2->v3.z += -50.0f;
         eMulMatrix(SkydomeLocalWorld2, &LocalRot, SkydomeLocalWorld2);
         view->Render(&SkySpecularModel, SkydomeLocalWorld2, nullptr, 0, nullptr);

@@ -520,7 +520,7 @@ void SuspensionTraffic::DoDriveForces(State &state) {
     }
 }
 
-static const float TrafficRollAdjust = 0.3f;
+static const float TrafficRollAdjust = 0.5f;
 
 void SuspensionTraffic::DoWheelForces(State &state) {
     const float dT = state.time;
@@ -632,7 +632,7 @@ void SuspensionTraffic::DoWheelForces(State &state) {
             UMath::Cross(c, forwardNormal, c);
 
             float d2 = UMath::Dot(c, groundNormal);
-            float load = UMath::Max(d2 * 4.0f - 3.0f, TrafficRollAdjust) * springForce;
+            float load = UMath::Max(d2 * 4.0f - 3.0f, 0.3f) * springForce;
 
             const UMath::Vector3 &pointVelocity = wheel.GetVelocity();
             UVector3 vNorm(pointVelocity);
@@ -689,7 +689,7 @@ void SuspensionTraffic::DoWheelForces(State &state) {
             UMath::Vector3 torque;
             UMath::Vector3 r;
             UMath::Sub(p, cg, r);
-            r.y *= 0.5f;
+            r.y *= TrafficRollAdjust;
 
             UMath::Cross(r, force, torque);
             this->mRB->Resolve(force, torque);
