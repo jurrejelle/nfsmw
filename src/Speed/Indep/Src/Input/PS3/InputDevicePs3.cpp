@@ -74,19 +74,20 @@ bool input_connected[4];
 bool gShowPortInfo;
 
 bool GameDevice::IsConnected() { // Decl: 755
-  bool uVar2;
-  SteeringWheelDevice *pSVar3;
-  PADStatus HardwarePadStatus [4];
-  PADStatus auStack_38 [52];
-  
-  pSVar3 = this->mWheelDevice;
-  if ((pSVar3 == nullptr) || pSVar3->IsConnected()) {
-    if (gShowPortInfo) {
-      PADRead(auStack_38);
-    }
-    return input_connected[this->GetDeviceIndex()];
+  if ((this->mWheelDevice != nullptr) && this->mWheelDevice->IsConnected()) {
+    (void)this->GetDeviceIndex();
+    (void)this->GetDeviceIndex();
+    return true;
   }
-return true;
+  if (gShowPortInfo) {
+    PADStatus HardwarePadStatus[4];
+    PADRead(HardwarePadStatus);
+    (void)this->GetDeviceIndex();
+    (void)this->GetDeviceIndex();
+    (void)this->GetDeviceIndex();
+    (void)this->GetDeviceIndex();
+  }
+  return input_connected[this->GetDeviceIndex()];
 }
 
 void GameDevice::StartVibration() { // Decl: 775
