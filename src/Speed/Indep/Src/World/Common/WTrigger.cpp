@@ -305,6 +305,7 @@ bool WTriggerManager::CheckCollideRB(const IRigidBody *rBody, const WTrigger *tr
                     (rPos.y - rbRadius < trig->fPosRadius.y + trig->fHeight * 0.5f)) {
                     return true;
                 }
+                return false;
             } else if (trig->fShape == 1) {
                 UMath::Vector3 dim3;
                 UMath::Matrix4 bodyMat;
@@ -331,6 +332,7 @@ bool WTriggerManager::CheckCollideRB(const IRigidBody *rBody, const WTrigger *tr
                 }
             } else {
                 unsigned char shapeNum;
+                return false;
             }
         }
     }
