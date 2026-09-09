@@ -20,6 +20,8 @@ struct NGParticle {
 
 struct SpriteDef {
     // total size: 0x2C
+    SpriteDef() {}
+
     TextureInfo *texture_info; // offset 0x0, size 0x4
     uint32 color;              // offset 0x4, size 0x4
     float width;               // offset 0x8, size 0x4
@@ -29,6 +31,9 @@ struct SpriteDef {
 
 struct XSpriteManager {
     // total size: 0x3394
+    XSpriteManager() {}
+    ~XSpriteManager() {}
+
     uint32 position;             // offset 0x0, size 0x4
     SpriteDef XSpriteBuffer[300]; // offset 0x4, size 0x3390
 

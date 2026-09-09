@@ -111,8 +111,8 @@ class ParticleList {
 };
 
 XenonEffectLists gNGEffectList;
-extern ParticleList gParticleList;
-extern XSpriteManager NGSpriteManager;
+ParticleList gParticleList;
+XSpriteManager NGSpriteManager;
 extern unsigned int randomSeed;
 float bRandom(float range, unsigned int *seed);
 unsigned int bStringHash(const char *str);
