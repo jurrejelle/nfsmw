@@ -70,23 +70,21 @@ void XSpriteManager::RenderAll(eView *view) {
 
     {
         uint32 i;
-        bMatrix4 *identity = eGetIdentityMatrix();
 
         for (i = 0; i < this->position; i++) {
-            pPoly.Vertices[0] = XSpriteBufferP->startPos;
-            pPoly.Vertices[1] = XSpriteBufferP->startPos;
-            pPoly.Vertices[2] = XSpriteBufferP->EndPosPos;
-            pPoly.Vertices[3] = XSpriteBufferP->EndPosPos;
-
-            *reinterpret_cast<uint32 *>(pPoly.Colours[3]) = XSpriteBufferP->color;
             *reinterpret_cast<uint32 *>(pPoly.Colours[0]) = XSpriteBufferP->color;
             *reinterpret_cast<uint32 *>(pPoly.Colours[1]) = XSpriteBufferP->color;
             *reinterpret_cast<uint32 *>(pPoly.Colours[2]) = XSpriteBufferP->color;
+            *reinterpret_cast<uint32 *>(pPoly.Colours[3]) = XSpriteBufferP->color;
+            pPoly.Vertices[0] = XSpriteBufferP->startPos;
+            pPoly.Vertices[1] = XSpriteBufferP->startPos;
+            pPoly.Vertices[1].z = XSpriteBufferP->startPos.z + XSpriteBufferP->width;
+            pPoly.Vertices[3] = XSpriteBufferP->EndPosPos;
+            pPoly.Vertices[2] = XSpriteBufferP->EndPosPos;
+            pPoly.Vertices[2].z = XSpriteBufferP->EndPosPos.z + XSpriteBufferP->width;
 
-            pPoly.Vertices[1].z += XSpriteBufferP->width;
-            pPoly.Vertices[2].z += XSpriteBufferP->width;
 
-            RenderViewPolyEx(view, &pPoly, XSpriteBufferP->texture_info, identity, 0, 0.0f);
+            RenderViewPolyEx(view, &pPoly, XSpriteBufferP->texture_info, eGetIdentityMatrix(), 0, 0.0f);
             XSpriteBufferP++;
         }
     }
