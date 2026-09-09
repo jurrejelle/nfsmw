@@ -153,7 +153,7 @@ void fn_80311870(int, void *, int);
 extern EA::Allocator::IAllocator &gMemoryAllocator;
 
 void *arenaLo;
-unsigned int g_GC_Disk_GameName;
+char g_GC_Disk_GameName[4];
 int snProfilerEnable = 0;
 
 void InitPlatform() {
@@ -169,7 +169,7 @@ void InitPlatform() {
     bMemoryInit();
     THREAD_init();
     TIMER_init(0x64);
-    g_GC_Disk_GameName = *reinterpret_cast<const unsigned int *>(DVDGetCurrentDiskID());
+    *reinterpret_cast<unsigned int *>(g_GC_Disk_GameName) = *reinterpret_cast<const unsigned int *>(DVDGetCurrentDiskID());
 
     opts.size = 0x38;
     FILE_getopts(&opts);
@@ -179,7 +179,7 @@ void InitPlatform() {
     opts.MaxFileOps = 0x40;
     FILE_setopts(&opts);
 
-    FILE_init(0, 0);
+    FILE_init(nullptr, 0);
     ASYNCFILE_init(0x10, 0);
     SYNCTASK_add(DVDErrorTask, 2, 0, 0);
 
