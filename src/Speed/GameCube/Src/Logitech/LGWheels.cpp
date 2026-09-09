@@ -288,6 +288,7 @@ bool LGWheels::SameSpringForceParams(long channel, signed char offset, unsigned 
 
 void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short direction) {
     int ret;
+    Constant *c = &constant;
 
     ret = 0;
     if (wheels.IsConnected(channel)) {
@@ -295,12 +296,12 @@ void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short d
             return;
         }
 
-        if (constant.Playing[channel][0] != 0) {
+        if (c->Playing[channel][0] != 0) {
             if (SameConstantForceParams(channel, magnitude, direction)) {
                 return;
             }
 
-            ret = constant.UpdateForce(channel, 0, static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
+            ret = c->UpdateForce(channel, 0, static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
             if (ret < 0) {
                 return;
             }
@@ -310,21 +311,21 @@ void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short d
             return;
         }
 
-        if (constant.EffectID[channel][0] == static_cast<unsigned long>(-1)) {
-            ret = constant.DownloadForce(channel, 0, wheels.WheelHandles[channel], static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
+        if (c->EffectID[channel][0] == static_cast<unsigned long>(-1)) {
+            ret = c->DownloadForce(channel, 0, wheels.WheelHandles[channel], static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
             if (ret >= 0) {
                 ConstantForceParams[channel].magnitude = magnitude;
                 ConstantForceParams[channel].direction = direction;
             }
         } else if (!SameConstantForceParams(channel, magnitude, direction)) {
-            ret = constant.UpdateForce(channel, 0, static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
+            ret = c->UpdateForce(channel, 0, static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
             if (ret >= 0) {
                 ConstantForceParams[channel].magnitude = magnitude;
                 ConstantForceParams[channel].direction = direction;
             }
         }
 
-        constant.Start(channel, 0);
+        c->Start(channel, 0);
     } else {
         OSReport(kPlayForceError, channel);
     }
@@ -393,33 +394,34 @@ bool LGWheels::SameDamperForceParams(long channel, short coefficient) {
 
 void LGWheels::PlayFrontalCollisionForce(long channel, unsigned char magnitude) {
     int ret;
+    Periodic *c = &periodic;
 
     ret = 0;
     if (wheels.IsConnected(channel)) {
-        if (periodic.Playing[channel][0] != 0) {
+        if (c->Playing[channel][0] != 0) {
             if (!SameFrontalCollisionForceParams(channel, magnitude)) {
-                ret = periodic.UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
+                ret = c->UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
                 if (ret >= 0) {
                     FrontalCollisionParams[channel].magnitude = magnitude;
                 }
             }
-            periodic.Start(channel, 0);
+            c->Start(channel, 0);
             return;
         }
 
-        if (periodic.EffectID[channel][0] == static_cast<unsigned long>(-1)) {
-            ret = periodic.DownloadForce(channel, 0, wheels.WheelHandles[channel], 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
+        if (c->EffectID[channel][0] == static_cast<unsigned long>(-1)) {
+            ret = c->DownloadForce(channel, 0, wheels.WheelHandles[channel], 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
         } else if (SameFrontalCollisionForceParams(channel, magnitude)) {
             ret = 0;
         } else {
-            ret = periodic.UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
+            ret = c->UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 20, 0, 0, 0);
         }
 
         if (ret >= 0) {
             FrontalCollisionParams[channel].magnitude = magnitude;
         }
 
-        periodic.Start(channel, 0);
+        c->Start(channel, 0);
     } else {
         OSReport(kPlayForceError, channel);
     }
@@ -533,16 +535,17 @@ bool LGWheels::SameBumpyRoadEffectParams(long channel, short magnitude) {
 
 void LGWheels::PlaySlipperyRoadEffect(long channel, short magnitude) {
     int ret;
+    Condition *c = &condition;
 
     if (IsPlaying(channel, 2)) {
         StopDamperForce(channel);
-        condition.Playing[channel][1] = 0;
+        c->Playing[channel][1] = 0;
         damperWasPlaying[channel] = 1;
     }
 
     if (IsPlaying(channel, 0)) {
         StopSpringForce(channel);
-        condition.Playing[channel][0] = 0;
+        c->Playing[channel][0] = 0;
         springWasPlaying[channel] = 1;
     }
 
@@ -552,12 +555,12 @@ void LGWheels::PlaySlipperyRoadEffect(long channel, short magnitude) {
             return;
         }
 
-        if (condition.Playing[channel][2] != 0) {
+        if (c->Playing[channel][2] != 0) {
             if (SameSlipperyRoadEffectParams(channel, magnitude)) {
                 return;
             }
 
-            ret = condition.UpdateForce(channel, 2, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
+            ret = c->UpdateForce(channel, 2, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
             if (ret < 0) {
                 return;
             }
@@ -566,20 +569,20 @@ void LGWheels::PlaySlipperyRoadEffect(long channel, short magnitude) {
             return;
         }
 
-        if (condition.EffectID[channel][2] == static_cast<unsigned long>(-1)) {
-            ret = condition.DownloadForce(channel, 2, wheels.WheelHandles[channel], 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
+        if (c->EffectID[channel][2] == static_cast<unsigned long>(-1)) {
+            ret = c->DownloadForce(channel, 2, wheels.WheelHandles[channel], 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
         } else if (SameSlipperyRoadEffectParams(channel, magnitude)) {
-            condition.Start(channel, 2);
+            c->Start(channel, 2);
             return;
         } else {
-            ret = condition.UpdateForce(channel, 2, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
+            ret = c->UpdateForce(channel, 2, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, -magnitude, -magnitude);
         }
 
         if (ret >= 0) {
             SlipperyRoadParams[channel].magnitude = magnitude;
         }
 
-        condition.Start(channel, 2);
+        c->Start(channel, 2);
     } else {
         OSReport(kPlayForceError, channel);
     }
