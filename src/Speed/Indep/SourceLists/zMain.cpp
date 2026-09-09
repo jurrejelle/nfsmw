@@ -18,3 +18,5 @@
 #include "Speed/Indep/Src/Main/Common/Event.cpp"
 
 #include "Speed/Indep/Src/Main/Common/EventSequencer.cpp"
+
+#include "Speed/Indep/Src/Input/PS3/InputDevicePs3.cpp"
