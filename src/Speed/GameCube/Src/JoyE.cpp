@@ -170,8 +170,8 @@ int ActualReadJoystickData() {
                     }
                     joy_data->ThePadData[0].AnalogLeftX = data;
                     joy_data->ThePadData[0].AnalogLeftY = 0x80 - static_cast<int>(joy_data->padSTATUS.stickY * 1.75f);
-                    joy_data->ThePadData[0].LTrigger = static_cast<unsigned char>(joy_data->padSTATUS.triggerLeft * 1.7f);
-                    joy_data->ThePadData[0].RTrigger = static_cast<unsigned char>(joy_data->padSTATUS.triggerRight * 1.7f);
+                    joy_data->ThePadData[0].LTrigger = static_cast<unsigned char>(static_cast<unsigned int>(joy_data->padSTATUS.triggerLeft) * 1.7f);
+                    joy_data->ThePadData[0].RTrigger = static_cast<unsigned char>(static_cast<unsigned int>(joy_data->padSTATUS.triggerRight) * 1.7f);
                 } else if (plat_lgwheels->IsConnected(port)) {
                     if (!wasWheelConnected[port]) {
                         wasWheelConnected[port] = 1;
