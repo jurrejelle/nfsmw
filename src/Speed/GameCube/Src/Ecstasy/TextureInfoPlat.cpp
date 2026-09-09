@@ -141,9 +141,9 @@ unsigned char TextureInfoPlatInfo::SetImage(TextureInfo *texture_info) {
 
 unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int format, void *imageData, void *imagePal,
                                             int alphaUsageType, int clamp) {
-    int wrap_s = 0;
-    int wrap_t = 0;
-    int texture_format = format & 0x7FFFFFFF;
+    GXTexWrapMode wrap_s = GX_CLAMP;
+    GXTexWrapMode wrap_t = GX_CLAMP;
+    unsigned int texture_format = format & 0x7FFFFFFF;
     bool positive = format >= 0;
     GXTlutFmt tlut_format = static_cast<GXTlutFmt>(positive ? GX_TL_RGB5A3 : GX_TL_IA8);
 
@@ -151,7 +151,7 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
         int width_lsb = width & (~width + 1);
 
         if (width == width_lsb) {
-            wrap_s = 1;
+            wrap_s = GX_REPEAT;
         }
     }
 
@@ -159,7 +159,7 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
         int height_lsb = height & (~height + 1);
 
         if (height == height_lsb) {
-            wrap_t = 1;
+            wrap_t = GX_REPEAT;
         }
     }
 
@@ -167,11 +167,11 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
         GXTexObj *obj = &ImageInfos.obj;
 
         GXInitTexObjCI(obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXCITexFmt>(texture_format),
-                       static_cast<GXTexWrapMode>(wrap_s), static_cast<GXTexWrapMode>(wrap_t), static_cast<u8>(mip), 0);
+                       wrap_s, wrap_t, static_cast<u8>(mip), 0);
         GXInitTlutObj(&ImageInfos.objClut, imagePal, tlut_format, texture_format == GX_TF_C4 ? 0x10 : 0x100);
     } else {
         GXInitTexObj(&ImageInfos.obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXTexFmt>(texture_format),
-                     static_cast<GXTexWrapMode>(wrap_s), static_cast<GXTexWrapMode>(wrap_t), static_cast<u8>(mip));
+                     wrap_s, wrap_t, static_cast<u8>(mip));
     }
 
     if (mip) {
