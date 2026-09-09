@@ -396,7 +396,7 @@ bool WTriggerManager::CheckCollideSRB(const IRigidBody *srBody, const WTrigger *
                 }
             }
 
-            if (rPos.y + srRadius < trig->fPosRadius.y - trig->fHeight * 0.5f || rPos.y - srRadius >= trig->fPosRadius.y + trig->fHeight * 0.5f) {
+            if (!(rPos.y + srRadius >= trig->fPosRadius.y - trig->fHeight * 0.5f && rPos.y - srRadius < trig->fPosRadius.y + trig->fHeight * 0.5f)) {
                 unsigned char shapeNum;
                 return false;
             }

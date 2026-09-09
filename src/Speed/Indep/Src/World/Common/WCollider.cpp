@@ -6,11 +6,11 @@
 #include "Speed/Indep/Src/World/WWorldMath.h"
 #include "Speed/Indep/bWare/Inc/bMath.hpp"
 
-// TODO move
-bool Tweak_colliderDraws = false;
-
 UTL::Std::map<unsigned int, WCollider *, _type_map> WCollider::fWuidMap;
 UTL::Collections::Listable<WCollider, 100>::List UTL::Collections::Listable<WCollider, 100>::_mTable;
+
+// TODO move
+bool Tweak_colliderDraws = false;
 
 WCollider::WCollider(eColliderShape colliderShape, unsigned int typeMask, unsigned int exclusionMask)
     : fRequestedPosition(UMath::Vector3::kZero),     //
