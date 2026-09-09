@@ -12,11 +12,6 @@ static const char kDownloadConditionForceError[] = "ERROR: DownloadForce(conditi
 static const char kDownloadConditionForceInvalidWheel[] = "ERROR: Trying to download a condition force to channel %d but wheel has not been opened.\n";
 static const char kUpdateConditionForceError[] = "ERROR: UpdateForce(condition force) on channel %d returned %d\n";
 
-static inline unsigned long &ConditionGetEffectID(Force *self, int channel, int forceNumber) {
-    char *base = reinterpret_cast<char *>(self) + 0x80;
-    return *reinterpret_cast<unsigned long *>(base + channel * 32 + forceNumber * 4);
-}
-
 Condition::Condition() : Force() {}
 
 int Condition::DownloadForce(long channel, long forceNumber, unsigned long & handle, unsigned char type, unsigned long duration, unsigned long startDelay, signed char offset, unsigned char deadband, unsigned char satNeg, unsigned char satPos, short coeffNeg, short coeffPos) {
@@ -24,7 +19,7 @@ int Condition::DownloadForce(long channel, long forceNumber, unsigned long & han
     int ret;
 
     ret = 0;
-    if (ConditionGetEffectID(this, channel, forceNumber) != static_cast<unsigned long>(-1)) {
+    if (EffectID[channel][forceNumber] != static_cast<unsigned long>(-1)) {
         Destroy(channel, forceNumber);
     }
 
@@ -41,10 +36,10 @@ int Condition::DownloadForce(long channel, long forceNumber, unsigned long & han
         force.p.condition[0].coefficientPos = coeffPos;
         force.p.condition[1] = force.p.condition[0];
 
-        ret = LGDownloadForceEffect(handle, &ConditionGetEffectID(this, channel, forceNumber), &force);
+        ret = LGDownloadForceEffect(handle, &EffectID[channel][forceNumber], &force);
         if (ret < 0) {
             OSReport(kDownloadConditionForceError, channel, ret);
-            ConditionGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+            EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
         }
     } else {
         OSReport(kDownloadConditionForceInvalidWheel, channel);
@@ -69,10 +64,10 @@ int Condition::UpdateForce(long channel, long forceNumber, unsigned char type, u
     force.p.condition[0].coefficientPos = coeffPos;
     force.p.condition[1] = force.p.condition[0];
 
-    ret = LGUpdateForceEffect(ConditionGetEffectID(this, channel, forceNumber), &force);
+    ret = LGUpdateForceEffect(EffectID[channel][forceNumber], &force);
     if (ret < 0) {
         OSReport(kUpdateConditionForceError, channel, ret);
-        ConditionGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+        EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
     }
 
     return ret;

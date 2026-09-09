@@ -12,11 +12,6 @@ static const char kDownloadConstantForceError[] = "ERROR: DownloadForce(constant
 static const char kDownloadConstantForceInvalidWheel[] = "ERROR: Trying to download a constant force to channel %d but wheel has not been opened.\n";
 static const char kUpdateConstantForceError[] = "ERROR: UpdateForce(constant force) on channel %d returned %d\n";
 
-static inline unsigned long &ConstantGetEffectID(Force *self, int channel, int forceNumber) {
-    char *base = reinterpret_cast<char *>(self) + 0x80;
-    return *reinterpret_cast<unsigned long *>(base + channel * 32 + forceNumber * 4);
-}
-
 Constant::Constant() : Force() {}
 
 int Constant::DownloadForce(long channel, long forceNumber, unsigned long & handle, unsigned long duration, unsigned long startDelay, short magnitude, unsigned short direction, unsigned long attackTime, unsigned long fadeTime, unsigned char attackLevel, unsigned char fadeLevel) {
@@ -24,7 +19,7 @@ int Constant::DownloadForce(long channel, long forceNumber, unsigned long & hand
     int ret;
 
     ret = 0;
-    if (ConstantGetEffectID(this, channel, forceNumber) != static_cast<unsigned long>(-1)) {
+    if (EffectID[channel][forceNumber] != static_cast<unsigned long>(-1)) {
         Destroy(channel, forceNumber);
     }
 
@@ -40,10 +35,10 @@ int Constant::DownloadForce(long channel, long forceNumber, unsigned long & hand
         force.p.constant.envelope.attackLevel = attackLevel;
         force.p.constant.envelope.fadeLevel = fadeLevel;
 
-        ret = LGDownloadForceEffect(handle, &ConstantGetEffectID(this, channel, forceNumber), &force);
+        ret = LGDownloadForceEffect(handle, &EffectID[channel][forceNumber], &force);
         if (ret < 0) {
             OSReport(kDownloadConstantForceError, channel, ret);
-            ConstantGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+            EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
         }
     } else {
         OSReport(kDownloadConstantForceInvalidWheel, channel);
@@ -67,10 +62,10 @@ int Constant::UpdateForce(long channel, long forceNumber, unsigned long duration
     force.p.constant.envelope.attackLevel = attackLevel;
     force.p.constant.envelope.fadeLevel = fadeLevel;
 
-    ret = LGUpdateForceEffect(ConstantGetEffectID(this, channel, forceNumber), &force);
+    ret = LGUpdateForceEffect(EffectID[channel][forceNumber], &force);
     if (ret < 0) {
         OSReport(kUpdateConstantForceError, channel, ret);
-        ConstantGetEffectID(this, channel, forceNumber) = static_cast<unsigned long>(-1);
+        EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
     }
 
     return ret;

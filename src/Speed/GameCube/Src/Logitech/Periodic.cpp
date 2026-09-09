@@ -12,21 +12,14 @@ static const char kDownloadPeriodicForceError[] = "ERROR: DownloadForce(periodic
 static const char kDownloadPeriodicForceInvalidWheel[] = "ERROR: Trying to download a periodic force to channel %d but wheel has not been opened.\n";
 static const char kUpdatePeriodicForceError[] = "ERROR: UpdateForce(periodic force) on channel %d returned %d\n";
 
-static inline unsigned long &PeriodicGetEffectID(Force *self, int channel, int forceNumber) {
-    char *base = reinterpret_cast<char *>(self) + 0x80;
-    return *reinterpret_cast<unsigned long *>(base + channel * 32 + forceNumber * 4);
-}
-
 Periodic::Periodic() : Force() {}
 
 int Periodic::DownloadForce(long channel, long forceNumber, unsigned long & handle, unsigned char type, unsigned long duration, unsigned long startDelay, unsigned char magnitude, unsigned short direction, unsigned short period, unsigned short phase, short offset, unsigned long attackTime, unsigned long fadeTime, unsigned char attackLevel, unsigned char fadeLevel) {
     LGForceEffect force;
     int ret;
-    int slot;
     unsigned long *effectId;
 
-    slot = forceNumber * 4 + channel * 32;
-    effectId = reinterpret_cast<unsigned long *>(reinterpret_cast<char *>(this) + 0x80 + slot);
+    effectId = &EffectID[channel][forceNumber];
     ret = 0;
     if (*effectId != static_cast<unsigned long>(-1)) {
         Destroy(channel, forceNumber);
@@ -62,12 +55,8 @@ int Periodic::DownloadForce(long channel, long forceNumber, unsigned long & hand
 int Periodic::UpdateForce(long channel, long forceNumber, unsigned char type, unsigned long duration, unsigned long startDelay, unsigned char magnitude, unsigned short direction, unsigned short period, unsigned short phase, short offset, unsigned long attackTime, unsigned long fadeTime, unsigned char attackLevel, unsigned char fadeLevel) {
     LGForceEffect force;
     int ret;
-    int slot;
-    unsigned long *base;
 
     memset(&force, 0, sizeof(force));
-    slot = forceNumber * 4 + channel * 32;
-    base = reinterpret_cast<unsigned long *>(reinterpret_cast<char *>(this) + 0x80);
     force.type = type;
     force.p.periodic.offset = offset;
     force.duration = duration;
@@ -81,10 +70,10 @@ int Periodic::UpdateForce(long channel, long forceNumber, unsigned char type, un
     force.p.periodic.envelope.attackLevel = attackLevel;
     force.p.periodic.envelope.fadeLevel = fadeLevel;
 
-    ret = LGUpdateForceEffect(*reinterpret_cast<unsigned long *>(reinterpret_cast<char *>(base) + slot), &force);
+    ret = LGUpdateForceEffect(EffectID[channel][forceNumber], &force);
     if (ret < 0) {
         OSReport(kUpdatePeriodicForceError, channel, ret);
-        *reinterpret_cast<unsigned long *>(reinterpret_cast<char *>(base) + slot) = static_cast<unsigned long>(-1);
+        EffectID[channel][forceNumber] = static_cast<unsigned long>(-1);
     }
 
     return ret;
