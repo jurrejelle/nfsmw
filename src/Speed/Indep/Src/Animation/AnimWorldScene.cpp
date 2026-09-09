@@ -200,30 +200,33 @@ void ControlWorldAnim(unsigned int fAnimTreeNameHash, float fTimeSet, bool fAnim
 }
 
 void StartWorldAnimations() {
-    if (!DisableWorldAnimations && !AnimCfg_DisableWorldAnimations) {
-        TheWorldAnimInstanceDirectory.Init();
-        CAnimWorldScene *pscene = TheAnimPlayer.GetWorldAnimScene();
-        if (!pscene) {
-            TheAnimPlayer.InitWorldAnimScene();
-        }
-        pscene = TheAnimPlayer.GetWorldAnimScene();
-        if (pscene) {
-            bPList<WorldAnimInstance> &directory_list = TheWorldAnimInstanceDirectory.GetInstanceList();
-            bPNode *node = directory_list.GetHead();
-            while (node != directory_list.EndOfList()) {
-                WorldAnimInstance *instance = reinterpret_cast<WorldAnimInstance *>(node->GetObject());
-                bMatrix4 location_matrix;
-                bIdentity(&location_matrix);
-                location_matrix.v3 = instance->instance_matrix.v3;
-                CWorldAnimEntityTree *tree_instance = pscene->InstantiateAnimTree(instance);
-                node = node->GetNext();
-            }
-            ControlWorldAnim(bStringHash("EN_TollBoothArm_01"), 0.0f, true, true);
-            ControlWorldAnim(bStringHash("EN_TollBoothArm_02"), 0.0f, true, true);
-            ControlWorldAnim(bStringHash("EN_TollBoothArm_03"), 0.0f, true, true);
-            ControlWorldAnim(bStringHash("EN_TollBoothArm_04"), 0.0f, true, true);
-        }
+    if (DisableWorldAnimations || AnimCfg_DisableWorldAnimations) {
+        return;
     }
+
+    TheWorldAnimInstanceDirectory.Init();
+    CAnimWorldScene *pscene = TheAnimPlayer.GetWorldAnimScene();
+    if (!pscene) {
+        TheAnimPlayer.InitWorldAnimScene();
+    }
+    pscene = TheAnimPlayer.GetWorldAnimScene();
+    if (!pscene) {
+        return;
+    }
+
+    CAnimWorldScene &world_animation_scene = *pscene;
+    bPList<WorldAnimInstance> &directory_list = TheWorldAnimInstanceDirectory.GetInstanceList();
+    for (bPNode *node = directory_list.GetHead(); node != directory_list.EndOfList(); node = node->GetNext()) {
+        WorldAnimInstance *instance = reinterpret_cast<WorldAnimInstance *>(node->GetObject());
+        bMatrix4 location_matrix;
+        bIdentity(&location_matrix);
+        location_matrix.v3 = instance->instance_matrix.v3;
+        CWorldAnimEntityTree *tree_instance = world_animation_scene.InstantiateAnimTree(instance);
+    }
+    ControlWorldAnim(bStringHash("EN_TollBoothArm_01"), 0.0f, true, true);
+    ControlWorldAnim(bStringHash("EN_TollBoothArm_02"), 0.0f, true, true);
+    ControlWorldAnim(bStringHash("EN_TollBoothArm_03"), 0.0f, true, true);
+    ControlWorldAnim(bStringHash("EN_TollBoothArm_04"), 0.0f, true, true);
 }
 
 void ResetWorldAnimations() {

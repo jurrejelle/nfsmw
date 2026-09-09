@@ -86,6 +86,8 @@ void CWorldAnimEntity::EndianSwapEntityData(void *data, int size) {
     bPlatEndianSwap(&info->mLODZ);
     bPlatEndianSwap(&info->mAnimTreeHash);
     bPlatEndianSwap(&info->mAnimNameHash);
+    bPlatEndianSwap(&info->mAnimContentFlags);
+    bPlatEndianSwap(&info->mParentIndex);
     bPlatEndianSwap(&info->mLocalMatrix);
 #endif
 }

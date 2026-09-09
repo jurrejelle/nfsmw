@@ -749,17 +749,18 @@ void CAnimScene::AnimatedCars_Bind() {
     }
 
     for (int i = 0; i < 16; i++) {
-        if (gCarAnimationStates[i].CarIndex >= 0) {
+        int car_index = gCarAnimationStates[i].CarIndex;
+        if (car_index >= 0) {
+            IRigidBody *irb;
+            IInput *pInput;
             gCarAnimationStates[i].mIVehicle->SetSpeed(0.0f);
 
-            IRigidBody *irb;
             if (gCarAnimationStates[i].mIVehicle->QueryInterface(&irb)) {
                 UMath::Vector3 zeroVec = {};
                 irb->SetLinearVelocity(zeroVec);
                 irb->SetAngularVelocity(zeroVec);
             }
 
-            IInput *pInput;
             if (gCarAnimationStates[i].mIVehicle->QueryInterface(&pInput)) {
                 pInput->SetControlHandBrake(1.0f);
                 pInput->SetControlGas(0.0f);
