@@ -354,7 +354,7 @@ void LGWheels::PlayDamperForce(long channel, short coefficient) {
                 return;
             }
 
-            ret = condition.UpdateForce(channel, 1, 8, static_cast<unsigned long>(-1), 0, 0, 0xFF, 0xFF, 0xFF, coefficient, coefficient);
+            ret = condition.UpdateForce(channel, 1, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, coefficient, coefficient);
             if (ret < 0) {
                 return;
             }
@@ -364,12 +364,12 @@ void LGWheels::PlayDamperForce(long channel, short coefficient) {
         }
 
         if (condition.EffectID[channel][1] == static_cast<unsigned long>(-1)) {
-            ret = condition.DownloadForce(channel, 1, wheels.WheelHandles[channel], 8, static_cast<unsigned long>(-1), 0, 0, 0xFF, 0xFF, 0xFF, coefficient, coefficient);
+            ret = condition.DownloadForce(channel, 1, wheels.WheelHandles[channel], 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, coefficient, coefficient);
         } else if (SameDamperForceParams(channel, coefficient)) {
             condition.Start(channel, 1);
             return;
         } else {
-            ret = condition.UpdateForce(channel, 1, 8, static_cast<unsigned long>(-1), 0, 0, 0xFF, 0xFF, 0xFF, coefficient, coefficient);
+            ret = condition.UpdateForce(channel, 1, 8, static_cast<unsigned long>(-1), 0, 0, 0, 0xFF, 0xFF, coefficient, coefficient);
         }
 
         if (ret >= 0) {
