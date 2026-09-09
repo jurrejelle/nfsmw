@@ -135,6 +135,7 @@ int ActualReadJoystickData() {
                 int slot = 0;
                 short data;
                 unsigned short buttons;
+                int pad_state;
 
                 bMemSet(joy_data, 0xFF, sizeof(JoyData));
 
@@ -148,26 +149,29 @@ int ActualReadJoystickData() {
                           ((buttons >> 11) & 1) << 3 | ((buttons >> 4) & 1) << 4 | ((buttons >> 12) & 1) << 5 |
                           ((buttons >> 3) & 1) << 8 | ((buttons >> 2) & 1) << 9 | ((buttons >> 0) & 1) << 10 |
                           ((buttons >> 1) & 1) << 11);
-                    data = static_cast<int>(joy_data->padSTATUS.substickX * 2.15f) + 0x80;
-                    if (data & 0x8000) {
-                        data = 0;
+                    pad_state = static_cast<int>(joy_data->padSTATUS.substickX * 2.15f) + 0x80;
+                    if (pad_state & 0x8000) {
+                        pad_state = 0;
                     }
+                    data = pad_state;
                     if (data > 0xFF) {
                         data = 0xFF;
                     }
                     joy_data->ThePadData[0].AnalogRightX = data;
-                    data = 0x80 - static_cast<int>(joy_data->padSTATUS.substickY * 2.15f);
-                    if (data & 0x8000) {
-                        data = 0;
+                    pad_state = 0x80 - static_cast<int>(joy_data->padSTATUS.substickY * 2.15f);
+                    if (pad_state & 0x8000) {
+                        pad_state = 0;
                     }
+                    data = pad_state;
                     if (data > 0xFF) {
                         data = 0xFF;
                     }
                     joy_data->ThePadData[0].AnalogRightY = data;
-                    data = static_cast<int>(joy_data->padSTATUS.stickX * 1.75f) + 0x80;
-                    if (data & 0x8000) {
-                        data = 0;
+                    pad_state = static_cast<int>(joy_data->padSTATUS.stickX * 1.75f) + 0x80;
+                    if (pad_state & 0x8000) {
+                        pad_state = 0;
                     }
+                    data = pad_state;
                     if (data > 0xFF) {
                         data = 0xFF;
                     }
