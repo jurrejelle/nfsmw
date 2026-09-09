@@ -621,13 +621,13 @@ VMStatsManager gVMStatsManager_LS("LoadScreen Streamer");
 VMStatsManager gVMStatsManager_IG("InGame");
 
 void VMStats::Init() {
-    mServiceTimeMax = 0;
-    mServiceTimeAvg = 0.0f;
-    mServiceTimeMin = static_cast<unsigned int>(-1);
     mNumPageFaults = 0;
     mNumWritebacks = 0;
     mElapsedTime = 0.0f;
     mServiceTimeMicroSecs = 0;
+    mServiceTimeMin = static_cast<unsigned int>(-1);
+    mServiceTimeMax = 0;
+    mServiceTimeAvg = 0.0f;
 }
 
 void VMStatsManager::Init(const char *name) {
