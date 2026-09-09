@@ -166,11 +166,8 @@ void WTriggerManager::Init() {
     Restart();
 
     for (unsigned int i = 0; i < WCollisionAssets::Get().NumTriggers(); i++) {
-        WTrigger &trig = WCollisionAssets::Get().Trigger(i);
-
-        if ((trig.fFlags & 0x200) != 0) {
-            WTrigger &trig2 = WCollisionAssets::Get().Trigger(i);
-            trig2.fFlags &= ~0x400;
+        if ((WCollisionAssets::Get().Trigger(i).fFlags & 0x200) != 0) {
+            WCollisionAssets::Get().Trigger(i).fFlags &= ~0x400;
         }
     }
 }
@@ -184,8 +181,7 @@ void WTriggerManager::SubmitForFire(WTrigger &trig, HSIMABLE hSimable) {
     if ((trig.fFlags & 0x8000) != 0) {
         ISimable *iSimable = ISimable::FindInstance(hSimable);
         if (iSimable != nullptr) {
-            FireOnExitRec rec(trig, hSimable);
-            this->fgFireOnExitList->insert(rec);
+            this->fgFireOnExitList->insert(FireOnExitRec(trig, hSimable));
         } else {
             trig.FireEvents(hSimable);
         }
@@ -409,8 +405,8 @@ bool WTriggerManager::CheckCollideSRB(const IRigidBody *srBody, const WTrigger *
 }
 
 inline float DistanceSquared_XZ(const UMath::Vector3 &a, const UMath::Vector3 &b) {
-    float z = a.z - b.z;
     float x = a.x - b.x;
+    float z = a.z - b.z;
     return x * x + z * z;
 }
 
@@ -423,8 +419,9 @@ void WTriggerManager::GetIntersectingTriggers(const UMath::Vector3 &pt, float ra
     for (unsigned int *iter = nodeInds.begin(); iter != nodeInds.end(); ++iter) {
         WGridNode *gridNode = grid.fNodes[*iter];
         if (gridNode != nullptr) {
+            const unsigned int *indPtr;
             WGridNode::iterator eIter(gridNode, WGrid_kTrigger);
-            while (const unsigned int *indPtr = eIter.GetIndPtr()) {
+            while ((indPtr = eIter.GetIndPtr()) != nullptr) {
                 unsigned int ind = *indPtr;
                 WTrigger &trig = WCollisionAssets::Get().Trigger(ind);
                 if (trig.fIterStamp != this->fIterCount) {
@@ -463,7 +460,8 @@ void WTriggerManager::ClearAllFireOnExit() {
 void WTriggerManager::Update(float dT) {
     this->fProcessingStimulus = 1;
     IRigidBody::List::const_iterator enditer = IRigidBody::GetList().end();
-    for (IRigidBody::List::const_iterator iter = IRigidBody::GetList().begin(); iter != enditer; ++iter) {
+    IRigidBody::List::const_iterator iter;
+    for (iter = IRigidBody::GetList().begin(); iter != enditer; ++iter) {
         IRigidBody *rigidBody = *iter;
         if (rigidBody->IsSimple()) {
             this->ProcessSRB(rigidBody, dT);
@@ -472,9 +470,8 @@ void WTriggerManager::Update(float dT) {
         }
     }
     this->fProcessingStimulus = 2;
-    FireOnExitList::iterator iter = this->fgFireOnExitList->begin();
-    while (iter != this->fgFireOnExitList->end()) {
-        const FireOnExitRec &rec = *iter;
+    for (FireOnExitList::iterator iter = this->fgFireOnExitList->begin(); iter != this->fgFireOnExitList->end();) {
+        FireOnExitRec &rec = const_cast<FireOnExitRec &>(*iter);
         ISimable *iSimable = ISimable::FindInstance(rec.mhSimable);
         if (iSimable != nullptr) {
             IRigidBody *iRigidBody = iSimable->GetRigidBody();
