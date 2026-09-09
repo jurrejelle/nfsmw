@@ -1859,8 +1859,8 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
             float avoidable_delta_offset = bCross(&avoidable_velocity, reinterpret_cast<const bVector2 *>(&cookie.Forward));
 
             if (closest_cookie < closest_avoidable && dist_ahead > (my_extent + his_extent)) {
-                this->fOccludingTrailSpeed = trailing_speed;
                 closest_avoidable = closest_cookie;
+                this->fOccludingTrailSpeed = trailing_speed;
             }
 
             UMath::Vector3 cut_to_position = point_of_impact;
