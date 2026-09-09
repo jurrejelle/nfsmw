@@ -252,10 +252,8 @@ void LGWheels::StopSpringForce(long channel) {
 }
 
 bool LGWheels::SameSpringForceParams(long channel, signed char offset, unsigned char saturation, short coefficient) {
-    const char *channelParams = reinterpret_cast<const char *>(this) + channel * 4;
-    return *reinterpret_cast<const signed char *>(channelParams + 0x167C) == offset &&
-           *reinterpret_cast<const unsigned char *>(channelParams + 0x167D) == saturation &&
-           *reinterpret_cast<const short *>(channelParams + 0x167E) == coefficient;
+    return SpringForceParams[channel].offset == offset && SpringForceParams[channel].saturation == saturation &&
+           SpringForceParams[channel].coefficient == coefficient;
 }
 
 void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short direction) {
@@ -631,10 +629,8 @@ void LGWheels::StopSurfaceEffect(long channel) {
 }
 
 bool LGWheels::SameSurfaceEffectParams(long channel, unsigned char type, unsigned char magnitude, unsigned short period) {
-    const char *channelParams = reinterpret_cast<const char *>(this) + channel * 4;
-    return *reinterpret_cast<const unsigned char *>(channelParams + 0x16D4) == type &&
-           *reinterpret_cast<const unsigned char *>(channelParams + 0x16D5) == magnitude &&
-           *reinterpret_cast<const unsigned short *>(channelParams + 0x16D6) == period;
+    return SurfaceEffectParams[channel].type == type && SurfaceEffectParams[channel].magnitude == magnitude &&
+           SurfaceEffectParams[channel].period == period;
 }
 
 void LGWheels::PlayCarAirborne(long channel) {
