@@ -1005,7 +1005,6 @@ bool WCollisionMgr::GetBarrierNormal(const WCollisionInstanceCacheList &instList
     return cInfo.HitSomething();
 }
 
-// UNSOLVED https://decomp.me/scratch/hGkzc
 void WCollisionMgr::GetBarrierList(WCollisionBarrierList &barrierList, const WCollisionInstanceCacheList &instList, const UMath::Vector3 &pos,
                                    float radius) {
     float radiusSq = radius * radius;
