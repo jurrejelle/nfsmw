@@ -568,7 +568,7 @@ void WRoadNetwork::GetSegmentCurveStep(const UMath::Vector3 &start, const UMath:
 
     roadSpline.BuildSplineEx(start, UVector3(start) + UVector3(start_control), end, UVector3(end) + UVector3(end_control));
     roadSpline.EvaluateSpline(u, tempPos);
-    point = UMath::Vector4To3(tempPos);
+    point = reinterpret_cast<UMath::Vector3 &>(tempPos);
 }
 
 WRoadNav::WRoadNav() {
