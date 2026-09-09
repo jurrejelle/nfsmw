@@ -3,6 +3,7 @@
 #include "Speed/Indep/Libs/Support/Utility/UMath.h"
 #include "Speed/Indep/Src/World/WCollisionMgr.h"
 #include "Speed/Indep/Src/World/WWorld.h"
+#include "Speed/Indep/Src/World/WWorldMath.h"
 #include "Speed/Indep/bWare/Inc/bMath.hpp"
 
 // TODO move
@@ -189,8 +190,10 @@ void WCollider::PrepareRegion(unsigned int updateMask) {
 }
 
 bool WCollider::IsEmpty() const {
-    // TODO fObbList.empty()?
     return this->fInstanceCacheList.empty() && this->fBarrierList.empty();
+    // retail's DWARF carries a third, code-free vector<const WCollisionObject *>::empty()
+    // frame after these two, so the obb list was tested here and the result went nowhere
+    this->fObbList.empty();
 }
 
 void WCollider::Clear() {
@@ -298,14 +301,9 @@ void WCollisionObject::MakeMatrix(UMath::Matrix4 &m, bool addXLate) const {
 }
 
 float WCollisionInstance::CalcSphericalRadius() const {
-    // TODO
-    // float maxExtent = WWorldMath::wmax(fInvMatRow2Length.w, fInvPosRadius.w);
-    // maxExtent = WWorldMath::wmax(maxExtent, fHeight);
-    // return WWorldMath::wmax(maxExtent, fInvMatRow0Width.w);
-
-    float maxExtent = (this->fInvMatRow2Length.w < this->fInvPosRadius.w) ? this->fInvPosRadius.w : this->fInvMatRow2Length.w;
-    maxExtent = (this->fHeight < maxExtent) ? maxExtent : this->fHeight;
-    return (this->fInvMatRow0Width.w < maxExtent) ? maxExtent : this->fInvMatRow0Width.w;
+    float maxExtent = WWorldMath::wmax(this->fInvPosRadius.w, this->fInvMatRow2Length.w);
+    maxExtent = WWorldMath::wmax(maxExtent, this->fHeight);
+    return WWorldMath::wmax(maxExtent, this->fInvMatRow0Width.w);
 }
 
 // STRIPPED
