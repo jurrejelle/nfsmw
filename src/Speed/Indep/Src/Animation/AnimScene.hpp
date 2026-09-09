@@ -154,7 +154,7 @@ class CAnimScene : public ICEScene, public bTNode<CAnimScene> {
         return mTimeElapsed > time;
     }
     bool IsFinished() {
-        return mTimeElapsed >= mTimeTotalLength;
+        return GetTimeElapsed() > GetTimeTotalLength();
     }
     void SetCameraControl(bool enable) {
         mControllingCamera = enable;

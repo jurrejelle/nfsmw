@@ -93,7 +93,7 @@ void CWorldAnimCtrl::Cleanup() {
     m_animPart.Purge();
     for (int i = 0; i < 4; i++) {
         if (m_pFnAnim[i]) {
-            EAGL4Anim::MemoryPoolManager::DeleteFnAnim(m_pFnAnim[i]);
+            EAGL4Anim::AnimBank::DeleteFnAnim(m_pFnAnim[i]);
             m_pFnAnim[i] = nullptr;
         }
     }

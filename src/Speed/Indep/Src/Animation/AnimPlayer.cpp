@@ -133,10 +133,12 @@ void AnimLoader_LoadResourceFile(const char *filename) {
 void AnimLoader_NextStep() {
     if (gAnimLoader_InProgress) {
         if (gAnimLoader_CurSharedFilePosition < static_cast<int>(gAnimLoader_Info.mSharedFileCount)) {
-            AnimLoader_LoadResourceFile(TheAnimDirectory->GetFileName(gAnimLoader_CurSharedFilePosition + gAnimLoader_Info.mSharedFileStartIndex));
+            char *filename = TheAnimDirectory->GetFileName(gAnimLoader_CurSharedFilePosition + gAnimLoader_Info.mSharedFileStartIndex);
+            AnimLoader_LoadResourceFile(filename);
             gAnimLoader_CurSharedFilePosition++;
         } else if (gAnimLoader_CurSceneFilePosition < static_cast<int>(gAnimLoader_Info.mSceneFileCount)) {
-            AnimLoader_LoadResourceFile(TheAnimDirectory->GetFileName(gAnimLoader_CurSceneFilePosition + gAnimLoader_Info.mSceneFileStartIndex));
+            char *filename = TheAnimDirectory->GetFileName(gAnimLoader_CurSceneFilePosition + gAnimLoader_Info.mSceneFileStartIndex);
+            AnimLoader_LoadResourceFile(filename);
             gAnimLoader_CurSceneFilePosition++;
         } else {
             gAnimLoader_InProgress = false;
@@ -546,13 +548,12 @@ void StartCopDoorAnim(int door, float startPos, float AnimLength, float endPos) 
 
 void UpdateCopDoorPositions(float time) {
     for (int door = 0; door < 4; door++) {
-        float animLength = gCopCarDoorAnim_AnimLength[door];
-        if (animLength != 0.0f) {
+        if (gCopCarDoorAnim_AnimLength[door] != 0.0f) {
             gCopCarDoorAnim_CurrentTime[door] = gCopCarDoorAnim_CurrentTime[door] + time;
             if (gCopCarDoorAnim_CurrentTime[door] <= 0.0f) {
                 NISCopCarDoorOpenAmount[door] = gCopCarDoorAnim_StartPos[door];
-            } else if (gCopCarDoorAnim_CurrentTime[door] < animLength) {
-                float ratio = gCopCarDoorAnim_CurrentTime[door] / animLength;
+            } else if (gCopCarDoorAnim_CurrentTime[door] < gCopCarDoorAnim_AnimLength[door]) {
+                float ratio = gCopCarDoorAnim_CurrentTime[door] / gCopCarDoorAnim_AnimLength[door];
                 NISCopCarDoorOpenAmount[door] = gCopCarDoorAnim_StartPos[door] + ratio * gCopCarDoorAnim_Delta[door];
             } else {
                 gCopCarDoorAnim_AnimLength[door] = 0.0f;

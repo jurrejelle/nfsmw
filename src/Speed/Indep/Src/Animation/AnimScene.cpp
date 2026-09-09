@@ -95,7 +95,9 @@ CAnimSceneData *CreateAnimSceneData(bChunk *nested_chunk, bChunk *sub_chunk) {
     CAnimSceneData *anim_scene_data = BNEW CAnimSceneData(nested_chunk);
 
     if (anim_scene_data) {
-        anim_scene_data->InitHeaderData(sub_chunk + 1, sub_chunk->Size);
+        void *data = sub_chunk->GetData();
+        unsigned int size = sub_chunk->GetSize();
+        anim_scene_data->InitHeaderData(data, size);
         g_loadedAnimSceneDataList.AddTail(anim_scene_data);
         return anim_scene_data;
     }
@@ -384,11 +386,9 @@ void CAnimScene::JumpToEnd() {
 }
 
 void CAnimScene::SetTime(float time) {
-    bPNode *node = mInstancedAnimEntityList.GetTail();
-    while (node != mInstancedAnimEntityList.EndOfList()) {
+    for (bPNode *node = mInstancedAnimEntityList.GetTail(); node != mInstancedAnimEntityList.EndOfList(); node = node->GetPrev()) {
         IAnimEntity *iae = reinterpret_cast<IAnimEntity *>(node->GetObject());
         iae->SetTime(time);
-        node = node->GetPrev();
     }
     AnimatedCars_SetTime(time);
     mTimeElapsed = time;
@@ -420,22 +420,19 @@ void CAnimScene::UpdateTime(float time_step) {
 #endif
     }
 
-    bPNode *node = mInstancedAnimEntityList.GetTail();
-    while (node != mInstancedAnimEntityList.EndOfList()) {
+    for (bPNode *node = mInstancedAnimEntityList.GetTail(); node != mInstancedAnimEntityList.EndOfList(); node = node->GetPrev()) {
         IAnimEntity *iae = reinterpret_cast<IAnimEntity *>(node->GetObject());
         iae->UpdateTimeStep(mTimeDelta);
-        node = node->GetPrev();
     }
 
-    int scene_type = mAnimSceneData->GetSceneInfo()->SceneType;
-    if (scene_type == 0) {
-        if (GetTimeElapsed() > GetTimeTotalLength()) {
+    if (mAnimSceneData->GetSceneInfo()->SceneType == 0) {
+        if (IsFinished()) {
             if (IsControllingCamera()) {
-                mControllingCamera = false;
+                SetCameraControl(false);
             }
         }
-    } else if (scene_type == 2 || scene_type == 4) {
-        if (GetTimeElapsed() > GetTimeTotalLength()) {
+    } else if (mAnimSceneData->GetSceneInfo()->SceneType == 2 || mAnimSceneData->GetSceneInfo()->SceneType == 4) {
+        if (IsFinished()) {
             IsControllingCamera();
         }
     }
@@ -445,11 +442,9 @@ void CAnimScene::UpdateTime(float time_step) {
 }
 
 void CAnimScene::RenderEffects(eView *view, int is_reflection) {
-    bPNode *node = mInstancedAnimEntityList.GetTail();
-    while (node != mInstancedAnimEntityList.EndOfList()) {
+    for (bPNode *node = mInstancedAnimEntityList.GetTail(); node != mInstancedAnimEntityList.EndOfList(); node = node->GetPrev()) {
         IAnimEntity *iae = reinterpret_cast<IAnimEntity *>(node->GetObject());
         iae->RenderEffects(view, is_reflection);
-        node = node->GetPrev();
     }
 }
 
@@ -797,16 +792,13 @@ void CAnimScene::AnimatedCars_UnBind() {
 
 IAnimEntity *CAnimScene::GetAnimEntityWithModelName(const char *name) {
     uint32 hashID = bStringHash(name);
-    bPNode *node = mInstancedAnimEntityList.GetTail();
-    while (node != mInstancedAnimEntityList.EndOfList()) {
+    for (bPNode *node = mInstancedAnimEntityList.GetTail(); node != mInstancedAnimEntityList.EndOfList(); node = node->GetPrev()) {
         IAnimEntity *iae = reinterpret_cast<IAnimEntity *>(node->GetObject());
         if (iae->GetWorldModel()) {
-            eModel *model = iae->GetWorldModel()->GetModel();
-            if (model->GetNameHash() == hashID) {
+            if (iae->GetWorldModel()->GetModel()->GetNameHash() == hashID) {
                 return iae;
             }
         }
-        node = node->GetPrev();
     }
     return nullptr;
 }
@@ -831,12 +823,10 @@ void CAnimScene::CreateAnimEntities() {
 }
 
 void CAnimScene::ClearAnimEntities() {
-    bPNode *node = mInstancedAnimEntityList.GetTail();
-    while (node != mInstancedAnimEntityList.EndOfList()) {
+    for (bPNode *node = mInstancedAnimEntityList.GetTail(); node != mInstancedAnimEntityList.EndOfList(); node = node->GetPrev()) {
         IAnimEntity *iae = reinterpret_cast<IAnimEntity *>(node->GetObject());
         iae->Purge();
         delete iae;
-        node = node->GetPrev();
     }
     while (!mInstancedAnimEntityList.IsEmpty()) {
         mInstancedAnimEntityList.RemoveTail();

@@ -118,12 +118,11 @@ void CAnimSkeleton::DynamicLoadResolve() {
 void CAnimSkeleton::PrintfSkeletonBoneData() {}
 
 CAnimSkeleton *GetSkeletonFromList(uint32 namehash) {
-    CAnimSkeleton *skel_list = g_loadedSkeletonList.GetHead();
-    while (skel_list != g_loadedSkeletonList.EndOfList()) {
-        if (skel_list->GetSkeletonName() && bStringHash(skel_list->GetSkeletonName()) == namehash) {
+    unsigned int skel_hash;
+    for (CAnimSkeleton *skel_list = g_loadedSkeletonList.GetHead(); skel_list != g_loadedSkeletonList.EndOfList(); skel_list = skel_list->GetNext()) {
+        if (skel_list->GetSkeletonName() && (skel_hash = bStringHash(skel_list->GetSkeletonName())) == namehash) {
             return skel_list;
         }
-        skel_list = skel_list->GetNext();
     }
 
     return nullptr;
