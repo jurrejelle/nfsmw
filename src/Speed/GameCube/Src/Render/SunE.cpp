@@ -147,11 +147,11 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     sin_angle = bSin(angle);
     cos_angle = bCos(angle);
 
-    sun_vis_poly_fix_ini[0].z = 1.0f;
+    poly->Vertices[0].z = 1.0f;
     poly->Vertices[1].z = 1.0f;
-    poly->Vertices[2].z = sun_vis_poly_fix_ini[0].z;
-    poly->Vertices[3].z = sun_vis_poly_fix_ini[0].z;
-    poly->Vertices[0].z = sun_vis_poly_fix_ini[0].z;
+    poly->Vertices[2].z = 1.0f;
+    poly->Vertices[3].z = 1.0f;
+    sun_vis_poly_fix_ini[0].z = 1.0f;
     diagonal1 = half_size * sin_angle;
     diagonal0 = half_size * cos_angle;
     sum = diagonal1 + diagonal0;
