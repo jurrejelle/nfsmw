@@ -1885,9 +1885,10 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
             float left_projection = bCross(&left_diagonal, reinterpret_cast<const bVector2 *>(&cookie.Forward));
             float avoidable_half_width = bAbs(right_projection);
             avoidable_half_width = bMax(avoidable_half_width, bAbs(left_projection));
+            avoidable_half_width = extra_width * close_factor + avoidable_half_width;
+
             float new_current_offset = approach_time * close_factor * (delta_offset * 0.2f) + current_offset;
             new_current_offset += bCross(&nav_forward, reinterpret_cast<const bVector2 *>(&cookie.Forward)) * 2.0f;
-            avoidable_half_width = extra_width * close_factor + avoidable_half_width;
             float hole_punch_safety_margin = close_factor;
             if (is_drag) {
                 hole_punch_safety_margin = close_factor * 0.8f;
