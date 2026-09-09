@@ -1054,8 +1054,7 @@ void WCollisionMgr::GetBarrierList(WCollisionBarrierList &barrierList, const WCo
                     UMath::RotateTranslate(UMath::Vector4To3(wBarrier.fPts[0]), t.fTransform, UMath::Vector4To3(wBarrier.fPts[0]));
                     UMath::RotateTranslate(UMath::Vector4To3(wBarrier.fPts[1]), t.fTransform, UMath::Vector4To3(wBarrier.fPts[1]));
 
-                    // TODO GetSurface is probably wrong
-                    const Attrib::Collection *collection = cArt->GetSurface(wBarrier.GetWSurface().Surface());
+                    const Attrib::Collection *collection = cInst.fCollisionArticle->GetSurface(wBarrier.GetWSurface().Surface());
                     WCollisionBarrierListEntry ble(wBarrier, collection, distsqr);
 
                     if (1) {
