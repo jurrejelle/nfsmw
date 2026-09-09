@@ -31,8 +31,8 @@ int Constant::DownloadForce(long channel, long forceNumber, unsigned long & hand
         force.p.constant.magnitude = magnitude;
         force.p.constant.direction = direction;
         force.p.constant.envelope.attackTime = attackTime;
-        force.p.constant.envelope.fadeTime = fadeTime;
         force.p.constant.envelope.attackLevel = attackLevel;
+        force.p.constant.envelope.fadeTime = fadeTime;
         force.p.constant.envelope.fadeLevel = fadeLevel;
 
         ret = LGDownloadForceEffect(handle, &EffectID[channel][forceNumber], &force);
@@ -51,15 +51,16 @@ int Constant::UpdateForce(long channel, long forceNumber, unsigned long duration
     LGForceEffect force;
     int ret;
 
+    ret = 0;
     memset(&force, 0, sizeof(force));
-    force.type = 0;
+    force.type = ret;
     force.duration = duration;
     force.startDelay = startDelay;
     force.p.constant.magnitude = magnitude;
     force.p.constant.direction = direction;
     force.p.constant.envelope.attackTime = attackTime;
-    force.p.constant.envelope.fadeTime = fadeTime;
     force.p.constant.envelope.attackLevel = attackLevel;
+    force.p.constant.envelope.fadeTime = fadeTime;
     force.p.constant.envelope.fadeLevel = fadeLevel;
 
     ret = LGUpdateForceEffect(EffectID[channel][forceNumber], &force);
