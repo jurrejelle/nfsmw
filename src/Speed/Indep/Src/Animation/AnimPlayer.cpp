@@ -87,12 +87,12 @@ void AnimLoader_Init() {
     gAnimLoader_MovingPointer = gAnimLoader_MemPointer;
 }
 
-void AnimLoader_IncrementAndAlignUp(int &ref, int size) {
-    ref += size;
-    int remainder = ref & 0xF;
-    if (remainder != 0) {
-        int temp = ref + 0x10;
-        ref = temp - remainder;
+void AnimLoader_IncrementAndAlignUp(int &pos, int size) {
+    pos += size;
+    int extra = pos & 0xF;
+    if (extra != 0) {
+        pos += 0x10;
+        pos -= extra;
     }
 }
 
@@ -468,6 +468,7 @@ bool CAnimPlayer::AreAllPaused() {}
 
 void CAnimPlayer::UpdateTime(float time_step) {
     if (mWorldAnimScene != nullptr) {
+        int size;
         mWorldAnimScene->UpdateTime(time_step);
     }
     UpdateCopDoorPositions(time_step);
@@ -485,9 +486,10 @@ bool CAnimPlayer::Init() {
 void CAnimPlayer::Purge() {}
 
 void CAnimPlayer::InitWorldAnimScene() {
+    int directory_size;
     if (!DisableWorldAnimations && !AnimCfg_DisableWorldAnimations) {
-        int numEntries = TheWorldAnimInstanceDirectory.GetNumInstanceEntries();
-        if (!mWorldAnimScene && numEntries > 0) {
+        directory_size = TheWorldAnimInstanceDirectory.GetNumInstanceEntries();
+        if (!mWorldAnimScene && directory_size > 0) {
             mWorldAnimScene = BNEW CAnimWorldScene();
         }
     }

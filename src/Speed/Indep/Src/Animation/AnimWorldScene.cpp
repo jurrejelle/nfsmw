@@ -176,8 +176,9 @@ CWorldAnimEntityTree *CAnimWorldScene::InstantiateAnimTree(WorldAnimInstance *in
 }
 
 void ControlWorldAnim(unsigned int fAnimTreeNameHash, float fTimeSet, bool fAnimPause, bool fAnimHide) {
+    CWorldAnimEntityTree *animTree;
     if (TheAnimPlayer.GetWorldAnimScene()) {
-        CWorldAnimEntityTree *animTree = TheAnimPlayer.GetWorldAnimScene()->GetAnimTreeFromHash(fAnimTreeNameHash);
+        animTree = TheAnimPlayer.GetWorldAnimScene()->GetAnimTreeFromHash(fAnimTreeNameHash);
         if (!animTree) {
             return;
         }

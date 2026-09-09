@@ -266,7 +266,7 @@ bool CAnimScene::IsBoundToGame() {
 
 bool CAnimScene::BindToGame() {
     if (!mIsBoundToGame) {
-        mControllingCamera = true;
+        SetCameraControl(true);
         NisScene *scene_info = mAnimSceneData->GetSceneInfo();
         mTimeStart = static_cast<float>(scene_info->StartFrame) * (1.0f / 30.0f);
         mTimeTotalLength = static_cast<float>(scene_info->VanishFrame) * (1.0f / 30.0f);
@@ -279,7 +279,7 @@ bool CAnimScene::BindToGame() {
 bool CAnimScene::UnBindToGame() {
     if (mIsBoundToGame) {
         if (IsControllingCamera()) {
-            mControllingCamera = false;
+            SetCameraControl(false);
         }
         AnimatedCars_UnBind();
         mIsBoundToGame = false;

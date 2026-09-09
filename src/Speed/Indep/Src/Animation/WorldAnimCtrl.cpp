@@ -121,7 +121,7 @@ int CWorldAnimCtrl::CreateFnAnimFromBank(EAGL4Anim::AnimBank *animBank, int anim
     m_pFnAnim[dof]->GetLength(m_animLength);
 
     if (m_pFnAnim[dof] != nullptr) {
-        m_isAllocated = 1;
+        SetAllocated();
         return 1;
     }
     return 0;
@@ -131,8 +131,8 @@ int CWorldAnimCtrl::CreateFnAnimFromNamehash(uint32 namehash, int dof) {
     EAGL4Anim::AnimBank *animBank = nullptr;
     int item_index = 0;
     if (GetAnimFromBankByNamehash(namehash, &animBank, &item_index)) {
-        CreateFnAnimFromBank(animBank, item_index, dof);
-        m_isAllocated = 1;
+        int res = CreateFnAnimFromBank(animBank, item_index, dof);
+        SetAllocated();
         return 1;
     }
     return 0;
