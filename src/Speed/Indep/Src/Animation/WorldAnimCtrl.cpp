@@ -196,19 +196,21 @@ int CWorldAnimCtrl::AdvanceAnimTime(float timestep) {
 
     float end_of_anim = m_flags & 0x40 ? GetLoopRangeScaledEnd() : m_animLength;
 
-    bool linear = m_flags & 8;
     bool triggered = m_flags & 0x800;
+    bool linear = m_flags & 8;
     bool loop = m_flags & 0x20 ? !triggered : false;
     bool pingpong = m_flags & 0x10;
+    bool range;
+    bool print_out_here;
 
     if (linear) {
         if (pingpong) {
-            ClearFlags(0x10);
+            m_flags &= ~0x10;
             pingpong = false;
         }
     } else {
         if (!pingpong) {
-            SetFlags(8);
+            m_flags |= 8;
             linear = true;
         }
     }
