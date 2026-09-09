@@ -152,25 +152,55 @@ bool LGWheels::IsConnected(long channel) {
 bool LGWheels::IsPlaying(long channel, long forceType) {
     switch (forceType) {
     case 0:
-        return condition.Playing[channel][0] != 0;
+        if (condition.Playing[channel][0] != 0) {
+            return true;
+        }
+        break;
     case 1:
-        return constant.Playing[channel][0] != 0;
+        if (constant.Playing[channel][0] != 0) {
+            return true;
+        }
+        break;
     case 2:
-        return condition.Playing[channel][1] != 0;
+        if (condition.Playing[channel][1] != 0) {
+            return true;
+        }
+        break;
     case 3:
-        return constant.Playing[channel][1] != 0;
+        if (constant.Playing[channel][1] != 0) {
+            return true;
+        }
+        break;
     case 4:
-        return periodic.Playing[channel][0] != 0;
+        if (periodic.Playing[channel][0] != 0) {
+            return true;
+        }
+        break;
     case 5:
-        return periodic.Playing[channel][1] != 0;
+        if (periodic.Playing[channel][1] != 0) {
+            return true;
+        }
+        break;
     case 6:
-        return periodic.Playing[channel][2] != 0;
+        if (periodic.Playing[channel][2] != 0) {
+            return true;
+        }
+        break;
     case 7:
-        return condition.Playing[channel][2] != 0;
+        if (condition.Playing[channel][2] != 0) {
+            return true;
+        }
+        break;
     case 8:
-        return periodic.Playing[channel][3] != 0;
+        if (periodic.Playing[channel][3] != 0) {
+            return true;
+        }
+        break;
     case 9:
-        return IsAirborne[channel] == 1;
+        if (IsAirborne[channel] == 1) {
+            return true;
+        }
+        break;
     }
 
     return false;
