@@ -3230,7 +3230,9 @@ bool WRoadNav::CanTrafficSpawn() {
         return false;
     }
 
-    // const bool player_or_racer;
+    // the initialiser is not observable: retail's DIE has no location and the
+    // variable costs no code, so only the name, type and position are known
+    const bool player_or_racer = this->fPathType == kPathPlayer || this->fPathType == kPathRacer;
     bool forward = (which_node == 1);
     bool inverted = segment->IsProfileInverted(which_node);
 
