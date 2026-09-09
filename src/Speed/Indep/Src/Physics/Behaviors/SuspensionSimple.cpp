@@ -463,8 +463,7 @@ float SuspensionSimple::Tire::UpdateLoaded(float lat_vel, float fwd_vel, float b
             ((this->mSpecs->DYNAMIC_GRIP().At(this->mAxleIndex) * this->mTractionBoost * pilot_factor * this->mLoad) / skid_speed) * this->mSlip;
         float groundfriction = this->mAppliedTorque / this->mRadius;
 
-        this->mLongitudeForce = dynamicfriction;
-        this->mLongitudeForce = UMath::Limit(this->mLongitudeForce, groundfriction);
+        this->mLongitudeForce = UMath::Limit(dynamicfriction, groundfriction);
     } else {
         this->mLongitudeForce = this->mAppliedTorque / this->mRadius;
     }
