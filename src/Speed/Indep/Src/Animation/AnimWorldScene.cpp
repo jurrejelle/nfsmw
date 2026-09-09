@@ -15,7 +15,9 @@ CAnimWorldScene::CAnimWorldScene() : mHandle(0) {
 
 void CAnimWorldScene::ClearAllAnimations() {
     while (!mInstancedAnimTreeList.IsEmpty()) {
-        delete mInstancedAnimTreeList.RemoveTail();
+        CWorldAnimEntityTree *tree = mInstancedAnimTreeList.GetTail();
+        tree->Remove();
+        delete tree;
     }
 }
 
@@ -40,7 +42,8 @@ void CAnimWorldScene::UpdateTime(float time_step) {
         for (CWorldAnimEntityTree *tree = mInstancedAnimTreeList.GetHead(); tree != mInstancedAnimTreeList.EndOfList(); tree = tree->GetNext()) {
             for (bPNode *node = tree->instantiated_world_anim_entities.GetHead(); node != tree->instantiated_world_anim_entities.EndOfList();
                  node = node->GetNext()) {
-                reinterpret_cast<IAnimEntity *>(node->GetpObject())->UpdateTimeStep(time_step);
+                CWorldAnimEntity *entity = reinterpret_cast<CWorldAnimEntity *>(node->GetObject());
+                entity->UpdateTimeStep(time_step);
             }
         }
     }

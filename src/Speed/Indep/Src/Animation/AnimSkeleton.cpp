@@ -153,7 +153,7 @@ int UnloaderEAGLSkeletons(bChunk *chunk) {
             struct bChunk *assoc_chunk = skel->GetAssociatedChunk();
 
             if (assoc_chunk == chunk) {
-                skel->Remove();
+                g_loadedSkeletonList.Remove(skel);
                 skel->Cleanup();
                 delete skel;
             }

@@ -49,12 +49,12 @@ void ResetCarAnimState(IVehicle *vehicle) {
 }
 
 CAnimSceneData *CAnimSceneData::FindAnimSceneData(uint32 anim_id) {
-    CAnimSceneData *scene_data = static_cast<CAnimSceneData *>(g_loadedAnimSceneDataList.GetHead());
-    while (scene_data != g_loadedAnimSceneDataList.EndOfList()) {
-        if (anim_id == scene_data->GetSceneInfo()->mSceneNameHash) {
-            return scene_data;
+    CAnimSceneData *anim_scene_data = static_cast<CAnimSceneData *>(g_loadedAnimSceneDataList.GetHead());
+    for (; anim_scene_data != g_loadedAnimSceneDataList.EndOfList(); anim_scene_data = anim_scene_data->GetNext()) {
+        unsigned int cur_id = anim_scene_data->GetAnimID();
+        if (anim_id == cur_id) {
+            return anim_scene_data;
         }
-        scene_data = scene_data->GetNext();
     }
     return nullptr;
 }
@@ -463,11 +463,11 @@ void CAnimScene::RemoveProperties() {}
 CAnimProperty *CAnimScene::FindProperty(eAnimProperty property_id) {
     CAnimProperty *anim_property = static_cast<CAnimProperty *>(mAnimPropertyList.GetHead());
 
-    while (anim_property != mAnimPropertyList.EndOfList()) {
-        if (anim_property->GetType() == property_id) {
+    for (; anim_property != mAnimPropertyList.EndOfList(); anim_property = anim_property->GetNext()) {
+        eAnimProperty cur_property = anim_property->GetType();
+        if (cur_property == property_id) {
             return anim_property;
         }
-        anim_property = anim_property->GetNext();
     }
     return nullptr;
 }

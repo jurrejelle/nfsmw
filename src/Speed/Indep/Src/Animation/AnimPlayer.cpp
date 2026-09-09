@@ -97,20 +97,20 @@ void AnimLoader_IncrementAndAlignUp(int &pos, int size) {
 }
 
 int AnimLoader_SizeNeeded() {
-    int cur_shared_file_position = 0;
-    int cur_scene_file_position = 0;
+    int curSharedFilePosition = 0;
+    int curSceneFilePosition = 0;
     int size_needed = 0;
 
     while (true) {
-        if (cur_shared_file_position < static_cast<int>(gAnimLoader_Info.mSharedFileCount)) {
-            char *filename = TheAnimDirectory->GetFileName(cur_shared_file_position + gAnimLoader_Info.mSharedFileStartIndex);
+        if (curSharedFilePosition < static_cast<int>(gAnimLoader_Info.mSharedFileCount)) {
+            char *filename = TheAnimDirectory->GetFileName(curSharedFilePosition + gAnimLoader_Info.mSharedFileStartIndex);
             int file_size = bFileSize(filename);
-            cur_shared_file_position++;
+            curSharedFilePosition++;
             AnimLoader_IncrementAndAlignUp(size_needed, file_size);
-        } else if (cur_scene_file_position < static_cast<int>(gAnimLoader_Info.mSceneFileCount)) {
-            char *filename = TheAnimDirectory->GetFileName(cur_scene_file_position + gAnimLoader_Info.mSceneFileStartIndex);
+        } else if (curSceneFilePosition < static_cast<int>(gAnimLoader_Info.mSceneFileCount)) {
+            char *filename = TheAnimDirectory->GetFileName(curSceneFilePosition + gAnimLoader_Info.mSceneFileStartIndex);
             int file_size = bFileSize(filename);
-            cur_scene_file_position++;
+            curSceneFilePosition++;
             AnimLoader_IncrementAndAlignUp(size_needed, file_size);
         } else {
             return size_needed;
@@ -280,11 +280,10 @@ bool CAnimPlayer::IsLoaded(uint32 anim_id) {
 
 int CAnimPlayer::CreateAnimInstance(uint32 anim_id, int camera_track_number, int anim_candidate_type, int anim_candidate_index) {
     CAnimSceneData *anim_scene_data = CAnimSceneData::FindAnimSceneData(anim_id);
-    int result = 0;
     if (anim_scene_data) {
-        result = CreateAnimScene(anim_scene_data, camera_track_number, anim_candidate_type, anim_candidate_index);
+        return CreateAnimScene(anim_scene_data, camera_track_number, anim_candidate_type, anim_candidate_index);
     }
-    return result;
+    return 0;
 }
 
 void CAnimPlayer::DeleteAnimInstance(AnimHandle anim_handle) {
@@ -320,11 +319,11 @@ int CAnimPlayer::CreateAndPlayAnim(uint32 anim_id, int camera_track_number, int 
 
 CAnimScene *CAnimPlayer::FindAnimScene(AnimHandle anim_handle) {
     CAnimScene *anim_scene = mInstancedAnimSceneList.GetHead();
-    while (anim_scene != mInstancedAnimSceneList.EndOfList()) {
-        if (anim_handle == anim_scene->GetHandle()) {
+    for (; anim_scene != mInstancedAnimSceneList.EndOfList(); anim_scene = anim_scene->GetNext()) {
+        int cur_handle = anim_scene->GetHandle();
+        if (anim_handle == cur_handle) {
             return anim_scene;
         }
-        anim_scene = anim_scene->GetNext();
     }
     return nullptr;
 }
