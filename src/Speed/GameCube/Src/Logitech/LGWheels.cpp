@@ -582,8 +582,8 @@ void LGWheels::PlaySurfaceEffect(long channel, unsigned char type, unsigned char
             }
 
             if (ret >= 0) {
-                SurfaceEffectParams[channel].magnitude = magnitude;
                 SurfaceEffectParams[channel].type = type;
+                SurfaceEffectParams[channel].magnitude = magnitude;
                 SurfaceEffectParams[channel].period = period;
             }
             return;
@@ -592,8 +592,8 @@ void LGWheels::PlaySurfaceEffect(long channel, unsigned char type, unsigned char
         if (periodic.EffectID[channel][3] == static_cast<unsigned long>(-1)) {
             ret = periodic.DownloadForce(channel, 3, wheels.WheelHandles[channel], type, static_cast<unsigned long>(-1), 0, magnitude, 90, period, 0, 0, 0, 0, 0, 0);
             if (ret >= 0) {
-                SurfaceEffectParams[channel].magnitude = magnitude;
                 SurfaceEffectParams[channel].type = type;
+                SurfaceEffectParams[channel].magnitude = magnitude;
                 SurfaceEffectParams[channel].period = period;
             }
             periodic.Start(channel, 3);
@@ -613,8 +613,8 @@ void LGWheels::PlaySurfaceEffect(long channel, unsigned char type, unsigned char
         }
 
         if (ret >= 0) {
-            SurfaceEffectParams[channel].magnitude = magnitude;
             SurfaceEffectParams[channel].type = type;
+            SurfaceEffectParams[channel].magnitude = magnitude;
             SurfaceEffectParams[channel].period = period;
         }
 
