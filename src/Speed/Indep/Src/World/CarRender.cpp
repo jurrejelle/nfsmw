@@ -3270,6 +3270,8 @@ bool CarRenderInfo::Render(eView *view, const bVector3 *world_position, const bM
                 for (int i = 0; i < CARPART_MODEL_NUM; i++) {
                     eModel *spoiler_model = this->mCarPartModels[CARSLOTID_SPOILER][i][car_body_lod].GetModel();
                     if (spoiler_model != nullptr) {
+                        bMatrix4 spoiler_pivot_no_trans;
+
                         eMulMatrix(&spoiler_local_world[i], &this->SpoilerPositionMarker->Matrix, biased_local_world);
                         spoiler_model->ReplaceLightMaterial(STRINGHASH_CARSKIN, light_material_spoiler);
                         view->Render(spoiler_model, &spoiler_local_world[i], light_context, disable_env_flag | extra_render_flags, nullptr);
