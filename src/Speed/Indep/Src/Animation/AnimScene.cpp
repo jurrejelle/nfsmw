@@ -618,14 +618,11 @@ void CAnimScene::CreateCarAnimationControllers() {
         if (gCarAnimationStates[i].CarIndex != -1) {
             char nameToHash[34];
             char *baseCarName = Car_Name[i];
-            NisScene *scene = mAnimSceneData->GetSceneInfo();
-            bSPrintf(nameToHash, "%s%s", scene->mSceneName, baseCarName);
+            bSPrintf(nameToHash, "%s%s", mAnimSceneData->GetSceneInfo()->mSceneName, baseCarName);
             unsigned int name_hash = bStringHash(nameToHash);
-            scene = mAnimSceneData->GetSceneInfo();
-            bSPrintf(nameToHash, "%s%s_t", scene->mSceneName, baseCarName);
+            bSPrintf(nameToHash, "%s%s_t", mAnimSceneData->GetSceneInfo()->mSceneName, baseCarName);
             unsigned int name_hash_t = bStringHash(nameToHash);
-            scene = mAnimSceneData->GetSceneInfo();
-            bSPrintf(nameToHash, "%s%s_q", scene->mSceneName, baseCarName);
+            bSPrintf(nameToHash, "%s%s_q", mAnimSceneData->GetSceneInfo()->mSceneName, baseCarName);
             unsigned int name_hash_q = bStringHash(nameToHash);
 
             if (name_hash != 0 && name_hash_t != 0 && name_hash_q != 0) {

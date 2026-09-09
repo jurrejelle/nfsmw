@@ -268,8 +268,9 @@ void CWorldAnimEntity::UpdateTimeStep(float time_step) {
     ProfileNode profile_node("TODO", 0);
 
     bool visible = true;
+    int section_number;
     if (mAnimTree && mAnimTree->mInstanceData) {
-        int section_number = mAnimTree->mInstanceData->section_number;
+        section_number = mAnimTree->mInstanceData->section_number;
         if (!TheTrackStreamer.IsSectionVisible(section_number)) {
             visible = false;
         }
@@ -355,8 +356,7 @@ WorldAnimEntityTreeInfo::~WorldAnimEntityTreeInfo() {
     while (!loaded_world_anim_entity_chunks.IsEmpty()) {
         bPNode *node = loaded_world_anim_entity_chunks.GetTail();
 
-        node->Remove();
-        delete node;
+        loaded_world_anim_entity_chunks.RemoveTail();
     }
 }
 

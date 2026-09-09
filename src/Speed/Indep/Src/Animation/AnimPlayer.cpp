@@ -123,8 +123,9 @@ void AnimLoader_Callback(int);
 void AnimLoader_LoadResourceFile(const char *filename) {
     int file_size = bFileSize(filename);
     ResourceFile *res_file = CreateResourceFile(filename, RESOURCE_FILE_NIS, 0, 0, file_size);
+    CAnimResourceFileProxy::MemoryPool memPool;
     res_file->AssignMemory(gAnimLoader_MovingPointer, 0, filename);
-    res_file->BeginLoading(reinterpret_cast<void (*)(void *)>(AnimLoader_Callback), nullptr);
+    res_file->BeginLoading(AnimLoader_Callback, 0);
     CAnimResourceFileProxy *proxy = BNEW CAnimResourceFileProxy(res_file, gAnimLoader_MovingPointer, gAnimLoader_UsingMemoryPool);
     gAnimLoader_ResourceFileList.AddTail(proxy);
     AnimLoader_IncrementAndAlignUp(reinterpret_cast<int &>(gAnimLoader_MovingPointer), file_size);

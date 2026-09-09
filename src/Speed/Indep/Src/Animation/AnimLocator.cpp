@@ -86,19 +86,15 @@ bool ANIM_GetWorldHeight(const UMath::Vector3 &pt, float &height, UMath::Vector3
         WCollisionMgr::WorldCollisionInfo cInfo;
         WCollisionMgr(0, 3).CheckHitWorld(seg, cInfo, 1);
 
-        if (!cInfo.HitSomething()) {
-            return false;
+        if (cInfo.HitSomething() && cInfo.fType == 1) {
+            height = cInfo.fCollidePt.y;
+            norm.x = -cInfo.fNormal.x;
+            norm.y = -cInfo.fNormal.y;
+            norm.z = -cInfo.fNormal.z;
+            return true;
         }
-        if (cInfo.fType != 1) {
-            return false;
-        }
-
-        height = cInfo.fCollidePt.y;
-        norm.x = -cInfo.fNormal.x;
-        norm.y = -cInfo.fNormal.y;
-        norm.z = -cInfo.fNormal.z;
-        return true;
     }
+    return false;
 }
 
 // STRIPPED

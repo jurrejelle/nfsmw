@@ -182,9 +182,7 @@ bool CBasicCharacterAnimEntity::Init(void *init_data, SpaceNode *parent_space_no
         if (info->mPlayFlags & 0x40) {
             mAnimCtrl->SetLoopRange(info->mLoopRangeStart, info->mLoopRangeEnd);
         }
-        CAnimCtrl *ctrl = mAnimCtrl;
-        ctrl->SetMasterDelayTime(info->mPlayDelay);
-        ctrl->SetFlags(0x80);
+        mAnimCtrl->SetMasterDelayTime(info->mPlayDelay);
         if (mAnimCtrl && mAnimCtrl->GetFlags() == 8) {
             bBreak();
         }
@@ -196,8 +194,9 @@ bool CBasicCharacterAnimEntity::Init(void *init_data, SpaceNode *parent_space_no
         mAnimCtrl->UpdateAnimPose(true);
         FindWorldBonePosition(1, &pelvis_position);
         float non_adjusted_z = mSpaceNode->GetWorldMatrix()->v3.z;
-        eUnSwizzleWorldVector(pelvis_position, pelvis_position);
+        bool point_valid;
         float ground_elevation;
+        eUnSwizzleWorldVector(pelvis_position, pelvis_position);
         if (WCollisionMgr(0, 3).GetWorldHeightAtPointRigorous(*reinterpret_cast<UMath::Vector3 *>(&pelvis_position), ground_elevation, nullptr)) {
             mPreviousElevation = ground_elevation;
             mHavePreviousElevation = true;
@@ -208,7 +207,8 @@ bool CBasicCharacterAnimEntity::Init(void *init_data, SpaceNode *parent_space_no
     }
 
     if (skeletal_animation && mAnimCtrl && anim_part) {
-        if (anim_part->GetNumGlobalMatrices() == 0x30) {
+        int boneCount = anim_part->GetNumGlobalMatrices();
+        if (boneCount == 0x30) {
             if (info->mSkelNameHash == bStringHash("Bip23")) {
                 mBoneMapType = 3;
             } else {
