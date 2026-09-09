@@ -54,13 +54,13 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     float diff;
 
     eGetScreenHeight();
-    half_size = layer->Size;
+    intensity = layer->IntensityScale;
 
-    if (layer->Texture == SUNTEX_CENTER && half_size > max_size) {
-        max_size = half_size;
+    if (layer->Texture == SUNTEX_CENTER && layer->Size > max_size) {
+        max_size = layer->Size;
     }
 
-    half_size *= 0.5f;
+    half_size = layer->Size * 0.5f;
     angle = static_cast<unsigned short>(
         layer->Angle +
         static_cast<int>(layer->SweepAngleAmount * (((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f))
@@ -72,12 +72,13 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Vertices[1].z = 1.0f;
     poly->Vertices[2].z = 1.0f;
     poly->Vertices[3].z = 1.0f;
+    sun_vis_poly_fix_ini[2] = 1.0f;
 
     sin_angle *= half_size;
     cos_angle *= half_size;
     sum = sin_angle + cos_angle;
     diff = cos_angle - sin_angle;
-    intensity = layer->IntensityScale * SunVisibility * SunMaxIntensity;
+    intensity = intensity * SunVisibility * SunMaxIntensity;
     c0 = layer->Colour[0];
     center_x = x + layer->OffsetX;
     c1 = layer->Colour[1];
