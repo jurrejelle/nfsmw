@@ -134,6 +134,7 @@ int ActualReadJoystickData() {
                 JoyData *joy_data = &PadRingData[port][JoystickRingBufferTop];
                 int slot = 0;
                 short data;
+                unsigned short buttons;
 
                 bMemSet(joy_data, 0xFF, sizeof(JoyData));
 
@@ -141,12 +142,12 @@ int ActualReadJoystickData() {
                     joy_data->padSTATUS = HardwarePadStatus[port];
                     joy_data->ThePadData[0].Type = 0x41;
                     joy_data->ThePadData[0].Error = 0;
-                    data = joy_data->padSTATUS.button;
+                    buttons = joy_data->padSTATUS.button;
                     joy_data->ThePadData[0].DigitalButtons =
-                        ~(((data >> 8) & 1) << 0 | ((data >> 9) & 1) << 1 | ((data >> 10) & 1) << 2 |
-                          ((data >> 11) & 1) << 3 | ((data >> 4) & 1) << 4 | ((data >> 12) & 1) << 5 |
-                          ((data >> 3) & 1) << 8 | ((data >> 2) & 1) << 9 | ((data >> 0) & 1) << 10 |
-                          ((data >> 1) & 1) << 11);
+                        ~(((buttons >> 8) & 1) << 0 | ((buttons >> 9) & 1) << 1 | ((buttons >> 10) & 1) << 2 |
+                          ((buttons >> 11) & 1) << 3 | ((buttons >> 4) & 1) << 4 | ((buttons >> 12) & 1) << 5 |
+                          ((buttons >> 3) & 1) << 8 | ((buttons >> 2) & 1) << 9 | ((buttons >> 0) & 1) << 10 |
+                          ((buttons >> 1) & 1) << 11);
                     data = static_cast<int>(joy_data->padSTATUS.substickX * 2.15f) + 0x80;
                     if (data & 0x8000) {
                         data = 0;
@@ -199,12 +200,12 @@ int ActualReadJoystickData() {
                     } else {
                         joy_data->ThePadData[slot].Type = 0x50;
                     }
-                    data = reinterpret_cast<LGPosition *>(plat_lgwheels)[port].button;
+                    buttons = joy_data->padSTATUS.button;
                     joy_data->ThePadData[slot].DigitalButtons =
-                        ~(((data >> 8) & 1) << 0 | ((data >> 9) & 1) << 1 | ((data >> 10) & 1) << 2 |
-                          ((data >> 11) & 1) << 3 | ((data >> 4) & 1) << 4 | ((data >> 12) & 1) << 5 |
-                          ((data >> 3) & 1) << 8 | ((data >> 2) & 1) << 9 | ((data >> 0) & 1) << 10 |
-                          ((data >> 1) & 1) << 11);
+                        ~(((buttons >> 8) & 1) << 0 | ((buttons >> 9) & 1) << 1 | ((buttons >> 10) & 1) << 2 |
+                          ((buttons >> 11) & 1) << 3 | ((buttons >> 4) & 1) << 4 | ((buttons >> 12) & 1) << 5 |
+                          ((buttons >> 3) & 1) << 8 | ((buttons >> 2) & 1) << 9 | ((buttons >> 0) & 1) << 10 |
+                          ((buttons >> 1) & 1) << 11);
                     joy_data->ThePadData[slot].AnalogRightX = 0;
                     joy_data->ThePadData[slot].AnalogLeftX =
                         reinterpret_cast<LGPosition *>(plat_lgwheels)[port].wheel + 0x80;
