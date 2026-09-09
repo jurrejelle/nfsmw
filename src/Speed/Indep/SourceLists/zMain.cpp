@@ -19,4 +19,6 @@
 
 #include "Speed/Indep/Src/Main/Common/EventSequencer.cpp"
 
-#include "Speed/Indep/Src/Input/PS3/InputDevicePs3.cpp"
+#ifdef EA_PLATFORM_GAMECUBE
+#include "Speed/Indep/Src/Input/GC/InputDeviceGC.cpp"
+#endif
