@@ -277,11 +277,11 @@ void WTriggerManager::ProcessSRB(IRigidBody *srBody, float dT) {
 // UNSOLVED
 bool WTriggerManager::CheckCollideRB(const IRigidBody *rBody, const WTrigger *trig, float dT) const {
     const float rbRadius = rBody->GetRadius();
-    // const float rbRadiusPlusVel;
+    const float rbRadiusPlusVel = rBody->GetSpeed() * dT + rbRadius;
     UMath::Vector3 rPos;
     UMath::Vector3 cp;
 
-    float radsSq = rBody->GetSpeed() * dT + rbRadius + trig->fPosRadius.w;
+    float radsSq = rbRadiusPlusVel + trig->fPosRadius.w;
     cp = UMath::Vector4To3(trig->fPosRadius);
     radsSq *= radsSq;
     UMath::Vector3 dP;
