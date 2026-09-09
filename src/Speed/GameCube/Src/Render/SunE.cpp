@@ -63,7 +63,7 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     half_size = layer->Size * 0.5f;
     angle = static_cast<unsigned short>(
         layer->Angle +
-        static_cast<int>(layer->SweepAngleAmount * (((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f))
+        static_cast<int>(layer->SweepAngleAmount * ((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f)
     );
     sin_angle = bSin(angle);
     cos_angle = bCos(angle);
@@ -133,17 +133,16 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     float diff;
 
     eGetScreenHeight();
+    intensity = layer->IntensityScale;
 
-    half_size = layer->Size;
-
-    if (layer->Texture == SUNTEX_CENTER && half_size > max_size) {
-        max_size = half_size;
+    if (layer->Texture == SUNTEX_CENTER && layer->Size > max_size) {
+        max_size = layer->Size;
     }
 
-    half_size *= 0.5f;
+    half_size = layer->Size * 0.5f;
     angle = static_cast<unsigned short>(
         layer->Angle +
-        static_cast<int>(layer->SweepAngleAmount * (((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f))
+        static_cast<int>(layer->SweepAngleAmount * ((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f)
     );
     sin_angle = bSin(angle);
     cos_angle = bCos(angle);
@@ -159,7 +158,7 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     diff = diagonal0 - diagonal1;
     sun_vis_poly_fix_ini[6] = poly->Vertices[1].z;
     sun_vis_poly_fix_ini[10] = poly->Vertices[2].z;
-    intensity = layer->IntensityScale * SunVisibility * SunMaxIntensity;
+    intensity = intensity * SunVisibility * SunMaxIntensity;
     sun_vis_poly_fix_ini[14] = poly->Vertices[3].z;
     c0 = layer->Colour[0];
     center_x = x + layer->OffsetX;
