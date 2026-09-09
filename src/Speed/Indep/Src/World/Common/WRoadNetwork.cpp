@@ -1285,8 +1285,6 @@ short WRoadNav::GetNextTraffic(const UMath::Vector3 &toVec, float &nextLaneOffse
                     continue;
 
                 char towards; // TODO
-                // as in CanTrafficSpawn the initialiser is not observable, and here anything that
-                // reads a member perturbs the codegen, so it has to fold to a constant
                 const bool respect_drive_through_barriers = false;
                 int new_which_node = (node->fIndex != decision_segment->fNodeIndex[1]);
                 bool new_forward = new_which_node == 1;
@@ -1757,8 +1755,6 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
         IVehicle *his_vehicle;
         avoidable_body->QueryInterface(&his_vehicle);
         const DriverClass his_class = his_vehicle ? his_vehicle->GetDriverClass() : DRIVER_NONE;
-        // he_is_player and he_is_airacer are unused and carry no location in retail's
-        // DWARF, so their DriverClass tests are a guess; only he_is_traffic is observable
         const bool he_is_player = his_vehicle != nullptr && his_class == DRIVER_HUMAN;
         const bool he_is_traffic = his_vehicle != nullptr && (his_class == DRIVER_TRAFFIC || his_class == DRIVER_NONE);
         const bool he_is_airacer = his_vehicle != nullptr && his_class == DRIVER_RACER;
@@ -1868,11 +1864,6 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
             float offset_change = avoidable_delta_offset * approach_time;
             cut_to_position.x += offset_change * 0.8f * cookie.Forward.y;
             cut_to_position.z -= offset_change * 0.8f * cookie.Forward.x;
-            // retail's constant here is 0x3e4ccccc = 0.19999999f, NOT 0.2f (0x3e4ccccd) - its
-            // pool has both, and this is the site that uses the smaller one. Writing it costs
-            // 18 rows today: it is the 14th float constant in the function, and with it GCSE
-            // hoists the 3.0f of the approach_time test into f14, which shifts every
-            // callee-saved FPR. See todo_zworld2.txt for the allocno analysis.
             float extra_width = offset_change * 0.2f;
 
             bVector2 cookie_to_avoidable(cut_to_position.x - cookie.Centre.x, cut_to_position.z - cookie.Centre.z);
@@ -3236,8 +3227,6 @@ bool WRoadNav::CanTrafficSpawn() {
         return false;
     }
 
-    // retail's DIE has no location and the variable costs no code, so only its
-    // name, type and position are known - the initialiser here is a placeholder
     const bool player_or_racer = false;
     bool forward = (which_node == 1);
     bool inverted = segment->IsProfileInverted(which_node);

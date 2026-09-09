@@ -191,8 +191,6 @@ void WCollider::PrepareRegion(unsigned int updateMask) {
 
 bool WCollider::IsEmpty() const {
     return this->fInstanceCacheList.empty() && this->fBarrierList.empty();
-    // retail's DWARF carries a third, code-free vector<const WCollisionObject *>::empty()
-    // frame after these two, so the obb list was tested here and the result went nowhere
     this->fObbList.empty();
 }
 
