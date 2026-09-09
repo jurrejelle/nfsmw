@@ -392,10 +392,10 @@ bool WRoadNetwork::GetSegmentTrafficLaneRightSide(const WRoadSegment &segment, i
     return laneInd >= profilePtr[0]->fMiddleZone;
 }
 
-int WRoadNetwork::GetSegmentTrafficLaneInd(const WRoadSegment &segment, int lane_count) {
+int WRoadNetwork::GetSegmentTrafficLaneInd(const WRoadSegment &segment, int laneCount) {
     WRoadNetwork &roadNetwork = Get();
     const WRoadProfile *profilePtr[2];
-    int decLaneCount = lane_count;
+    int decLaneCount = laneCount;
 
     roadNetwork.GetSegmentProfiles(segment, profilePtr);
     for (int i = 0; i < profilePtr[0]->fNumZones; i++) {
@@ -2540,10 +2540,10 @@ bool WRoadNav::IsWrongWay() const {
     if (!this->IsValid()) {
         return false;
     }
-    bool seg_forward = (this->fNodeInd == 1);
+    bool seg_foward = (this->fNodeInd == 1);
     const WRoadSegment *segment = this->GetSegment();
 
-    return segment->IsInRace() && (segment->RaceRouteForward() ^ seg_forward);
+    return segment->IsInRace() && (segment->RaceRouteForward() ^ seg_foward);
 }
 
 bool WRoadNav::FindClosestOnPath(const UMath::Vector3 &position, UMath::Vector3 *found_position, UMath::Vector3 *found_direction,

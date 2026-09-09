@@ -108,18 +108,18 @@ bool WCollisionMgr::FindFaceInTriStrip(const UMath::Vector3 &pt, const WCollisio
 }
 
 static void CalcCollisionFaceNormal(UMath::Vector3 *norm, UMath::Vector4 *facePts) {
-    UMath::Vector3 vecZ;
     UMath::Vector3 vecX;
+    UMath::Vector3 vecZ;
     UMath::Vector3 normal;
 
-    vecX.x = facePts[1].x - facePts[0].x;
-    vecX.y = facePts[1].y - facePts[0].y;
-    vecX.z = facePts[1].z - facePts[0].z;
+    vecZ.x = facePts[1].x - facePts[0].x;
+    vecZ.y = facePts[1].y - facePts[0].y;
+    vecZ.z = facePts[1].z - facePts[0].z;
 
-    vecZ.x = facePts[0].x - facePts[2].x;
-    vecZ.y = facePts[0].y - facePts[2].y;
-    vecZ.z = facePts[0].z - facePts[2].z;
-    v3crossprod(&vecX, &vecZ, &normal);
+    vecX.x = facePts[0].x - facePts[2].x;
+    vecX.y = facePts[0].y - facePts[2].y;
+    vecX.z = facePts[0].z - facePts[2].z;
+    v3crossprod(&vecZ, &vecX, &normal);
     if (normal.x == 0.0f && normal.y == 0.0f && normal.z == 0.0f) {
         norm->x = 0.0f;
         norm->z = 0.0f;
