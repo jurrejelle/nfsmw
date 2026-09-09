@@ -957,8 +957,8 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
         eMulVector(&state->mTirePos, &this->mRenderMatrix, &this->mTireMatrices[i].v3);
         state->UpdateWorld(this->GetWCollider(), this->GetFlag(CF_ISRAINING), is_flat);
 
-        if (onground) {
-            if (candofx) {
+        if (onground && candofx) {
+            {
                 float skid = UMath::Max(UMath::Abs(data.mTireSkid[i] * 0.05f) - 0.1f, 0.0f);
                 float slip = UMath::Max(UMath::Abs(data.mTireSlip[i] * 0.2f) - 0.1f, 0.0f);
                 float skidmark_intensity = UMath::Sqrt(skid * skid + slip * slip);
@@ -980,8 +980,6 @@ void CarRenderConn::UpdateTires(float dT, float carspeed, const RenderConn::Pkt_
                 float skidfx_ratio = data.mTireSkid[i] * this->GetAttributes().SkidFX(axle);
 
                 state->DoFX(slipfx_ratio, skidfx_ratio, carspeed, this->GetVelocity(), &this->mRenderMatrix, dT);
-            } else {
-                state->KillSkids();
             }
         } else {
             state->KillSkids();
