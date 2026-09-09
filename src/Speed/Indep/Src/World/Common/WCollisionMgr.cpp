@@ -620,8 +620,8 @@ void WCollisionMgr::GetInstanceListGuts(const NodeIndexList &nodeInds, WCollisio
         WGridNode *node = grid.fNodes[*iter];
 
         if (node != nullptr) {
-            WGridNode::iterator eIter(node, WGrid_kInstance);
             const unsigned int *instIndPtr;
+            WGridNode::iterator eIter(node, WGrid_kInstance);
 
             while ((instIndPtr = eIter.GetIndPtr()) != nullptr) {
                 unsigned int instInd = *instIndPtr;
@@ -646,7 +646,7 @@ void WCollisionMgr::GetInstanceListGuts(const NodeIndexList &nodeInds, WCollisio
                     OrthoInverse(invMat);
 #endif
 
-                    const UMath::Vector3 &instPos = *UMath::Vector4To3(&invMat[3]);
+                    const UMath::Vector3 &instPos = reinterpret_cast<const UMath::Vector3 &>(invMat[3]);
 
                     NearPtLineXZ(instPos, UMath::Vector4To3(seg[0]), invDen, npVec, nearPt);
 
