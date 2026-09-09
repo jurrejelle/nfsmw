@@ -73,6 +73,8 @@ void GameDevice::Initialize() { // Decl: 735
 bool input_connected[4];
 bool gShowPortInfo;
 
+// void calls are likely from a debug build that are stripped out.
+// TODO figure out using undercover
 bool GameDevice::IsConnected() { // Decl: 755
   if ((this->mWheelDevice != nullptr) && this->mWheelDevice->IsConnected()) {
     (void)this->GetDeviceIndex();
