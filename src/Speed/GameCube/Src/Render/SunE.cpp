@@ -45,7 +45,7 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     float intensity;
     float center_x;
     float center_y;
-    unsigned char alpha;
+    unsigned int alpha;
     unsigned short angle;
     unsigned char c0;
     unsigned char c1;
@@ -84,11 +84,7 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     center_y = y + layer->OffsetY;
     c2 = layer->Colour[2];
 
-    if (intensity < 28.0f) {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity));
-    } else {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity - 28.0f));
-    }
+    alpha = static_cast<unsigned int>(intensity);
 
     poly->Vertices[3].x = center_x - diff;
     poly->Vertices[0].x = center_x - sum;
@@ -127,7 +123,7 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     float intensity;
     float center_x;
     float center_y;
-    unsigned char alpha;
+    unsigned int alpha;
     unsigned short angle;
     unsigned char c0;
     unsigned char c1;
@@ -169,11 +165,7 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     c1 = layer->Colour[1];
     center_y = y + layer->OffsetY;
     c2 = layer->Colour[2];
-    if (intensity < 28.0f) {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity));
-    } else {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity - 28.0f));
-    }
+    alpha = static_cast<unsigned int>(intensity);
 
     poly->Vertices[3].x = center_x - diff;
     poly->Vertices[3].y = center_y + sum;
@@ -213,13 +205,7 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
 
 void eUpdateSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
     float intensity = layer->IntensityScale * SunVisibility * SunMaxIntensity;
-    unsigned char alpha;
-
-    if (intensity < 28.0) {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity));
-    } else {
-        alpha = static_cast<unsigned char>(static_cast<int>(intensity - 28.0));
-    }
+    unsigned int alpha = static_cast<unsigned int>(intensity);
 
     poly->Vertices[0].x = sun_vis_poly_fix_ini[0] + x;
     poly->Vertices[0].y = sun_vis_poly_fix_ini[1] + y;
@@ -228,11 +214,11 @@ void eUpdateSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, fl
     poly->Vertices[2].x = sun_vis_poly_fix_ini[8] + x;
     poly->Vertices[2].y = sun_vis_poly_fix_ini[9] + y;
     poly->Vertices[3].x = sun_vis_poly_fix_ini[12] + x;
-    poly->Colours[3][3] = alpha;
-    poly->Colours[0][3] = alpha;
     poly->Vertices[3].y = sun_vis_poly_fix_ini[13] + y;
+    poly->Colours[0][3] = alpha;
     poly->Colours[1][3] = alpha;
     poly->Colours[2][3] = alpha;
+    poly->Colours[3][3] = alpha;
 }
 
 void eCalcSunVisibility(eView *view, float x, float y) {
