@@ -38,35 +38,38 @@ void eCalcSunVisibility(eView *view, float x, float y);
 void eRenderSun(eView *view);
 
 void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
-    float screen_width = static_cast<float>(eGetScreenWidth());
-    float half_size;
-    float sin_angle;
-    float cos_angle;
-    float intensity;
-    float center_x;
-    float center_y;
+    float screen_widthf = static_cast<float>(eGetScreenWidth());
+    float screen_heightf = static_cast<float>(eGetScreenHeight());
+    float layer_intensity;
     unsigned short angle;
+    float max_sweep_angle;
+    float scale_x;
+    float sweep_angle;
+    float rx;
+    float angle_sin;
+    float angle_cos;
+    float dx;
+    float dy;
     int a;
+    float lx;
+    float ly;
     int r;
     int g;
     int b;
-    float sum;
-    float diff;
 
-    eGetScreenHeight();
-    intensity = layer->IntensityScale;
+    layer_intensity = layer->IntensityScale;
 
     if (layer->Texture == SUNTEX_CENTER && layer->Size > max_size) {
         max_size = layer->Size;
     }
 
-    half_size = layer->Size * 0.5f;
-    angle = static_cast<unsigned short>(
-        layer->Angle +
-        static_cast<int>(layer->SweepAngleAmount * ((x + max_size) / ((screen_width + max_size) + max_size)) * 65536.0f)
-    );
-    sin_angle = bSin(angle);
-    cos_angle = bCos(angle);
+    rx = layer->Size * 0.5f;
+    max_sweep_angle = layer->SweepAngleAmount;
+    scale_x = (x + max_size) / ((screen_widthf + max_size) + max_size);
+    sweep_angle = max_sweep_angle * scale_x * 65536.0f;
+    angle = static_cast<unsigned short>(layer->Angle + static_cast<int>(sweep_angle));
+    angle_sin = bSin(angle);
+    angle_cos = bCos(angle);
 
     poly->Vertices[0].z = 1.0f;
     poly->Vertices[1].z = 1.0f;
@@ -74,27 +77,27 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Vertices[3].z = 1.0f;
     sun_vis_poly_fix_ini[0].z = 1.0f;
 
-    sin_angle *= half_size;
-    cos_angle *= half_size;
-    sum = sin_angle + cos_angle;
-    diff = cos_angle - sin_angle;
-    intensity = intensity * SunVisibility * SunMaxIntensity;
+    angle_sin *= rx;
+    angle_cos *= rx;
+    dx = angle_sin + angle_cos;
+    dy = angle_cos - angle_sin;
+    layer_intensity = layer_intensity * SunVisibility * SunMaxIntensity;
     r = layer->Colour[0];
-    center_x = x + layer->OffsetX;
+    lx = x + layer->OffsetX;
     g = layer->Colour[1];
-    center_y = y + layer->OffsetY;
+    ly = y + layer->OffsetY;
     b = layer->Colour[2];
 
-    a = static_cast<unsigned int>(intensity);
+    a = static_cast<unsigned int>(layer_intensity);
 
-    poly->Vertices[3].x = center_x - diff;
-    poly->Vertices[0].x = center_x - sum;
-    poly->Vertices[3].y = center_y + sum;
-    poly->Vertices[0].y = center_y - diff;
-    poly->Vertices[1].y = center_y - sum;
-    poly->Vertices[1].x = center_x + diff;
-    poly->Vertices[2].x = center_x + sum;
-    poly->Vertices[2].y = center_y + diff;
+    poly->Vertices[3].x = lx - dy;
+    poly->Vertices[0].x = lx - dx;
+    poly->Vertices[3].y = ly + dx;
+    poly->Vertices[0].y = ly - dy;
+    poly->Vertices[1].y = ly - dx;
+    poly->Vertices[1].x = lx + dy;
+    poly->Vertices[2].x = lx + dx;
+    poly->Vertices[2].y = ly + dy;
 
     poly->Colours[0][0] = r;
     poly->Colours[0][1] = g;
