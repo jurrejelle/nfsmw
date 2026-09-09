@@ -395,9 +395,10 @@ bool WRoadNetwork::GetSegmentTrafficLaneRightSide(const WRoadSegment &segment, i
 int WRoadNetwork::GetSegmentTrafficLaneInd(const WRoadSegment &segment, int laneCount) {
     WRoadNetwork &roadNetwork = Get();
     const WRoadProfile *profilePtr[2];
-    int decLaneCount = laneCount;
+    int decLaneCount;
 
     roadNetwork.GetSegmentProfiles(segment, profilePtr);
+    decLaneCount = laneCount;
     for (int i = 0; i < profilePtr[0]->fNumZones; i++) {
         if (profilePtr[0]->GetLaneType(i, false) == WRoadNav::kLaneTraffic) {
             if (decLaneCount <= 0) {
