@@ -312,16 +312,16 @@ void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short d
 
         if (constant.EffectID[channel][0] == static_cast<unsigned long>(-1)) {
             ret = constant.DownloadForce(channel, 0, wheels.WheelHandles[channel], static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
-        } else if (SameConstantForceParams(channel, magnitude, direction)) {
-            constant.Start(channel, 0);
-            return;
-        } else {
+            if (ret >= 0) {
+                ConstantForceParams[channel].magnitude = magnitude;
+                ConstantForceParams[channel].direction = direction;
+            }
+        } else if (!SameConstantForceParams(channel, magnitude, direction)) {
             ret = constant.UpdateForce(channel, 0, static_cast<unsigned long>(-1), 0, magnitude, direction, 0, 0, 0, 0);
-        }
-
-        if (ret >= 0) {
-            ConstantForceParams[channel].magnitude = magnitude;
-            ConstantForceParams[channel].direction = direction;
+            if (ret >= 0) {
+                ConstantForceParams[channel].magnitude = magnitude;
+                ConstantForceParams[channel].direction = direction;
+            }
         }
 
         constant.Start(channel, 0);
@@ -456,15 +456,14 @@ void LGWheels::PlayDirtRoadEffect(long channel, unsigned char magnitude) {
             ret = periodic.DownloadForce(
                 channel, 1, wheels.WheelHandles[channel], 2, static_cast<unsigned long>(-1), 0, magnitude, 90,
                 65, 0, 0, 0, 0, 0, 0);
-        } else if (SameDirtRoadEffectParams(channel, magnitude)) {
-            periodic.Start(channel, 1);
-            return;
-        } else {
+            if (ret >= 0) {
+                DirtRoadParams[channel].magnitude = magnitude;
+            }
+        } else if (!SameDirtRoadEffectParams(channel, magnitude)) {
             ret = periodic.UpdateForce(channel, 1, 2, static_cast<unsigned long>(-1), 0, magnitude, 90, 65, 0, 0, 0, 0, 0, 0);
-        }
-
-        if (ret >= 0) {
-            DirtRoadParams[channel].magnitude = magnitude;
+            if (ret >= 0) {
+                DirtRoadParams[channel].magnitude = magnitude;
+            }
         }
 
         periodic.Start(channel, 1);
@@ -508,15 +507,14 @@ void LGWheels::PlayBumpyRoadEffect(long channel, unsigned char magnitude) {
             ret = periodic.DownloadForce(
                 channel, 2, wheels.WheelHandles[channel], 3, static_cast<unsigned long>(-1), 0, magnitude,
                 90, 100, 0, 0, 0, 0, 0, 0);
-        } else if (SameBumpyRoadEffectParams(channel, magnitude)) {
-            periodic.Start(channel, 2);
-            return;
-        } else {
+            if (ret >= 0) {
+                BumpyRoadParams[channel].magnitude = magnitude;
+            }
+        } else if (!SameBumpyRoadEffectParams(channel, magnitude)) {
             ret = periodic.UpdateForce(channel, 2, 3, static_cast<unsigned long>(-1), 0, magnitude, 90, 100, 0, 0, 0, 0, 0, 0);
-        }
-
-        if (ret >= 0) {
-            BumpyRoadParams[channel].magnitude = magnitude;
+            if (ret >= 0) {
+                BumpyRoadParams[channel].magnitude = magnitude;
+            }
         }
 
         periodic.Start(channel, 2);
