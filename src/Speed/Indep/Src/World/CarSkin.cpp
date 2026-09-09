@@ -846,8 +846,6 @@ int CompositeSkin(RideInfo *ride_info) {
 
     int success = 1;
     if (IsInSkinCompositeCache(&composite_params) == 0) {
-        // retail's DWARF has an empty lexical block here, which only a declaration with no
-        // DIE of its own can produce; the exact declaration is not recoverable
         extern int CompositeSkin32(SkinCompositeParams *composite_params);
 
         UpdateSkinCompositeCache(&composite_params);
