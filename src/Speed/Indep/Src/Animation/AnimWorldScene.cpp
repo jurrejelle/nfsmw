@@ -93,6 +93,11 @@ CWorldAnimEntityTree *CAnimWorldScene::InstantiateAnimTree(WorldAnimInstance *in
         if (PrintWorldAnimationStuff) {
             if (begin_range == 0xFFFFFFFF || end_range == 0xFFFFFFFF) {
                 for (int i = 0; i < 4; i++) {
+                    WorldAnimNamedRange *range_array = treeinfo->named_ranges;
+                    WorldAnimNamedRange &namedrange = range_array[i];
+                    uint32 range = namedrange.range;
+                    uint32 br = range >> 16;
+                    uint32 er = range & 0xFFFF;
                 }
             }
         }
@@ -105,13 +110,15 @@ CWorldAnimEntityTree *CAnimWorldScene::InstantiateAnimTree(WorldAnimInstance *in
 
     int num_entities = treeinfo->loaded_world_anim_entity_chunks.CountElements();
     CWorldAnimEntity **arr_of_ptrs = new ("CWorldAnimEntity*", 0) CWorldAnimEntity *[num_entities];
+    float start_time_normalized;
+    float delay_time_normalized;
     bMemSet(arr_of_ptrs, 0, num_entities * static_cast<int>(sizeof(CWorldAnimEntity *)));
 
     if (instance->play_flags & 0x400) {
-        bRandom(1.0f);
+        start_time_normalized = bRandom(1.0f);
     }
     if (instance->play_flags & 0x200) {
-        bRandom(1.0f);
+        delay_time_normalized = bRandom(1.0f);
     }
 
     CWorldAnimEntity *root_entity = nullptr;
@@ -157,8 +164,7 @@ CWorldAnimEntityTree *CAnimWorldScene::InstantiateAnimTree(WorldAnimInstance *in
 
         if (entinfo->mThisInstanceNameHash == treeinfo->tree_name_hash) {
             root_entity = new_entity_instantiation;
-            SpaceNode *space = root_entity->GetSpaceNode();
-            space->SetLocalMatrix(instance_mat);
+            root_entity->GetSpaceNode()->SetLocalMatrix(instance_mat);
         }
 
         new_tree->instantiated_world_anim_entities.AddTail(new_entity_instantiation);

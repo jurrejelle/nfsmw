@@ -629,7 +629,7 @@ void CAnimScene::CreateCarAnimationControllers() {
                 CAnimCtrl *new_anim_ctrl = new ("Car CAnimCtrl") CAnimCtrl();
                 new_anim_ctrl->SetNameHash(name_hash);
                 new_anim_ctrl->SetTimeScale(0.5f);
-                new_anim_ctrl->SetFlags(new_anim_ctrl->GetFlags() | 8);
+                new_anim_ctrl->SetFlags(8);
                 new_anim_ctrl->GetAnimPart()->Init(skel);
                 new_anim_ctrl->CreateFnAnimFromNamehash(name_hash_t, 0);
                 new_anim_ctrl->CreateFnAnimFromNamehash(name_hash_q, 1);

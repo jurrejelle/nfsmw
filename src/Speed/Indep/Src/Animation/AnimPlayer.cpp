@@ -233,19 +233,18 @@ bool CAnimPlayer::Unload(uint32 anim_id) {
 
     if (scene_data) {
         CAnimResourceFileProxy *proxy = gAnimLoader_ResourceFileList.GetHead();
-        while (proxy != gAnimLoader_ResourceFileList.EndOfList()) {
-            CAnimResourceFileProxy *next_proxy = proxy->GetNext();
+        CAnimResourceFileProxy *next_proxy;
+        for (; proxy != gAnimLoader_ResourceFileList.EndOfList(); proxy = next_proxy) {
+            next_proxy = proxy->GetNext();
             if (proxy->mResourceFile) {
                 UnloadResourceFile(proxy->mResourceFile);
                 if (proxy->mMemoryPool == CAnimResourceFileProxy::TrackStream) {
-                    void *mem = proxy->mResourceFile->GetMemory();
-                    if (mem) {
-                        TheTrackStreamer.FreeUserMemory(mem);
+                    if (proxy->mResourceFile->GetMemory()) {
+                        TheTrackStreamer.FreeUserMemory(proxy->mResourceFile->GetMemory());
                     }
                 } else if (proxy->mMemoryPool == CAnimResourceFileProxy::CarPool) {
-                    void *mem = proxy->mResourceFile->GetMemory();
-                    if (mem) {
-                        bFree(mem);
+                    if (proxy->mResourceFile->GetMemory()) {
+                        TheCarLoader.FreeUserMemory(proxy->mResourceFile->GetMemory());
                     }
                 } else {
                     bFree(proxy->mResourceFile->GetMemory());
@@ -254,7 +253,6 @@ bool CAnimPlayer::Unload(uint32 anim_id) {
                 delete proxy;
                 return true;
             }
-            proxy = next_proxy;
         }
     }
 
