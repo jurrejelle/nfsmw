@@ -96,10 +96,6 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Vertices[2].x = center_x + sum;
     poly->Vertices[2].y = center_y + diff;
 
-    poly->Colours[3][3] = alpha;
-    poly->Colours[3][0] = c0;
-    poly->Colours[3][1] = c1;
-    poly->Colours[3][2] = c2;
     poly->Colours[0][0] = c0;
     poly->Colours[0][1] = c1;
     poly->Colours[0][2] = c2;
@@ -112,6 +108,10 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Colours[2][1] = c1;
     poly->Colours[2][2] = c2;
     poly->Colours[2][3] = alpha;
+    poly->Colours[3][0] = c0;
+    poly->Colours[3][1] = c1;
+    poly->Colours[3][2] = c2;
+    poly->Colours[3][3] = alpha;
 }
 
 void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
@@ -196,11 +196,11 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     poly->Colours[2][0] = c0;
     poly->Colours[2][1] = c1;
     poly->Colours[2][2] = c2;
-    poly->Colours[3][3] = alpha;
+    poly->Colours[2][3] = alpha;
     poly->Colours[3][0] = c0;
     poly->Colours[3][1] = c1;
     poly->Colours[3][2] = c2;
-    poly->Colours[2][3] = alpha;
+    poly->Colours[3][3] = alpha;
 }
 
 void eUpdateSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, float y) {
