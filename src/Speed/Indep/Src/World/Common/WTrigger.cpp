@@ -503,9 +503,13 @@ void WTriggerManager::Update(float dT) {
 }
 
 int LoaderTrigger(bChunk *chunk) {
+    switch (chunk->GetID()) {
+    }
     return 0;
 }
 
 int UnloaderTrigger(bChunk *chunk) {
+    switch (chunk->GetID()) {
+    }
     return 0;
 }
