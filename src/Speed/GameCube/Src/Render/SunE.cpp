@@ -231,7 +231,7 @@ void eCalcSunVisibility(eView *view, float x, float y) {
             u32 clear_in;
             u32 copy_clocks;
 
-            eUpdateSunPolyFix(&sun_vis_poly_fix, &vis_layer_fix, 1.0f, x, y);
+            eUpdateSunPolyFix(&sun_vis_poly_fix, &vis_layer_fix, vis_layer_fix.Size, x, y);
             GXClearPixMetric();
             eSetColourUpdate(0, 0);
             RenderViewPoly(view, &sun_vis_poly_fix, DefaultTextureInfo, 0);
