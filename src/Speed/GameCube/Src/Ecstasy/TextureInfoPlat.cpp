@@ -34,10 +34,10 @@ static inline unsigned short Convert32To16(unsigned int entry) {
     unsigned int b = entry & 0xFF;
 
     if (a > 0xEF) {
-        return 0x8000 | ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
+        return 0xFFFF8000 | ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
     }
 
-    return ((a >> 4) << 12) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
+    return ((a >> 5) << 12) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
 }
 
 void TextureInfoPlatInterface::SetPlatInfo(TextureInfoPlatInfo *info) {
