@@ -144,7 +144,8 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
     int wrap_s = 0;
     int wrap_t = 0;
     int texture_format = format & 0x7FFFFFFF;
-    GXTlutFmt tlut_format = static_cast<GXTlutFmt>(format >= 0 ? GX_TL_RGB5A3 : GX_TL_IA8);
+    bool positive = format >= 0;
+    GXTlutFmt tlut_format = static_cast<GXTlutFmt>(positive ? GX_TL_RGB5A3 : GX_TL_IA8);
 
     if (clamp & 1) {
         int width_lsb = width & (~width + 1);
