@@ -1755,14 +1755,11 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
         IVehicle *his_vehicle;
         avoidable_body->QueryInterface(&his_vehicle);
         const DriverClass his_class = his_vehicle ? his_vehicle->GetDriverClass() : DRIVER_NONE;
-        // const bool he_is_player;
-        // TODO const bool
-        int he_is_traffic;
-        if (!his_vehicle)
-            he_is_traffic = 0;
-        else
-            he_is_traffic = his_class == DRIVER_TRAFFIC || his_class == DRIVER_NONE;
-        // const bool he_is_airacer;
+        // he_is_player and he_is_airacer are unused and carry no location in retail's
+        // DWARF, so their DriverClass tests are a guess; only he_is_traffic is observable
+        const bool he_is_player = his_vehicle != nullptr && his_class == DRIVER_HUMAN;
+        const bool he_is_traffic = his_vehicle != nullptr && (his_class == DRIVER_TRAFFIC || his_class == DRIVER_NONE);
+        const bool he_is_airacer = his_vehicle != nullptr && his_class == DRIVER_RACER;
 
         if (is_racer && he_is_traffic && UMath::Abs(avoidable_right.x * my_cookie.Forward.x + avoidable_right.z * my_cookie.Forward.y) > 0.707f &&
             his_vehicle && VehicleClass::TRAILER == his_vehicle->GetVehicleClass()) {
@@ -1865,9 +1862,11 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
             }
 
             UMath::Vector3 cut_to_position = point_of_impact;
-            float offset_change = avoidable_delta_offset * bClamp(approach_time, 0.0f, 1.0f);
+            approach_time = bClamp(approach_time, 0.0f, 1.0f);
+            float offset_change = avoidable_delta_offset * approach_time;
             cut_to_position.x += offset_change * 0.8f * cookie.Forward.y;
             cut_to_position.z -= offset_change * 0.8f * cookie.Forward.x;
+            float extra_width = offset_change * 0.2f;
 
             bVector2 cookie_to_avoidable(cut_to_position.x - cookie.Centre.x, cut_to_position.z - cookie.Centre.z);
             bVector2 cookie_to_me(my_position.x - cookie.Centre.x, my_position.z - cookie.Centre.z);
@@ -1876,37 +1875,32 @@ void WRoadNav::HolePunchAvoidables(NavCookie *cookies, int num_cookies, float cu
             float my_d = bDot(&cookie_to_me, reinterpret_cast<const bVector2 *>(&cookie.Forward));
             float avoidable_ahead = avoidable_d - my_d;
             float close_factor = UMath::Ramp(avoidable_ahead, -6.0f, 6.0f);
-            float extra_width = offset_change * 0.2f;
             float avoidable_offset = bCross(reinterpret_cast<const bVector2 *>(&cookie.Forward), &cookie_to_avoidable);
-            float nav_cross = bCross(&nav_forward, reinterpret_cast<const bVector2 *>(&cookie.Forward));
             float right_projection = bCross(&right_diagonal, reinterpret_cast<const bVector2 *>(&cookie.Forward));
             float left_projection = bCross(&left_diagonal, reinterpret_cast<const bVector2 *>(&cookie.Forward));
-            float lateral_projection = bClamp(approach_time, 0.0f, 1.0f);
-            float new_current_offset = lateral_projection * close_factor * delta_offset * 0.2f + current_offset;
-            new_current_offset += nav_cross;
-            new_current_offset += nav_cross;
             float avoidable_half_width = bAbs(right_projection);
             avoidable_half_width = bMax(avoidable_half_width, bAbs(left_projection));
-            // this var doesn't exist
-            float adjusted_width = extra_width * close_factor + avoidable_half_width;
+            float new_current_offset = bCross(&nav_forward, reinterpret_cast<const bVector2 *>(&cookie.Forward));
+            new_current_offset += new_current_offset;
+            new_current_offset += approach_time * close_factor * delta_offset * 0.2f + current_offset;
+            avoidable_half_width = extra_width * close_factor + avoidable_half_width;
             float hole_punch_safety_margin = close_factor;
             if (is_drag) {
                 hole_punch_safety_margin = close_factor * 0.8f;
             }
-            float gap_right = cookie.RightOffset - avoidable_offset - adjusted_width;
-            float gap_left = avoidable_offset - adjusted_width - cookie.LeftOffset;
+            float gap_right = cookie.RightOffset - avoidable_offset - avoidable_half_width;
+            float gap_left = avoidable_offset - avoidable_half_width - cookie.LeftOffset;
             float gap_required = hole_punch_safety_margin + this->fVehicleHalfWidth;
             bool fit_right = gap_right > gap_required;
             bool fit_left = gap_left > gap_required;
             bool pass_left = new_current_offset < avoidable_offset;
             pass_left = fit_left ^ fit_right ? fit_left : pass_left;
-            // TODO is this lateral_projection?
-            float total_width = adjusted_width + this->fVehicleHalfWidth + hole_punch_safety_margin;
-
             int i = closest_cookie;
+            float lateral_projection = avoidable_half_width + this->fVehicleHalfWidth + hole_punch_safety_margin;
+
             for (; i < num_cookies; i++) {
                 NavCookie &this_cookie = cookies[i];
-                if (!this->CookieCutter(this_cookie, cut_to_position, total_width, pass_left, cut_flags) && i == closest_cookie)
+                if (!this->CookieCutter(this_cookie, cut_to_position, lateral_projection, pass_left, cut_flags) && i == closest_cookie)
                     break;
 
                 UMath::Vector2 delta;
