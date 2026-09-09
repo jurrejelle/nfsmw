@@ -6,7 +6,7 @@
 
 SunLayer vis_layer_fix;
 ePoly sun_vis_poly_fix;
-float sun_vis_poly_fix_ini[16];
+bVector3 sun_vis_poly_fix_ini[4];
 
 extern float SunPosX;
 extern float SunPosY;
@@ -72,7 +72,7 @@ void eBuildSunPoly(ePoly *poly, SunLayer *layer, float max_size, float x, float 
     poly->Vertices[1].z = 1.0f;
     poly->Vertices[2].z = 1.0f;
     poly->Vertices[3].z = 1.0f;
-    sun_vis_poly_fix_ini[2] = 1.0f;
+    sun_vis_poly_fix_ini[0].z = 1.0f;
 
     sin_angle *= half_size;
     cos_angle *= half_size;
@@ -147,19 +147,19 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     sin_angle = bSin(angle);
     cos_angle = bCos(angle);
 
-    sun_vis_poly_fix_ini[2] = 1.0f;
+    sun_vis_poly_fix_ini[0].z = 1.0f;
     poly->Vertices[1].z = 1.0f;
-    poly->Vertices[2].z = sun_vis_poly_fix_ini[2];
-    poly->Vertices[3].z = sun_vis_poly_fix_ini[2];
-    poly->Vertices[0].z = sun_vis_poly_fix_ini[2];
+    poly->Vertices[2].z = sun_vis_poly_fix_ini[0].z;
+    poly->Vertices[3].z = sun_vis_poly_fix_ini[0].z;
+    poly->Vertices[0].z = sun_vis_poly_fix_ini[0].z;
     diagonal1 = half_size * sin_angle;
     diagonal0 = half_size * cos_angle;
     sum = diagonal1 + diagonal0;
     diff = diagonal0 - diagonal1;
-    sun_vis_poly_fix_ini[6] = poly->Vertices[1].z;
-    sun_vis_poly_fix_ini[10] = poly->Vertices[2].z;
+    sun_vis_poly_fix_ini[1].z = poly->Vertices[1].z;
+    sun_vis_poly_fix_ini[2].z = poly->Vertices[2].z;
     intensity = intensity * SunVisibility * SunMaxIntensity;
-    sun_vis_poly_fix_ini[14] = poly->Vertices[3].z;
+    sun_vis_poly_fix_ini[3].z = poly->Vertices[3].z;
     c0 = layer->Colour[0];
     center_x = x + layer->OffsetX;
     c1 = layer->Colour[1];
@@ -170,20 +170,20 @@ void eBuildSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, flo
     poly->Vertices[3].x = center_x - diff;
     poly->Vertices[3].y = center_y + sum;
     poly->Vertices[0].y = center_y - diff;
-    sun_vis_poly_fix_ini[0] = center_x - sum;
-    poly->Vertices[0].x = sun_vis_poly_fix_ini[0];
+    sun_vis_poly_fix_ini[0].x = center_x - sum;
+    poly->Vertices[0].x = sun_vis_poly_fix_ini[0].x;
     poly->Vertices[1].y = center_y - sum;
     poly->Vertices[1].x = center_x + diff;
     poly->Vertices[2].y = center_y + diff;
     poly->Vertices[2].x = center_x + sum;
 
-    sun_vis_poly_fix_ini[4] = poly->Vertices[1].x;
-    sun_vis_poly_fix_ini[8] = poly->Vertices[2].x;
-    sun_vis_poly_fix_ini[12] = poly->Vertices[3].x;
-    sun_vis_poly_fix_ini[1] = poly->Vertices[0].y;
-    sun_vis_poly_fix_ini[5] = poly->Vertices[1].y;
-    sun_vis_poly_fix_ini[9] = poly->Vertices[2].y;
-    sun_vis_poly_fix_ini[13] = poly->Vertices[3].y;
+    sun_vis_poly_fix_ini[1].x = poly->Vertices[1].x;
+    sun_vis_poly_fix_ini[2].x = poly->Vertices[2].x;
+    sun_vis_poly_fix_ini[3].x = poly->Vertices[3].x;
+    sun_vis_poly_fix_ini[0].y = poly->Vertices[0].y;
+    sun_vis_poly_fix_ini[1].y = poly->Vertices[1].y;
+    sun_vis_poly_fix_ini[2].y = poly->Vertices[2].y;
+    sun_vis_poly_fix_ini[3].y = poly->Vertices[3].y;
 
     poly->Colours[0][0] = c0;
     poly->Colours[0][1] = c1;
@@ -207,14 +207,14 @@ void eUpdateSunPolyFix(ePoly *poly, SunLayer *layer, float max_size, float x, fl
     float intensity = layer->IntensityScale * SunVisibility * SunMaxIntensity;
     unsigned int alpha = static_cast<unsigned int>(intensity);
 
-    poly->Vertices[0].x = sun_vis_poly_fix_ini[0] + x;
-    poly->Vertices[0].y = sun_vis_poly_fix_ini[1] + y;
-    poly->Vertices[1].x = sun_vis_poly_fix_ini[4] + x;
-    poly->Vertices[1].y = sun_vis_poly_fix_ini[5] + y;
-    poly->Vertices[2].x = sun_vis_poly_fix_ini[8] + x;
-    poly->Vertices[2].y = sun_vis_poly_fix_ini[9] + y;
-    poly->Vertices[3].x = sun_vis_poly_fix_ini[12] + x;
-    poly->Vertices[3].y = sun_vis_poly_fix_ini[13] + y;
+    poly->Vertices[0].x = sun_vis_poly_fix_ini[0].x + x;
+    poly->Vertices[0].y = sun_vis_poly_fix_ini[0].y + y;
+    poly->Vertices[1].x = sun_vis_poly_fix_ini[1].x + x;
+    poly->Vertices[1].y = sun_vis_poly_fix_ini[1].y + y;
+    poly->Vertices[2].x = sun_vis_poly_fix_ini[2].x + x;
+    poly->Vertices[2].y = sun_vis_poly_fix_ini[2].y + y;
+    poly->Vertices[3].x = sun_vis_poly_fix_ini[3].x + x;
+    poly->Vertices[3].y = sun_vis_poly_fix_ini[3].y + y;
     poly->Colours[0][3] = alpha;
     poly->Colours[1][3] = alpha;
     poly->Colours[2][3] = alpha;
