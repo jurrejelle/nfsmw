@@ -786,7 +786,7 @@ bool RigidBody::CanCollideWithGround() const {
 static const unsigned int Tweak_MaxGroundCollisionResults = 16;
 static const unsigned int BOX_CORNERS = 8;
 
-// UNSOLVED, y_vel and tolerance math twice
+
 void RigidBody::DoInstanceCollision2d(const float dT) {
     Volatile &data = *this->mData;
     data.leversInContact = 0;
@@ -839,8 +839,12 @@ void RigidBody::DoInstanceCollision2d(const float dT) {
 
             float y_vel = data.angularVel.z * (world_arm.x - world_cog.x) + data.linearVel.y;
 
-            float tolerance =
-                speedXZ * dT + UMath::Max((data.angularVel.x * (world_arm.z - world_cog.z) - y_vel) * dT, 0.0f) + depth;
+            float tolerance = speedXZ * dT +
+                              UMath::Max((data.angularVel.x * (world_arm.z - world_cog.z) -
+                                          (data.angularVel.z * (world_arm.x - world_cog.x) + data.linearVel.y)) *
+                                             dT,
+                                         0.0f) +
+                              depth;
             tolerance = UMath::Clamp(tolerance, 0.25f, ceiling - world_point.y);
 
             world_pos.SetTolerance(tolerance);
@@ -884,8 +888,12 @@ void RigidBody::DoInstanceCollision2d(const float dT) {
 
             float y_vel = data.angularVel.z * (world_arm.x - world_cog.x) + data.linearVel.y;
 
-            float tolerance =
-                speedXZ * dT + UMath::Max((data.angularVel.x * (world_arm.z - world_cog.z) - y_vel) * dT, 0.0f) + depth;
+            float tolerance = speedXZ * dT +
+                              UMath::Max((data.angularVel.x * (world_arm.z - world_cog.z) -
+                                          (data.angularVel.z * (world_arm.x - world_cog.x) + data.linearVel.y)) *
+                                             dT,
+                                         0.0f) +
+                              depth;
             tolerance = UMath::Clamp(tolerance, 0.25f, ceiling - world_point.y);
 
             world_pos.SetTolerance(tolerance);
