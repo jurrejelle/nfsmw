@@ -481,7 +481,7 @@ inline void *eFrameMalloc(unsigned int size) {
         return nullptr;
     } else {
         CurrentBufferPos += roundup(size, 16);
-        return CurrentBufferPos - roundup(size, 16);
+        return address;
     }
 }
 
