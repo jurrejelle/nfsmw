@@ -137,7 +137,7 @@ int UnloaderAnimSceneData(bChunk *chunk) {
         while (anim_scene_data != g_loadedAnimSceneDataList.EndOfList()) {
             CAnimSceneData *next_anim_scene_data = anim_scene_data->GetNext();
             if (anim_scene_data->GetChunk() == chunk) {
-                anim_scene_data->Remove();
+                g_loadedAnimSceneDataList.Remove(anim_scene_data);
                 delete anim_scene_data;
                 break;
             }
