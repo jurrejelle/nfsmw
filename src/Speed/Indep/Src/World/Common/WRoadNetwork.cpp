@@ -2789,10 +2789,10 @@ void WRoadNav::SetBoundPos(const WRoadSegment &segment, float offset, bool start
 }
 
 void WRoadNav::SetStartEndPos(const WRoadSegment &segment, float startOffset, float endOffset) {
-    // const bool end; // TODO
-    // const bool start;
-    this->SetBoundPos(segment, endOffset, false);
-    this->SetBoundPos(segment, startOffset, true);
+    const bool end = false;
+    const bool start = true;
+    this->SetBoundPos(segment, endOffset, end);
+    this->SetBoundPos(segment, startOffset, start);
 }
 
 void WRoadNav::ChangeLanes(float new_lane_offset, float dist) {
