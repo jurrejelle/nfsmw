@@ -7,18 +7,24 @@ extern SlotPool *eAnimTextureSlotPool;
 extern TextureInfo *pTexPrev;
 
 static inline unsigned int Convert16To32(unsigned short entry) {
+    unsigned int a;
+    unsigned int r;
+    unsigned int g;
+    unsigned int b;
+
     if (entry & 0x8000) {
-        unsigned int r = (entry >> 10) & 0x1F;
-        unsigned int g = (entry >> 5) & 0x1F;
-        unsigned int b = entry & 0x1F;
-        return 0xFF000000 | (r << 19) | (g << 11) | (b << 3);
+        a = 0xFF;
+        r = ((entry >> 10) & 0x1F) << 3;
+        g = ((entry >> 5) & 0x1F) << 3;
+        b = (entry & 0x1F) << 3;
+    } else {
+        a = ((entry >> 12) & 0x0F) << 5;
+        r = ((entry >> 8) & 0x0F) << 4;
+        g = ((entry >> 4) & 0x0F) << 4;
+        b = (entry & 0x0F) << 4;
     }
 
-    unsigned int a = (entry >> 12) & 0x0F;
-    unsigned int r = (entry >> 8) & 0x0F;
-    unsigned int g = (entry >> 4) & 0x0F;
-    unsigned int b = entry & 0x0F;
-    return (a << 28) | (r << 20) | (g << 12) | (b << 4);
+    return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
 static inline unsigned short Convert32To16(unsigned int entry) {
@@ -28,10 +34,10 @@ static inline unsigned short Convert32To16(unsigned int entry) {
     unsigned int b = entry & 0xFF;
 
     if (a > 0xEF) {
-        return 0x8000 | ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+        return 0x8000 | ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
     }
 
-    return ((a >> 4) << 12) | ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+    return ((a >> 4) << 12) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
 }
 
 void TextureInfoPlatInterface::SetPlatInfo(TextureInfoPlatInfo *info) {
@@ -63,13 +69,13 @@ void *TextureInfoPlatInterface::LockPalette(TextureLockType lock) {
     TextureInfo *texture_info = static_cast<TextureInfo *>(this);
     TextureInfoPlatInfo *plat_info = this->GetPlatInfo();
     unsigned short *gcPal = static_cast<unsigned short *>(texture_info->PaletteData);
-    unsigned int *Pal32 = nullptr;
+    void *Pal32 = nullptr;
 
     if (gcPal) {
         Pal32 = new unsigned int[256];
         if (Pal32) {
             for (int j = 0; j <= 0xFF; j++) {
-                Pal32[j] = Convert16To32(gcPal[j]);
+                static_cast<unsigned int *>(Pal32)[j] = Convert16To32(gcPal[j]);
             }
         }
     }
