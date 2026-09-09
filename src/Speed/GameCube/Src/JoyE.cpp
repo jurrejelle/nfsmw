@@ -143,9 +143,10 @@ int ActualReadJoystickData() {
                     joy_data->ThePadData[0].Error = 0;
                     data = joy_data->padSTATUS.button;
                     joy_data->ThePadData[0].DigitalButtons =
-                        ~((data >> 8) & 1 | (data >> 8) & 2 | (data >> 8) & 4 | (data >> 8) & 8 | data & 0x10 |
-                          (data >> 7) & 0x20 | (data & 8) << 5 | (data & 4) << 7 | (data & 1) << 10 |
-                          (data & 2) << 10);
+                        ~(((data >> 8) & 1) << 0 | ((data >> 9) & 1) << 1 | ((data >> 10) & 1) << 2 |
+                          ((data >> 11) & 1) << 3 | ((data >> 4) & 1) << 4 | ((data >> 12) & 1) << 5 |
+                          ((data >> 3) & 1) << 8 | ((data >> 2) & 1) << 9 | ((data >> 0) & 1) << 10 |
+                          ((data >> 1) & 1) << 11);
                     data = static_cast<int>(joy_data->padSTATUS.substickX * 2.15f) + 0x80;
                     if (data & 0x8000) {
                         data = 0;
@@ -200,9 +201,10 @@ int ActualReadJoystickData() {
                     }
                     data = reinterpret_cast<LGPosition *>(plat_lgwheels)[port].button;
                     joy_data->ThePadData[slot].DigitalButtons =
-                        ~((data >> 8) & 1 | (data >> 8) & 2 | (data >> 8) & 4 | (data >> 8) & 8 | data & 0x10 |
-                          (data >> 7) & 0x20 | (data & 8) << 5 | (data & 4) << 7 | (data & 1) << 10 |
-                          (data & 2) << 10);
+                        ~(((data >> 8) & 1) << 0 | ((data >> 9) & 1) << 1 | ((data >> 10) & 1) << 2 |
+                          ((data >> 11) & 1) << 3 | ((data >> 4) & 1) << 4 | ((data >> 12) & 1) << 5 |
+                          ((data >> 3) & 1) << 8 | ((data >> 2) & 1) << 9 | ((data >> 0) & 1) << 10 |
+                          ((data >> 1) & 1) << 11);
                     joy_data->ThePadData[slot].AnalogRightX = 0;
                     joy_data->ThePadData[slot].AnalogLeftX =
                         reinterpret_cast<LGPosition *>(plat_lgwheels)[port].wheel + 0x80;
