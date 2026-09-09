@@ -581,6 +581,8 @@ void eUnSwizzle8bitPalette(unsigned int *palette) {}
 void eSwizzle8bitPalette(unsigned int *palette) {}
 
 struct VMStats {
+    VMStats() {}
+
     unsigned int mNumPageFaults;
     unsigned int mNumWritebacks;
     float mElapsedTime;
