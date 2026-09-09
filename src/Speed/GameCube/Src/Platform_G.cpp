@@ -620,7 +620,7 @@ VMStatsManager gVMStatsManager_FE("Frontend");
 VMStatsManager gVMStatsManager_LS("LoadScreen Streamer");
 VMStatsManager gVMStatsManager_IG("InGame");
 
-void VMStats::Init() {
+inline void VMStats::Init() {
     mNumPageFaults = 0;
     mNumWritebacks = 0;
     mElapsedTime = 0.0f;
@@ -631,22 +631,16 @@ void VMStats::Init() {
 }
 
 void VMStatsManager::Init(const char *name) {
-    mFrameStats.mNumPageFaults = 0;
-    mFrameStats.mNumWritebacks = 0;
-    DebugName = name;
-    mFrameStats.mServiceTimeMin = static_cast<unsigned int>(-1);
+    mFrameStats.Init();
     mFrameCounter = 0;
     mElapsedTime = 0.0f;
-    mMinNumServicesPerFrame = 9999999;
-    mMaxNumServicesPerFrame = 0;
-    mMinFrameTime = 9999999.0f;
-    mMaxFrameTime = -9999999.0f;
-    mFrameStats.mElapsedTime = 0.0f;
-    mFrameStats.mServiceTimeMicroSecs = 0;
-    mFrameStats.mServiceTimeMax = 0;
-    mFrameStats.mServiceTimeAvg = 0.0f;
     mAccumService_us = 0;
     mAccumNumFaults = 0;
     mMinServicePercentPerFrame = 9999999.0f;
     mMaxServicePercentPerFrame = -9999999.0f;
+    mMinNumServicesPerFrame = 9999999;
+    mMaxNumServicesPerFrame = 0;
+    mMinFrameTime = 9999999.0f;
+    mMaxFrameTime = -9999999.0f;
+    DebugName = name;
 }
