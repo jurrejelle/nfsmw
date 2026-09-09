@@ -413,9 +413,9 @@ float SuspensionSimple::Tire::UpdateLoaded(float lat_vel, float fwd_vel, float b
             float total_brake = bt + ebt;
             this->mAppliedTorque = this->mAppliedTorque + total_brake;
         } else {
-            float bt = this->mBrake * FTLB2NM(this->mBrakes->BRAKES().At(this->mAxleIndex));
-            float ebt = this->mEBrake * FTLB2NM(this->mBrakes->EBRAKE());
-            float total_brake = bt * 10.0f + ebt * 10.0f;
+            float bt = this->mBrake * FTLB2NM(this->mBrakes->BRAKES().At(this->mAxleIndex)) * 10.0f;
+            float ebt = this->mEBrake * FTLB2NM(this->mBrakes->EBRAKE()) * 10.0f;
+            float total_brake = bt + ebt;
 
             this->mAppliedTorque += this->mAV <= 0.0f ? total_brake : -total_brake;
         }
