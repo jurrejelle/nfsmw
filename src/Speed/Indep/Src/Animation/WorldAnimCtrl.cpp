@@ -226,17 +226,19 @@ int CWorldAnimCtrl::AdvanceAnimTime(float timestep) {
     }
 
     if (delay_world_start) {
-        float new_timestep = this_master_delay_elapsed + this_time_step;
+        this_master_delay_elapsed = this_master_delay_elapsed + this_time_step;
+        float new_timestep = this_master_delay_elapsed;
         if (new_timestep > this_master_delay_len) {
             new_evaltime += bFMod(new_timestep, this_master_delay_len);
         }
-        MasterDelayElapsed = (new_timestep / effective_time_scale) / 30;
+        MasterDelayElapsed = (this_master_delay_elapsed / effective_time_scale) / 30;
     } else if (delay_loop_start) {
-        float new_timestep = this_local_delay_elapsed + this_time_step;
+        this_local_delay_elapsed = this_local_delay_elapsed + this_time_step;
+        float new_timestep = this_local_delay_elapsed;
         if (new_timestep > this_local_delay_len) {
             new_evaltime += bFMod(new_timestep, this_local_delay_len);
         }
-        LocalDelayElapsed = (new_timestep / effective_time_scale) / 30;
+        LocalDelayElapsed = (this_local_delay_elapsed / effective_time_scale) / 30;
     } else if (linear) {
         if (m_flags & 0x1000) {
             new_evaltime -= this_time_step;
