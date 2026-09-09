@@ -1215,7 +1215,10 @@ short WRoadNav::GetNextTraffic(const UMath::Vector3 &toVec, float &nextLaneOffse
 
                 const WRoadNode *oppNode = roadNetwork.GetSegmentOppNode(*intersectionSegment, node);
                 const WRoadSegment *checkSegment = GetAttachedDirectionalSegment(oppNode, -1);
-                if (checkSegment && checkSegment->IsTrafficAllowed()) {
+                if (checkSegment != nullptr) {
+                    if (!checkSegment->IsTrafficAllowed())
+                        continue;
+
                     UMath::Vector3 vec;
                     bool reverse = (oppNode != &roadNetwork.fNodes[checkSegment->fNodeIndex[0]]);
                     roadNetwork.GetSegmentForwardVector(*checkSegment, vec);
@@ -1280,7 +1283,9 @@ short WRoadNav::GetNextTraffic(const UMath::Vector3 &toVec, float &nextLaneOffse
                     continue;
 
                 char towards; // TODO
-                // const bool respect_drive_through_barriers; // TODO
+                // as in CanTrafficSpawn the initialiser is not observable, and here anything that
+                // reads a member perturbs the codegen, so it has to fold to a constant
+                const bool respect_drive_through_barriers = false;
                 int new_which_node = (node->fIndex != decision_segment->fNodeIndex[1]);
                 bool new_forward = new_which_node == 1;
                 bool new_inverted = decision_segment->IsProfileInverted(new_which_node);
@@ -2948,13 +2953,13 @@ bool WRoadNav::IncLane(int direction) {
 }
 
 void WRoadNav::ChangeDragLanes(int left_right) {
-    char node_ind = this->GetNodeInd();
+    int nodeInd = this->GetNodeInd();
     WRoadNetwork &roadNetwork = WRoadNetwork::Get();
     const WRoadSegment *segment = roadNetwork.GetSegment(this->GetSegmentInd());
-    const WRoadProfile *profile = roadNetwork.GetSegmentProfile(*segment, node_ind);
+    const WRoadProfile *profile = roadNetwork.GetSegmentProfile(*segment, nodeInd);
 
-    bool backward = node_ind == 0;
-    bool inverted = segment->IsProfileInverted(node_ind);
+    bool backward = nodeInd == 0;
+    bool inverted = segment->IsProfileInverted(nodeInd);
     float current_offset = this->fLaneOffset;
 
     if (left_right == 0) {
@@ -2965,7 +2970,7 @@ void WRoadNav::ChangeDragLanes(int left_right) {
             temp_nav.SetRaceFilter(true);
             const UMath::Vector3 &car_position = rigid_body->GetPosition();
             temp_nav.InitAtPoint(car_position, this->GetForwardVector(), false, 1.0f);
-            if (temp_nav.fValid) {
+            if (temp_nav.IsValid()) {
                 current_offset = temp_nav.GetLaneOffset();
             }
         }
@@ -3230,9 +3235,9 @@ bool WRoadNav::CanTrafficSpawn() {
         return false;
     }
 
-    // the initialiser is not observable: retail's DIE has no location and the
-    // variable costs no code, so only the name, type and position are known
-    const bool player_or_racer = this->fPathType == kPathPlayer || this->fPathType == kPathRacer;
+    // retail's DIE has no location and the variable costs no code, so only its
+    // name, type and position are known - the initialiser here is a placeholder
+    const bool player_or_racer = false;
     bool forward = (which_node == 1);
     bool inverted = segment->IsProfileInverted(which_node);
 
