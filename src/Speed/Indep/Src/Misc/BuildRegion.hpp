@@ -5,6 +5,9 @@ namespace BuildRegion {
 
 bool IsAmerica();
 bool IsEurope();
+bool IsEuropeFr();
+bool IsEuropeGer();
+bool IsJapan();
 bool IsPal();
 
 inline const char *GetCarBadgingSuffix() {
