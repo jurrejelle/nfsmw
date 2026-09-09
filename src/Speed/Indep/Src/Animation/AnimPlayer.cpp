@@ -169,53 +169,55 @@ bool CAnimPlayer::Load(uint32 anim_id, int camera_track_number, bool DisableZone
         return false;
     }
 
-    uint32 scene_count = TheAnimDirectory->GetSceneCount();
-    bool scene_found = false;
-    uint32 scene_slot = 0;
+    {
+        uint32 scene_count = TheAnimDirectory->GetSceneCount();
+        bool scene_found = false;
+        uint32 scene_slot = 0;
 
-    if (scene_slot < scene_count) {
-        do {
-            AnimSceneLoadInfo info;
-            TheAnimDirectory->GetSceneLoadInfo(scene_slot, info);
-            if (info.mAnimSceneHash == anim_id) {
-                scene_found = true;
-                gAnimLoader_Info = info;
-                break;
+        if (scene_slot < scene_count) {
+            do {
+                AnimSceneLoadInfo info;
+                TheAnimDirectory->GetSceneLoadInfo(scene_slot, info);
+                if (info.mAnimSceneHash == anim_id) {
+                    scene_found = true;
+                    gAnimLoader_Info = info;
+                    break;
+                }
+                scene_slot++;
+            } while (scene_slot < scene_count);
+        }
+
+        bool loading_has_begun = false;
+
+        if (scene_found) {
+            int size_needed = AnimLoader_SizeNeeded();
+            if (size_needed >= 0xDBBA1) {
+                gAnimLoader_MemPointer = nullptr;
+            } else if (size_needed > gAnimCfg_Small_NIS_Size) {
+                TheTrackStreamer.BlockUntilLoadingComplete();
+                TheTrackStreamer.MakeSpaceInPool(size_needed, true);
+                gAnimLoader_MemPointer = TheTrackStreamer.AllocateUserMemory(size_needed, "NISMemory", 0);
+                gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::CarPool;
+                if (!gAnimLoader_MemPointer) {
+                    int alloc_size = size_needed;
+                    TheCarLoader.MakeSpaceInPool(alloc_size);
+                    gAnimLoader_MemPointer = TheCarLoader.AllocateUserMemory(alloc_size, "NISMemory");
+                    gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::TrackStream;
+                }
+            } else {
+                int alloc_size = size_needed;
+                gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::Main;
+                gAnimLoader_MemPointer = bMalloc(alloc_size, "NISMemory", 0, 0x2000);
             }
-            scene_slot++;
-        } while (scene_slot < scene_count);
-    }
 
-    bool loading_has_begun = false;
-
-    if (!scene_found) {
+            if (gAnimLoader_MemPointer) {
+                AnimLoader_Init();
+                loading_has_begun = true;
+                AnimLoader_NextStep();
+            }
+        }
         return loading_has_begun;
     }
-
-    int size_needed = AnimLoader_SizeNeeded();
-    if (size_needed >= 0xDBBA1) {
-        gAnimLoader_MemPointer = nullptr;
-    } else if (size_needed > gAnimCfg_Small_NIS_Size) {
-        TheTrackStreamer.BlockUntilLoadingComplete();
-        TheTrackStreamer.MakeSpaceInPool(size_needed, true);
-        gAnimLoader_MemPointer = TheTrackStreamer.AllocateUserMemory(size_needed, "NISMemory", 0);
-        gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::CarPool;
-        if (!gAnimLoader_MemPointer) {
-            TheCarLoader.MakeSpaceInPool(size_needed);
-            gAnimLoader_MemPointer = TheCarLoader.AllocateUserMemory(size_needed, "NISMemory");
-            gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::TrackStream;
-        }
-    } else {
-        gAnimLoader_UsingMemoryPool = CAnimResourceFileProxy::Main;
-        gAnimLoader_MemPointer = bMalloc(size_needed, 0x2000);
-    }
-
-    if (gAnimLoader_MemPointer) {
-        AnimLoader_Init();
-        loading_has_begun = true;
-        AnimLoader_NextStep();
-    }
-    return loading_has_begun;
 }
 
 bool CAnimPlayer::Unload(uint32 anim_id) {
