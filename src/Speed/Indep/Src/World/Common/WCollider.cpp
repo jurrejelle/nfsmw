@@ -7,7 +7,7 @@
 #include "Speed/Indep/bWare/Inc/bMath.hpp"
 
 // TODO move
-extern bool Tweak_colliderDraws;
+bool Tweak_colliderDraws = false;
 
 UTL::Std::map<unsigned int, WCollider *, _type_map> WCollider::fWuidMap;
 UTL::Collections::Listable<WCollider, 100>::List UTL::Collections::Listable<WCollider, 100>::_mTable;
