@@ -292,9 +292,7 @@ bool CAnimScene::UnBindToGame() {
 }
 
 void CAnimScene::ChangePlayStatus(ePlayStatus new_status) {
-    ePlayStatus current_status = mPlayStatus;
-
-    switch (current_status) {
+    switch (mPlayStatus) {
         case Stopped:
             if (new_status < Stopped) {
                 return;
@@ -311,6 +309,8 @@ void CAnimScene::ChangePlayStatus(ePlayStatus new_status) {
             return;
         case Paused:
             switch (new_status) {
+                case Playing:
+                    break;
                 case Paused:
                     return;
                 case Stopped:
@@ -318,8 +318,6 @@ void CAnimScene::ChangePlayStatus(ePlayStatus new_status) {
                     UnBindToGame();
                     ResetTime();
                     return;
-                case Playing:
-                    break;
                 default:
                     return;
             }
