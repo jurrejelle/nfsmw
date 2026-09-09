@@ -104,21 +104,18 @@ CAnimSceneData *CreateAnimSceneData(bChunk *nested_chunk, bChunk *sub_chunk) {
 
 int LoaderAnimSceneData(bChunk *chunk) {
     if (chunk->GetID() == BCHUNK_ANIM_SCENE) {
+        CAnimSceneData *anim_scene_data = nullptr;
         bChunk *sub = chunk->GetFirstChunk();
         bChunk *last = chunk->GetLastChunk();
-        CAnimSceneData *anim_scene_data = nullptr;
 
         while (sub != last) {
-            unsigned int chunk_id = sub->ID;
-
-            switch (chunk_id) {
+            switch (sub->GetID()) {
                 case BCHUNK_ANIM_SCENE_DATA:
                     anim_scene_data = CreateAnimSceneData(chunk, sub);
                     break;
                 case BCHUNK_ANIM_SCENE_ENTITY_DATA:
                     if (anim_scene_data) {
-                        char *data = sub->GetAlignedData(16);
-                        anim_scene_data->AddEntityData(data, sub->Size - (data - sub->GetData()));
+                        anim_scene_data->AddEntityData(sub->GetAlignedData(16), sub->GetAlignedSize(16));
                     }
                     break;
             }
