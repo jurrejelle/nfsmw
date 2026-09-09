@@ -132,9 +132,8 @@ struct Ramp : public Force {
     Ramp();
 };
 
-class LGWheels {
+struct LGWheels {
     // total size: 0x16E4
-  public:
     LGWheels();
     ~LGWheels();
 
@@ -172,20 +171,19 @@ class LGWheels {
     void PlayCarAirborne(long channel);
     void StopCarAirborne(long channel);
 
-  private:
-    LGPosition Position[4];                    // offset 0x0, size 0x28
-    short NonLinearWheel[256][4];             // offset 0x28, size 0x800
-    unsigned char wheels[0x880];              // offset 0x828, size 0x880
-    unsigned char force[0x100];               // offset 0x10A8, size 0x100
-    unsigned char condition[0x100];           // offset 0x11A8, size 0x100
-    unsigned char constant[0x100];            // offset 0x12A8, size 0x100
-    unsigned char periodic[0x100];            // offset 0x13A8, size 0x100
-    unsigned char ramp[0x100];                // offset 0x14A8, size 0x100
+    LGPosition Position[4];                   // offset 0x0, size 0x28
+    short NonLinearWheel[4][256];             // offset 0x28, size 0x800
+    Wheels wheels;                            // offset 0x828, size 0x880
+    Force force;                              // offset 0x10A8, size 0x100
+    Condition condition;                      // offset 0x11A8, size 0x100
+    Constant constant;                        // offset 0x12A8, size 0x100
+    Periodic periodic;                        // offset 0x13A8, size 0x100
+    Ramp ramp;                                // offset 0x14A8, size 0x100
     unsigned char OverallGain;                // offset 0x15A8, size 0x1
-    bool damperWasPlaying[4];                 // offset 0x15AC, size 0x4
-    bool springWasPlaying[4];                 // offset 0x15BC, size 0x4
-    bool wasPlayingBeforeAirborne[10][4];     // offset 0x15CC, size 0x28
-    bool IsAirborne[4];                       // offset 0x166C, size 0x4
+    bool damperWasPlaying[4];                 // offset 0x15AC, size 0x10
+    bool springWasPlaying[4];                 // offset 0x15BC, size 0x10
+    bool wasPlayingBeforeAirborne[4][10];     // offset 0x15CC, size 0xA0
+    bool IsAirborne[4];                       // offset 0x166C, size 0x10
     struct {
         char offset;                          // offset 0x0, size 0x1
         unsigned char saturation;             // offset 0x1, size 0x1
