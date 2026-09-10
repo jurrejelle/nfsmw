@@ -1,6 +1,7 @@
 #ifndef PHYSICS_SMACKABLE_H
 #define PHYSICS_SMACKABLE_H
 
+#include "Speed/Indep/Src/Generated/Hash.hpp"
 #include "Speed/Indep/Libs/Support/Utility/FastMem.h"
 #include "Speed/Indep/Libs/Support/Utility/UCollections.h"
 #include "Speed/Indep/Libs/Support/Utility/UListable.h"
@@ -27,12 +28,16 @@ class HeirarchyModel;
 struct SmackableParams : public Sim::Param {
     // TODO macro
     static UCrc32 TypeName() {
-        static UCrc32 value = "SuspensionParams";
+        static UCrc32 value = "SmackableParams";
         return value;
     }
 
-    SmackableParams(const UMath::Matrix4 &mat, bool virginspawn, IModel *scenery, bool simple_physics) {
-        // TODO
+    SmackableParams(const UMath::Matrix4 &mat, bool virginspawn, IModel *scenery, bool simple_physics)
+        : Sim::Param(UCrc32(UCRC32_BASE), this), //
+          fVirginSpawn(virginspawn),             //
+          fScenery(scenery),                     //
+          fSimplePhysics(simple_physics) {
+        UMath::Copy(mat, fMatrix);
     }
 
     struct UMath::Matrix4 fMatrix; // offset 0x10, size 0x40

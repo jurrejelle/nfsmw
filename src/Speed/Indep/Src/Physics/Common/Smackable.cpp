@@ -1013,21 +1013,19 @@ bool PlaceableScenery::Place(const UMath::Matrix4 &transform, bool snap_to_groun
     UMath::Matrix4 mat;
     UMath::Copy(transform, mat);
     if (snap_to_ground) {
-        WCollisionMgr wcm(0, 3);
+        UMath::Vector3 dim;
         float worldHeight = 1000.0f;
-        if (!wcm.GetWorldHeightAtPointRigorous(UMath::Vector4To3(mat.v3), worldHeight, nullptr)) {
+        if (WCollisionMgr(0, 3).GetWorldHeightAtPointRigorous(UMath::Vector4To3(mat.v3), worldHeight, nullptr) == false) {
             return false;
         }
-        UMath::Vector3 dim;
         GetDimension(dim);
         mat.v3.y = worldHeight + dim.y;
     }
     PlaceTrigger(mat, false);
-    SmackableParams sp(mat, true, static_cast<IModel *>(this), false);
     ISimable *physics = UTL::COM::Factory< Sim::Param, ISimable, UCrc32 >::CreateInstance(
-        UCrc32("Smackable"), sp);
+        UCrc32("Smackable"), SmackableParams(mat, true, static_cast<IModel *>(this), false));
     if (physics == nullptr) {
-        static_cast<IPlaceableScenery *>(this)->Destroy();
+        static_cast<IPlaceableScenery *>(this)->PickUp();
         return false;
     }
     return true;
