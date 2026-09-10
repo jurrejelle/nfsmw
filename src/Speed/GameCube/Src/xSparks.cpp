@@ -158,8 +158,8 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
         local_orientation.v3.z = 0.0f;
         local_orientation.v3.w = 1.0f;
         random_seed = randomSeed;
-        life = mEmitterDef.Life();
-        life_variance = life * mEmitterDef.LifeVariance();
+        life_variance = mEmitterDef.Life() * mEmitterDef.LifeVariance();
+        life = mEmitterDef.Life() - life_variance;
         r = static_cast<int>(mEmitterDef.Colour1().x * 255.0f);
         g = static_cast<int>(mEmitterDef.Colour1().y * 255.0f);
         b = static_cast<int>(mEmitterDef.Colour1().z * 255.0f);
@@ -167,9 +167,8 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
         particleColor = a << 24 | b << 16 | g << 8 | r;
         num_particles = intensity * mEmitterDef.NumParticles();
         num_particles_variance = num_particles * mEmitterDef.NumParticlesVariance() * 100.0f;
+        num_particles = intensity * mEmitterDef.NumParticles() - num_particles_variance;
         current_particle_age = 0.0f;
-        life -= life_variance;
-        num_particles -= num_particles_variance;
 
         if (num_particles != 0.0f) {
             particle_age_factor = dt / num_particles;
@@ -202,7 +201,7 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
                 rand.z = 1.0f - (mEmitterDef.VelocityDelta().z - bRandom(mEmitterDef.VelocityDelta().z, &random_seed) * 2.0f);
 
                 Scalexyz(mEmitterDef.VelocityInherit(), mVel, pvel);
-                UMath::Rotate(mEmitterDef.VelocityStart(), local_orientation, rotatedVel);
+                UMath::Rotate(mEmitterDef.VelocityStart(), mLocalWorld, rotatedVel);
                 UMath::Add(pvel, rotatedVel);
                 Scalexyz(pvel, rand);
 
