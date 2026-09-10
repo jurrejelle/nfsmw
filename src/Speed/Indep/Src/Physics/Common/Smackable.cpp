@@ -297,7 +297,8 @@ void Smackable::OnBehaviorChange(const UCrc32 &mechanic) {
         if (static_cast<ISimable *>(this)->QueryInterface(&mCollisionBody)) {
             float detach = mAttributes.DETACH_FORCE();
             if (mVirgin && detach != 0.0f) {
-                mCollisionBody->AttachedToWorld(true, UMath::Max(detach, 0.0f));
+                float force = UMath::Max(detach, 0.0f);
+                mCollisionBody->AttachedToWorld(true, force);
             }
             const CollisionGeometry::Bounds *cog =
                 mGeometry->GetChild(UCrc32(0x28b0bb8d));
