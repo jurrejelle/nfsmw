@@ -486,13 +486,13 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
             rpm = UMath::Max(rpm, max_torque_rpm);
         }
 
-        float torque = Physics::Info::Torque(eng, rpm) * FTLB2NM(1.0f);
-        float boost = Physics::Info::InductionBoost(eng, ind, rpm, 1.0f, nullptr, nullptr);
-        float nos_capacity = Physics::Info::NosCapacity(n, nullptr);
-        float force = torque * (boost + 1.0f) * total_gear_ratio;
-        if (time < nos_capacity && speed > 5.0f) {
-            float nos_boost = Physics::Info::NosBoost(n, nullptr);
-            force *= nos_boost;
+        float torque = Physics::Info::Torque(eng, rpm);
+
+        float force = FTLB2NM(torque) * (Physics::Info::InductionBoost(eng, ind, rpm, 1.0f, nullptr, nullptr) + 1.0f);
+        force *= total_gear_ratio;
+
+        if (time < Physics::Info::NosCapacity(n, nullptr) && speed > 5.0f) {
+            force *= Physics::Info::NosBoost(n, nullptr);
         }
         float accel = (force / wheel_radius) / mass;
 
@@ -512,14 +512,12 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
             dT = 1.0f;
         }
 
-        if (speed_limiter <= 0.0f || speed < speed_limiter) {
-            if (gear == last_gear &&
-                (accel < drag || redline_rpm <= rpm) &&
-                TopSpeed <= 0.0f) {
-                TopSpeed = speed;
-            }
-        } else {
+        if (speed_limiter > 0.0f && speed >= speed_limiter) {
             TopSpeed = speed_limiter;
+        } else if (gear == last_gear &&
+                   (accel < drag || redline_rpm <= rpm) &&
+                   TopSpeed <= 0.0f) {
+            TopSpeed = speed;
         }
 
         time += dT;
@@ -529,11 +527,7 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
         }
 
         if (rpm >= shift_up[gear + G_FIRST]) {
-            unsigned int next_gear = gear + 1;
-            gear = last_gear;
-            if (next_gear < last_gear) {
-                gear = next_gear;
-            }
+            gear = UMath::Min(gear + 1, last_gear);
         }
     }
 
@@ -544,19 +538,14 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
     float base_handling = vehicle.HandlingRating(0);
     float top_handling = vehicle.HandlingRating(1);
     float handling_sum = 0.0f;
-    float diff = top_handling - base_handling;
-    float *pw = &Physics::Info::PerformanceWeights[0].Handling;
     float weight_sum = 0.0f;
-    Physics::Upgrades::Type type = Physics::Upgrades::PUT_TIRES;
+    int type = Physics::Upgrades::PUT_TIRES;
     do {
-        Physics::Upgrades::Type next = static_cast<Physics::Upgrades::Type>(type + Physics::Upgrades::PUT_BRAKES);
-        weight_sum += *pw;
-        float pct = Physics::Upgrades::GetPercent(vehicle, type);
-        float w = *pw;
-        pw += 3;
-        handling_sum += pct * w;
-        type = next;
-    } while (static_cast<int>(type) < 7);
+        weight_sum += Physics::Info::PerformanceWeights[type].Handling;
+        handling_sum += Physics::Upgrades::GetPercent(vehicle, static_cast<Physics::Upgrades::Type>(type)) *
+                        Physics::Info::PerformanceWeights[type].Handling;
+        type++;
+    } while (type < 7);
     if (weight_sum > 1e-6f) {
         handling_sum /= weight_sum;
     }
