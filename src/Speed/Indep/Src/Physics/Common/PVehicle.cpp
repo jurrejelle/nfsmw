@@ -856,11 +856,7 @@ void PVehicle::UpdateListing() {
 PVehicle::Resource::Resource(const Attrib::Gen::pvehicle &pvehicle, bool spool, bool is_player) {
     Flags = 0;
     CarPartDatabase &db = CarPartDB;
-    const char *text = pvehicle.MODEL().GetString();
-    if (text == nullptr) {
-        text = "";
-    }
-    CarType type = db.GetCarType(bStringHash(text));
+    CarType type = db.GetCarType(bStringHash(pvehicle.MODEL().GetString()));
     Type = type;
     if (type != CARTYPE_NONE && type < NUM_CARTYPES) {
         if (CarInfo_IsSkinned(type)) {
