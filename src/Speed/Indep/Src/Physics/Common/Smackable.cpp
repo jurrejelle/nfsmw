@@ -985,7 +985,7 @@ PlaceableScenery *PlaceableScenery::Construct(const char *name, unsigned int att
     if (static_cast<unsigned int>(UTL::Collections::Countable< IPlaceableScenery >::Count()) > 12u) {
         return nullptr;
     }
-    bHash32 render_name(bStringHash(name));
+    bHash32 render_name(name);
     UCrc32 collision_name(name);
     bHash32 heirarchy_name(render_name);
     const ModelHeirarchy *heirarchy = FindSceneryHeirarchyByName(render_name.GetValue());
@@ -994,23 +994,16 @@ PlaceableScenery *PlaceableScenery::Construct(const char *name, unsigned int att
         return nullptr;
     }
     const CollisionGeometry::Bounds *bounds = collection->GetRoot();
-    if (bounds != nullptr) {
-        eModel model;
-        model.Init(render_name.GetValue());
-        if (model.GetSolid() == nullptr) {
-            bHash32 fallback(0xc7395a8);
-            render_name = fallback;
-            heirarchy_name = fallback;
-        }
-        const Attrib::Collection *attribs =
-            Attrib::FindCollection(Attrib::Gen::smackable::ClassKey(), attributes);
-        Attrib::Gen::smackable smk_attribs(attribs, 0, nullptr);
-        PlaceableScenery *result = new PlaceableScenery(heirarchy_name, bounds,
-                                                        smk_attribs.GetConstCollection(),
-                                                        heirarchy);
-        return result;
+    if (bounds == nullptr) {
+        return nullptr;
     }
-    return nullptr;
+    eModel model;
+    model.Init(render_name.GetValue());
+    if (model.GetSolid() == nullptr) {
+        render_name = bHash32(0xc7395a8);
+    }
+    Attrib::Gen::smackable smk_attribs(attributes, 0, nullptr);
+    return new PlaceableScenery(render_name, bounds, smk_attribs.GetConstCollection(), heirarchy);
 }
 
 void PlaceableScenery::PickUp() {

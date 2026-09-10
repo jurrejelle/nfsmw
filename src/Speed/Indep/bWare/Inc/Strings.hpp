@@ -87,6 +87,7 @@ int bStrICmp(const char *s1, const char *s2);
 const char *bAllocateSharedString(const char *s);
 void bFreeSharedString(const char *s);
 uint32 bStringHash(const char *text);
+uint32 bStringHashUpper(const char *text);
 uint32 bStringHash(const char *text, int prefix_hash);
 int bStrToLong(const char *s);
 float bStrToFloat(const char *s);

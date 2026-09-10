@@ -282,9 +282,7 @@ class PVehicle : public PhysicsObject,
     virtual void SetSpeed(float speed) override;
     virtual void GlareOn(VehicleFX::ID glare) override;
     virtual void GlareOff(VehicleFX::ID glare) override;
-    virtual bool IsGlareOn(VehicleFX::ID glare) const override {
-        return (mGlareState & glare) != 0;
-    }
+    virtual bool IsGlareOn(VehicleFX::ID glare) override;
     virtual bool IsCollidingWithSoftBarrier() override {
         return false;
     }

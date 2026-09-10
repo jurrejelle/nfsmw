@@ -138,6 +138,13 @@ void PVehicle::GlareOn(VehicleFX::ID glare) { mGlareState |= glare; }
 
 void PVehicle::GlareOff(VehicleFX::ID glare) { mGlareState &= ~glare; }
 
+inline bool PVehicle::IsGlareOn(VehicleFX::ID glare) {
+    if ((mGlareState & glare) != 0) {
+        return true;
+    }
+    return false;
+}
+
 void PVehicle::DebugObject() { PhysicsObject::DebugObject(); }
 
 void PVehicle::OnAttributeChange(const Attrib::Collection *collection, unsigned int attribkey) {}
