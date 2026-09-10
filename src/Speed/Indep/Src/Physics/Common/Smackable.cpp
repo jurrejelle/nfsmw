@@ -183,8 +183,9 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     float radius = UMath::Length(dimension);
     float mass = mAttributes.MASS();
     Dynamics::Inertia::Box inertia(mass, dimension.x * 2.0f, dimension.y * 2.0f, dimension.z * 2.0f);
-    UMath::Scale(inertia, 2.0f, inertia);
     UMath::Vector3 moment;
+    UCrc32 smack_class;
+    UMath::Scale(inertia, 2.0f, inertia);
     if (mAttributes.MOMENT(moment)) {
         if (moment.x > 0.0f) {
             inertia.x *= moment.x;
@@ -197,7 +198,6 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
         }
     }
     bool active = !virginspawn || mPersistant;
-    UCrc32 smack_class;
     if (simple_physics) {
         RBSimpleParams rbp(UMath::Vector4To3(matrix.v3), UMath::Vector3::kZero,
                            UMath::Vector3::kZero, matrix, radius, mass);
@@ -225,8 +225,7 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     if (mAttributes.EventSequencer().IsNotEmpty()) {
         Sim::Collision::AddListener(static_cast<Sim::Collision::IListener *>(this),
                                     GetInstanceHandle(), "Smackable");
-    }
-}
+    }}
 
 Smackable::~Smackable() {
     DetachAll();
