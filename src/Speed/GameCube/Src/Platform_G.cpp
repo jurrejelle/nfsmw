@@ -304,17 +304,16 @@ void DVDErrorTask(void *, int) {
         }
 
         /* Check for software reset combo (L+R+Start = 0x1600) on pad 0 or pad 1 */
-        if ((HardwarePadStatus[0].button & 0x1600) == 0x1600 ||
-            (HardwarePadStatus[1].button & 0x1600) == 0x1600) {
+        if ((HardwarePadStatus[0].button & resetButtonCombo) == resetButtonCombo ||
+            (HardwarePadStatus[1].button & resetButtonCombo) == resetButtonCombo) {
             if (!softwareResetCheckStarted) {
                 softwareResetStartTick = OSGetTick();
                 softwareResetCheckStarted = 1;
             } else {
-                u32 currentTick = OSGetTick();
-                u32 ticksPerMs = OS_BUS_CLOCK / 4000;
-                u32 elapsed = currentTick - softwareResetStartTick;
-                u32 msElapsed = elapsed / ticksPerMs;
-                if (msElapsed > 500) {
+                u32 current_tick = OSGetTick();
+                u32 diff_tick = (current_tick - softwareResetStartTick) / (OS_BUS_CLOCK / 4000);
+
+                if (diff_tick > 500) {
                     resetMode = 0;
                     softwareResetTriggered = 1;
                 }
