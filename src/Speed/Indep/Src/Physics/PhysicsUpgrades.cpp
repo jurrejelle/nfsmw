@@ -139,9 +139,10 @@ void BlendParts<int>(const Attribute &start_attribute, const Attribute &end_attr
 template <typename T>
 void ScalePart(Attribute &attrib, unsigned int index, float scale) {
     T start_data = T();
-    T new_data;
 
     attrib.Get(index, start_data);
+
+    T new_data;
 
     float *start_ptr = reinterpret_cast<float *>(&start_data);
     float *new_ptr = reinterpret_cast<float *>(&new_data);
@@ -694,13 +695,11 @@ PUJunkNode::PUJunkNode(const RefSpec &collection, const Attrib::Gen::junkman &ju
     : Instance(collection, 0, nullptr) {
     Attribute junk_attribute;
     if (junkman.Lookup(junkkey, junk_attribute)) {
-        Key uniqueKey = GenerateUniqueKey("junk_upgrade", false);
-        Modify(uniqueKey, 0);
+        Modify(GenerateUniqueKey("junk_upgrade", false), 0);
         unsigned int len = junk_attribute.GetLength();
         for (unsigned int index = 0; index < len; index++) {
             JunkmanMod modifire;
-            junk_attribute.Get(index, modifire);
-            if (&modifire != nullptr) {
+            if (junk_attribute.Get(index, modifire)) {
                 Attribute start_attribute = Get(modifire.DefinitionKey);
                 unsigned int count = start_attribute.GetLength();
                 if (count != 0) {
@@ -708,20 +707,19 @@ PUJunkNode::PUJunkNode(const RefSpec &collection, const Attrib::Gen::junkman &ju
                     Attribute attribute = Get(modifire.DefinitionKey);
                     unsigned int type = attribute.GetType();
                     for (unsigned int i = 0; i < count; i++) {
-                        if (type == 0x4cb36381) {
+                        switch (type) {
+                        case 0x4cb36381:
                             ScalePart<AxlePair>(attribute, i, modifire.Scale);
-                        } else if (type < 0x4cb36382) {
-                            if (type == 0x3c16ec5e) {
-                                ScalePart<float>(attribute, i, modifire.Scale);
-                            } else {
-                                bBreak();
-                            }
-                        } else {
-                            if (type != 0x5763da41) {
-                                bBreak();
-                                continue;
-                            }
+                            break;
+                        case 0x3c16ec5e:
+                            ScalePart<float>(attribute, i, modifire.Scale);
+                            break;
+                        case 0x5763da41:
                             ScalePart<int>(attribute, i, modifire.Scale);
+                            break;
+                        default:
+                            bBreak();
+                            break;
                         }
                     }
                 }
@@ -741,40 +739,41 @@ PUPartNode::PUPartNode(const RefSpec &collection0, const RefSpec &collection1, f
         Instance end_instance(collection1, 0, nullptr);
         Instance start_instance(collection0, 0, nullptr);
         AttributeIterator iter = end_instance.Iterator();
-        while (iter.Valid()) {
-            Key key = iter.GetKey();
-            Attribute end_attribute = end_instance.Get(key);
-            Attribute start_attribute = start_instance.Get(key);
-            unsigned int end_count = end_attribute.GetLength();
-            unsigned int start_count = start_attribute.GetLength();
-            unsigned int count = UMath::Max(end_count, start_count);
-            unsigned int end_type = end_attribute.GetType();
-            unsigned int start_type = start_attribute.GetType();
-            if (end_type == start_type) {
+        if (iter.Valid()) {
+            do {
+                Key key = iter.GetKey();
+                Attribute end_attribute = end_instance.Get(key);
+                Attribute start_attribute = start_instance.Get(key);
+                unsigned int end_count = end_attribute.GetLength();
+                unsigned int start_count = start_attribute.GetLength();
+                unsigned int count = UMath::Max(end_count, start_count);
+                unsigned int end_type = end_attribute.GetType();
+                unsigned int start_type = start_attribute.GetType();
+                if (end_type != start_type) {
+                    continue;
+                }
                 if (count != 0) {
                     Add(key, count);
                     Attribute new_attrib = Get(key);
                     unsigned int type = start_attribute.GetType();
                     for (unsigned int i = 0; i < count; i++) {
-                        if (type == 0x4cb36381) {
+                        switch (type) {
+                        case 0x4cb36381:
                             BlendParts<AxlePair>(start_attribute, end_attribute, i, weight, new_attrib);
-                        } else if (type < 0x4cb36382) {
-                            if (type == 0x3c16ec5e) {
-                                BlendParts<float>(start_attribute, end_attribute, i, weight, new_attrib);
-                            } else {
-                                bBreak();
-                            }
-                        } else {
-                            if (type != 0x5763da41) {
-                                bBreak();
-                                continue;
-                            }
+                            break;
+                        case 0x3c16ec5e:
+                            BlendParts<float>(start_attribute, end_attribute, i, weight, new_attrib);
+                            break;
+                        case 0x5763da41:
                             BlendParts<int>(start_attribute, end_attribute, i, weight, new_attrib);
+                            break;
+                        default:
+                            bBreak();
+                            break;
                         }
                     }
                 }
-            }
-            iter.Advance();
+            } while (iter.Advance());
         }
     }
 }
