@@ -41,20 +41,20 @@ PhysicsObject::PhysicsObject(const Attrib::Instance &attribs, SimableType objTyp
     , ISimable(this) //
     , IBody(this) //
     , IAttachable(this) //
+    , mWPos(new WWorldPos(0.025f)) //
+    , mObjType(objType) //
+    , mOwner(nullptr) //
     , mAttributes(attribs.GetConstCollection(), 0, nullptr) //
+    , mRigidBody(nullptr) //
+    , mEntity(nullptr) //
+    , mPlayer(nullptr) //
+    , mBodyService(nullptr) //
+    , mWorldID(reinterpret_cast<unsigned int>(GetInstanceHandle()) | 0x1000000) //
+    , mAttachments(new Sim::Attachments(static_cast<IAttachable *>(this))) //
 {
-    mWPos = new WWorldPos(0.025f);
-    mObjType = objType;
-    mOwner = nullptr;
-    mRigidBody = nullptr;
-    mEntity = nullptr;
-    mPlayer = nullptr;
-    mBodyService = nullptr;
-    mWorldID = reinterpret_cast<unsigned int>(GetInstanceHandle()) | 0x1000000;
     if (wuid != 0) {
         mWorldID = wuid;
     }
-    mAttachments = new Sim::Attachments(static_cast<IAttachable *>(this));
     mSimulateTask = AddTask(UCrc32(stringhash32("Physics")), 1.0f, 0.0f, Sim::TASK_FRAME_FIXED);
     Sim::ProfileTask(mSimulateTask, "Physics");
     Sim::Collision::AddParticipant(GetInstanceHandle());
@@ -66,24 +66,23 @@ PhysicsObject::PhysicsObject(const char *attributeClass, const char *attribName,
     , ISimable(this) //
     , IBody(this) //
     , IAttachable(this) //
+    , mWPos(new WWorldPos(0.025f)) //
+    , mObjType(objType) //
+    , mOwner(owner) //
     , mAttributes(Attrib::FindCollectionWithDefault(Attrib::StringToKey(attributeClass),
                                                     Attrib::StringToKey(attribName)),
                   0, nullptr) //
+    , mRigidBody(nullptr) //
+    , mEntity(nullptr) //
+    , mPlayer(nullptr) //
+    , mBodyService(nullptr) //
+    , mWorldID(reinterpret_cast<unsigned int>(GetInstanceHandle()) | 0x1000000) //
+    , mAttachments(new Sim::Attachments(static_cast<IAttachable *>(this))) //
 {
-    mWPos = new WWorldPos(0.025f);
-    mObjType = objType;
-    mOwner = owner;
-    mRigidBody = nullptr;
-    mEntity = nullptr;
-    mPlayer = nullptr;
-    mBodyService = nullptr;
-    mWorldID = reinterpret_cast<unsigned int>(GetInstanceHandle()) | 0x1000000;
     if (wuid != 0) {
         mWorldID = wuid;
     }
-    mAttachments = new Sim::Attachments(static_cast<IAttachable *>(this));
     mSimulateTask = AddTask(UCrc32(stringhash32("Physics")), 1.0f, 0.0f, Sim::TASK_FRAME_FIXED);
-    Sim::ProfileTask(mSimulateTask, "Physics");
     Sim::Collision::AddParticipant(GetInstanceHandle());
 }
 
