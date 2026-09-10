@@ -153,7 +153,7 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
     GXTexWrapMode wrap_t;
     unsigned int texture_format;
     unsigned int texture_format_IA8;
-    GXTlutFmt palette_format;
+    unsigned int palette_format;
 
     wrap_s = GX_CLAMP;
     wrap_t = GX_CLAMP;
@@ -175,11 +175,9 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
     palette_format = format >= static_cast<int>(texture_format_IA8) ? GX_TL_RGB5A3 : GX_TL_IA8;
 
     if (HasClut()) {
-        GXTexObj *obj = &ImageInfos.obj;
-
-        GXInitTexObjCI(obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXCITexFmt>(texture_format),
+        GXInitTexObjCI(&ImageInfos.obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXCITexFmt>(texture_format),
                        wrap_s, wrap_t, static_cast<u8>(mip), 0);
-        GXInitTlutObj(&ImageInfos.objClut, imagePal, palette_format, texture_format == GX_TF_C4 ? 0x10 : 0x100);
+        GXInitTlutObj(&ImageInfos.objClut, imagePal, static_cast<GXTlutFmt>(palette_format), texture_format == GX_TF_C4 ? 0x10 : 0x100);
     } else {
         GXInitTexObj(&ImageInfos.obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXTexFmt>(texture_format),
                      wrap_s, wrap_t, static_cast<u8>(mip));
