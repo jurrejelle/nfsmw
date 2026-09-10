@@ -14,34 +14,35 @@ namespace CollisionGeometry {
 
 static Collections TheCollections;
 
-BoundsPack::BoundsPack(bChunk *pack) : mChunk(pack) {
-    bChunk *last_chunk = reinterpret_cast<bChunk *>(reinterpret_cast<char *>(pack) + pack->Size + 8);
-    int count = 0;
-    for (bChunk *chunk = pack->GetFirstChunk(); chunk < last_chunk; chunk = chunk->GetNext()) {
-        count = count + 1;
-    }
-    this->mTable.reserve(count);
-
-    for (bChunk *chunk = pack->GetFirstChunk(); chunk < last_chunk; chunk = chunk->GetNext()) {
-        BoundsHeader *pheader = reinterpret_cast<BoundsHeader *>(chunk->GetAlignedData(16));
-        UCrc32 name(pheader->fNameHash);
-        ::bPlatEndianSwap(&name);
-
-        Collection *collection = this->mTable.Find(UCrc32(name));
-        if (collection == nullptr) {
-            collection = reinterpret_cast<Collection *>(pheader);
-            collection->Init();
-            this->mTable.Add(collection);
-        }
-    }
-}
-
 inline Collection *BoundsPack::Table::Find(UCrc32 name) {
     Pair *iter = _STL::lower_bound(this->begin(), this->end(), Pair(name, nullptr));
     if (iter != this->end() && iter->Name == name) {
         return iter->Collection;
     }
     return nullptr;
+}
+
+BoundsPack::BoundsPack(bChunk *pack) : mChunk(pack) {
+    bChunk *chunk;
+    int count = 0;
+    bChunk *last_chunk = pack->GetLastChunk();
+    for (chunk = pack->GetFirstChunk(); chunk < last_chunk; chunk = chunk->GetNext()) {
+        count = count + 1;
+    }
+    this->mTable.reserve(count);
+
+    for (chunk = pack->GetFirstChunk(); chunk < last_chunk; chunk = chunk->GetNext()) {
+        BoundsHeader *pheader = reinterpret_cast<BoundsHeader *>(chunk->GetAlignedData(16));
+        UCrc32 name(pheader->fNameHash);
+        if (pheader->fIsResolved == 0) {
+            ::bPlatEndianSwap(&name);
+        }
+
+        if (this->mTable.Find(UCrc32(name)) == nullptr) {
+            reinterpret_cast<Collection *>(pheader)->Init();
+            this->mTable.Add(reinterpret_cast<Collection *>(pheader));
+        }
+    }
 }
 
 BoundsPack *Collections::Find(const bChunk *header) {
@@ -117,44 +118,37 @@ void Collection::Init() {
     if (this->fIsResolved == 0) {
         ::bPlatEndianSwap(&this->fNameHash);
         ::bPlatEndianSwap(&this->fNumBounds);
-        if (this->fIsResolved == 0) {
-            int i;
-            PCloud *pcloud;
-            for (i = 0; i < this->fNumBounds; i++) {
-                Bounds &bounds = this->GetBounds()[i];
-                ::bPlatEndianSwap(&bounds.fPosition.x);
-                ::bPlatEndianSwap(&bounds.fPosition.y);
-                ::bPlatEndianSwap(&bounds.fPosition.z);
-                ::bPlatEndianSwap(&bounds.fHalfDimensions.x);
-                ::bPlatEndianSwap(&bounds.fHalfDimensions.y);
-                ::bPlatEndianSwap(&bounds.fHalfDimensions.z);
-                ::bPlatEndianSwap(&bounds.fOrientation.x);
-                ::bPlatEndianSwap(&bounds.fOrientation.y);
-                ::bPlatEndianSwap(&bounds.fOrientation.z);
-                ::bPlatEndianSwap(&bounds.fOrientation.w);
-                ::bPlatEndianSwap(&bounds.fPivot.x);
-                ::bPlatEndianSwap(&bounds.fPivot.y);
-                ::bPlatEndianSwap(&bounds.fPivot.z);
-                ::bPlatEndianSwap(&bounds.fChildIndex);
-                ::bPlatEndianSwap(&bounds.fRadius);
-                ::bPlatEndianSwap(&bounds.fFlags);
-                ::bPlatEndianSwap(&bounds.fNameHash);
-                ::bPlatEndianSwap(&bounds.fSurface);
-            }
-            ::bPlatEndianSwap(&this->GetPCHeader()->fNumPClouds);
-            pcloud = this->GetPCloud();
-            i = 0;
-            while (i < this->GetPCHeader()->fNumPClouds) {
-                ::bPlatEndianSwap(&pcloud->fNumVerts);
-                i = i + 1;
-                pcloud->fPList = reinterpret_cast<UMath::Vector4 *>(pcloud + 1);
-                for (int j = 0; j < pcloud->fNumVerts; j++) {
-                    ::bPlatEndianSwap(&pcloud->fPList[j]);
-                }
-                pcloud = reinterpret_cast<PCloud *>(pcloud->fPList + pcloud->fNumVerts);
-            }
-            this->fIsResolved = 1;
+    }
+    if (this->fIsResolved == 0) {
+        int i;
+        PCloud *pcloud;
+        for (i = 0; i < this->fNumBounds; i++) {
+            Bounds &bounds = this->GetBounds()[i];
+            bounds.fPosition.EndianSwap();
+            bounds.fHalfDimensions.EndianSwap();
+            bounds.fOrientation.EndianSwap();
+            bounds.fPivot.EndianSwap();
+            ::bPlatEndianSwap(&bounds.fNumChildren);
+            ::bPlatEndianSwap(&bounds.fChildIndex);
+            ::bPlatEndianSwap(&bounds.fRadius);
+            ::bPlatEndianSwap(&bounds.fPCloudIndex);
+            ::bPlatEndianSwap(&bounds.fFlags);
+            ::bPlatEndianSwap(&bounds.fNameHash);
+            ::bPlatEndianSwap(&bounds.fSurface);
         }
+        ::bPlatEndianSwap(&this->GetPCHeader()->fNumPClouds);
+        pcloud = this->GetPCloud();
+        i = 0;
+        while (i < this->GetPCHeader()->fNumPClouds) {
+            ::bPlatEndianSwap(&pcloud->fNumVerts);
+            i = i + 1;
+            pcloud->fPList = reinterpret_cast<UMath::Vector4 *>(pcloud + 1);
+            for (int j = 0; j < pcloud->fNumVerts; j++) {
+                ::bPlatEndianSwap(&pcloud->fPList[j]);
+            }
+            pcloud = reinterpret_cast<PCloud *>(pcloud->fPList + pcloud->fNumVerts);
+        }
+        this->fIsResolved = 1;
     } else {
         PCloud *pcloud = this->GetPCloud();
         for (int i = 0; i < this->GetPCHeader()->fNumPClouds; i++) {

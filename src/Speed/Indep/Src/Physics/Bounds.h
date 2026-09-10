@@ -7,10 +7,12 @@
 #include "Speed/Indep/Libs/Support/Utility/FastMem.h"
 #include "Speed/Indep/Libs/Support/Utility/UCOM.h"
 #include "Speed/Indep/Libs/Support/Utility/UCollections.h"
+#include "Speed/Indep/Libs/Support/Utility/UStandard.h"
 #include "Speed/Indep/Libs/Support/Utility/UCrc.h"
 #include "Speed/Indep/Src/Sim/SimSurface.h"
 #include "Speed/Indep/bWare/Inc/bChunk.hpp"
 #include "Speed/Indep/bWare/Inc/bList.hpp"
+#include "Speed/Indep/bWare/Inc/bWare.hpp"
 
 DECLARE_CONTAINER_TYPE(CollisionBoundsTable);
 
@@ -41,6 +43,12 @@ struct _V3c {
         to.z = static_cast<float>(z) / COLLISION_GEOM_VECTOR_PRESSICION;
     }
 
+    void EndianSwap() {
+        bPlatEndianSwap(&this->x);
+        bPlatEndianSwap(&this->y);
+        bPlatEndianSwap(&this->z);
+    }
+
     int16 x; // offset 0x0, size 0x2
     int16 y; // offset 0x2, size 0x2
     int16 z; // offset 0x4, size 0x2
@@ -53,6 +61,13 @@ struct _Q4c {
         to.y = static_cast<float>(this->y) / COLLISION_GEOM_QUAT_PRECISION;
         to.z = static_cast<float>(this->z) / COLLISION_GEOM_QUAT_PRECISION;
         to.w = static_cast<float>(this->w) / COLLISION_GEOM_QUAT_PRECISION;
+    }
+
+    void EndianSwap() {
+        bPlatEndianSwap(&this->x);
+        bPlatEndianSwap(&this->y);
+        bPlatEndianSwap(&this->z);
+        bPlatEndianSwap(&this->w);
     }
 
     int16 x; // offset 0x0, size 0x2
@@ -194,12 +209,11 @@ class BoundsPack : public bTNode<BoundsPack> {
         struct Collection *Collection; // offset 0x4, size 0x4
     };
 
-    class Table : public _STL::vector<Pair, UTL::Std::Allocator<Pair, _type_CollisionBoundsTable> > {
+    class Table : public UTL::Std::vector<Pair, _type_CollisionBoundsTable> {
       public:
         void Add(Collection *collection) {
             Pair pair(collection->fNameHash, collection);
-            iterator pos = _STL::upper_bound(this->begin(), this->end(), pair);
-            this->insert(pos, pair);
+            this->insert(_STL::upper_bound(this->begin(), this->end(), pair), pair);
         }
 
         Collection *Find(UCrc32 name);
