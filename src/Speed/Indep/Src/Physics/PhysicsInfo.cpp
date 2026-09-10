@@ -760,45 +760,44 @@ bool Physics::Info::EstimatePerformance(const Attrib::Gen::pvehicle &vehicle, Pe
     Performance stock;
     Performance upgraded;
 
-    bool success = GetStockPerformance(vehicle, stock);
-    bool result = false;
-    if (success) {
-        success = GetMaximumPerformance(vehicle, upgraded);
-        if (success) {
-            perf.TopSpeed = 0.0f;
+    if (!GetStockPerformance(vehicle, stock)) {
+        return false;
+    }
+    if (!GetMaximumPerformance(vehicle, upgraded)) {
+        return false;
+    }
+    {
+        {
             perf.Acceleration = 0.0f;
             perf.Handling = 0.0f;
+            perf.TopSpeed = 0.0f;
 
             Performance weights;
             Performance junk;
             Performance junk_weights;
 
-            Physics::Info::Performance *pw = PerformanceWeights;
-            Physics::Upgrades::Type type = Physics::Upgrades::PUT_TIRES;
-            do {
-                float value = Physics::Upgrades::GetPercent(vehicle, type);
+            for (int type = 0; type < 7; type++) {
+                float value = Physics::Upgrades::GetPercent(vehicle, static_cast<Physics::Upgrades::Type>(type));
 
-                junk_weights.Handling += pw->Handling;
-                junk_weights.Acceleration += pw->Acceleration;
-                junk_weights.TopSpeed += pw->TopSpeed;
+                junk_weights.Handling += PerformanceWeights[type].Handling;
+                junk_weights.Acceleration += PerformanceWeights[type].Acceleration;
+                junk_weights.TopSpeed += PerformanceWeights[type].TopSpeed;
 
-                if (Physics::Upgrades::GetJunkman(vehicle, type)) {
-                    junk.Handling += pw->Handling;
-                    junk.Acceleration += pw->Acceleration;
-                    junk.TopSpeed += pw->TopSpeed;
+                if (Physics::Upgrades::GetJunkman(vehicle, static_cast<Physics::Upgrades::Type>(type))) {
+                    junk.Handling += PerformanceWeights[type].Handling;
+                    junk.Acceleration += PerformanceWeights[type].Acceleration;
+                    junk.TopSpeed += PerformanceWeights[type].TopSpeed;
                 }
 
-                float hw = pw->Handling;
-                type = static_cast<Physics::Upgrades::Type>(type + Physics::Upgrades::PUT_BRAKES);
-                float handling = hw * value + perf.Handling;
-                weights.Handling += hw;
-                perf.Handling = handling;
-                weights.Acceleration += pw->Acceleration;
-                perf.Acceleration += pw->Acceleration * value;
-                weights.TopSpeed += pw->TopSpeed;
-                perf.TopSpeed += pw->TopSpeed * value;
-                pw++;
-            } while (static_cast<int>(type) < 7);
+                weights.Handling += PerformanceWeights[type].Handling;
+                perf.Handling = PerformanceWeights[type].Handling * value + perf.Handling;
+
+                weights.Acceleration += PerformanceWeights[type].Acceleration;
+                perf.Acceleration = PerformanceWeights[type].Acceleration * value + perf.Acceleration;
+
+                weights.TopSpeed += PerformanceWeights[type].TopSpeed;
+                perf.TopSpeed = PerformanceWeights[type].TopSpeed * value + perf.TopSpeed;
+            }
 
             if (weights.Handling > 1e-6f) {
                 perf.Handling = perf.Handling / weights.Handling;
@@ -811,9 +810,9 @@ bool Physics::Info::EstimatePerformance(const Attrib::Gen::pvehicle &vehicle, Pe
             }
 
             if (junk_weights.Handling > 1e-6f) {
-                float junk_ratio = junk.Handling / junk_weights.Handling;
-                upgraded.Handling = UMath::Lerp(upgraded.Handling, 1.0f, junk_ratio);
-                float bonus = junk_ratio * 0.33f;
+                junk.Handling = junk.Handling / junk_weights.Handling;
+                upgraded.Handling = UMath::Lerp(upgraded.Handling, 1.0f, junk.Handling);
+                float bonus = junk.Handling * 0.33f;
                 float h = perf.Handling * (bonus + 1.0f);
                 perf.Handling = h;
                 stock.Handling = UMath::Lerp(stock.Handling, upgraded.Handling, bonus);
@@ -821,9 +820,9 @@ bool Physics::Info::EstimatePerformance(const Attrib::Gen::pvehicle &vehicle, Pe
             }
 
             if (junk_weights.Acceleration > 1e-6f) {
-                float junk_ratio = junk.Acceleration / junk_weights.Acceleration;
-                upgraded.Acceleration = UMath::Lerp(upgraded.Acceleration, 1.0f, junk_ratio);
-                float bonus = junk_ratio * 0.33f;
+                junk.Acceleration = junk.Acceleration / junk_weights.Acceleration;
+                upgraded.Acceleration = UMath::Lerp(upgraded.Acceleration, 1.0f, junk.Acceleration);
+                float bonus = junk.Acceleration * 0.33f;
                 float a = perf.Acceleration * (bonus + 1.0f);
                 perf.Acceleration = a;
                 stock.Acceleration = UMath::Lerp(stock.Acceleration, upgraded.Acceleration, bonus);
@@ -831,24 +830,21 @@ bool Physics::Info::EstimatePerformance(const Attrib::Gen::pvehicle &vehicle, Pe
             }
 
             if (junk_weights.TopSpeed > 1e-6f) {
-                float junk_ratio = junk.TopSpeed / junk_weights.TopSpeed;
-                upgraded.TopSpeed = UMath::Lerp(upgraded.TopSpeed, 1.0f, junk_ratio);
-                float bonus = junk_ratio * 0.33f;
+                junk.TopSpeed = junk.TopSpeed / junk_weights.TopSpeed;
+                upgraded.TopSpeed = UMath::Lerp(upgraded.TopSpeed, 1.0f, junk.TopSpeed);
+                float bonus = junk.TopSpeed * 0.33f;
                 float t = perf.TopSpeed * (bonus + 1.0f);
                 perf.TopSpeed = t;
                 stock.TopSpeed = UMath::Lerp(stock.TopSpeed, upgraded.TopSpeed, bonus);
                 perf.TopSpeed = UMath::Min(t, 1.0f);
             }
 
-            result = true;
             perf.Handling = UMath::Lerp(stock.Handling, upgraded.Handling, perf.Handling);
             perf.Acceleration = UMath::Lerp(stock.Acceleration, upgraded.Acceleration, perf.Acceleration);
             perf.TopSpeed = UMath::Lerp(stock.TopSpeed, upgraded.TopSpeed, perf.TopSpeed);
-        } else {
-            result = false;
         }
     }
-    return result;
+    return true;
 }
 
 bool Physics::Info::ComputePerformance(const Attrib::Gen::pvehicle &vehicle, Performance &perf) {
@@ -857,14 +853,14 @@ bool Physics::Info::ComputePerformance(const Attrib::Gen::pvehicle &vehicle, Per
     }
 
     for (PerformanceMaps::iterator iter = TheStockCars.begin(); iter != TheStockCars.end(); iter++) {
-        if ((*iter).Key == vehicle.GetCollection()) {
-            perf = (*iter).Stock;
+        PerfLevel &p = *iter;
+        if (p.Key == vehicle.GetCollection()) {
+            perf = p.Stock;
             return true;
         }
     }
 
-    unsigned int coll_key = vehicle.GetCollection();
-    PerfLevel perf_level(coll_key);
+    PerfLevel perf_level(vehicle.GetCollection());
     if (!perf_level.Analyze(vehicle)) {
         return false;
     }
