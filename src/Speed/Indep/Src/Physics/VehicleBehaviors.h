@@ -3,6 +3,16 @@
 
 #include "Behavior.h"
 
+// total size: 0x10
+struct AIParams : public Sim::Param {
+    AIParams() : Sim::Param(TypeName(), static_cast<AIParams *>(nullptr)) {}
+
+    static UCrc32 TypeName() {
+        static UCrc32 value = "AIParams";
+        return value;
+    }
+};
+
 // total size: 0x38
 struct RBComplexParams : public Sim::Param {
     static UCrc32 TypeName() {

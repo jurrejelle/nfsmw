@@ -206,6 +206,10 @@ inline void Unitxyz(const Vector4 &a, Vector4 &r) {
     VU0_v4unitxyz(a, r);
 }
 
+inline void Unitxyz(Vector4 &a) {
+    VU0_v4unitxyz(a, a);
+}
+
 inline void MultXRot(const UMath::Matrix4 &m, float a, UMath::Matrix4 &r) {
     MATRIX4_multxrot(&m, a, &r);
 }
@@ -284,6 +288,14 @@ inline void ScaleAddxyz(const Vector4 &a, const float s, const Vector4 &b, Vecto
 
 inline void AddScale(const Vector3 &a, const Vector3 &b, const float s, Vector3 &r) {
     VU0_v3addscale(a, b, s, r);
+}
+
+inline void AddScale(const Vector4 &a, const Vector4 &b, const float s, Vector4 &r) {
+    VU0_v4addscale(a, b, s, r);
+}
+
+inline void AddScalexyz(const Vector4 &a, const Vector4 &b, const float s, Vector4 &r) {
+    VU0_v4addscalexyz(a, b, s, r);
 }
 
 inline void Sub(const Vector3 &a, const Vector3 &b, Vector3 &r) {

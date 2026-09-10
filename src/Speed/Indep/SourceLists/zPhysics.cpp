@@ -7,6 +7,8 @@
 
 #include "Speed/Indep/Src/Physics/Common/Explosion.cpp"
 
+#include "Speed/Indep/Src/Physics/Common/PVehicle.cpp"
+
 #include "Speed/Indep/Src/Physics/Common/PhysicsObject.cpp"
 
 #include "Speed/Indep/Src/Physics/Common/Smackable.cpp"
