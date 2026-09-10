@@ -32,11 +32,7 @@ struct Performance {
         Acceleration = accel;
     }
 
-    void Default() {
-        TopSpeed = 0.0f;
-        Handling = 0.0f;
-        Acceleration = 0.0f;
-    }
+    void Default();
 
     void Maximize(const Performance &other) {
         TopSpeed = UMath::Max(TopSpeed, other.TopSpeed);
@@ -48,6 +44,12 @@ struct Performance {
     float Handling;
     float Acceleration;
 };
+
+inline void Performance::Default() {
+    TopSpeed = 0.0f;
+    Handling = 0.0f;
+    Acceleration = 0.0f;
+}
 
 void Init();
 

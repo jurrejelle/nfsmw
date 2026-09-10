@@ -320,7 +320,7 @@ bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgr
     RefSpec newref;
     newref.SetCollection(node.GetConstCollection());
 
-    if (newref != basepart) {
+    if (!(newref == basepart)) {
         if (!newvehicle.IsDynamic()) {
             const char *name = newvehicle.CollectionName();
             Key uniqueKey = newvehicle.GenerateUniqueKey(name, false);
@@ -339,7 +339,7 @@ bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgr
         return false;
     }
 
-    vehicle = static_cast<const Attrib::Instance &>(newvehicle);
+    vehicle = newvehicle;
     return true;
 }
 
@@ -347,6 +347,7 @@ bool Physics::Upgrades::ApplyPreset(Attrib::Gen::pvehicle &vehicle, const Attrib
     if (!presetride.IsValid()) {
         return false;
     }
+
     if (!vehicle.IsValid()) {
         return false;
     }
@@ -367,18 +368,27 @@ bool Physics::Upgrades::ApplyPreset(Attrib::Gen::pvehicle &vehicle, const Attrib
         }
 
         Attribute attrib;
-        if (!presetride.Lookup(part->presetkey, attrib) || !attrib.IsValid()) {
+        if (!presetride.Lookup(part->presetkey, attrib)) {
             continue;
         }
 
-        int level = UMath::Min(attrib.Get< int >(0u), max_level);
+        if (!attrib.IsValid()) {
+            continue;
+        }
+
+        int level = 0;
+        if (!attrib.Get(0, level)) {
+            continue;
+        }
+
+        level = UMath::Min(max_level, level);
 
         if (!SetLevel(newvehicle, type, level)) {
             return false;
         }
     }
 
-    vehicle = static_cast<const Attrib::Instance &>(newvehicle);
+    vehicle = newvehicle;
     return true;
 }
 
@@ -620,61 +630,32 @@ bool Physics::Upgrades::MatchPerformance(Attrib::Gen::pvehicle &vehicle, const P
 
     Physics::Info::Performance match_line;
 
-    float acc_range = upgraded_performance.Acceleration - stock_performance.Acceleration;
-    if (acc_range > 1e-06f) {
-        match_line.Acceleration = UMath::Ramp(
-            (matched_performance.Acceleration - stock_performance.Acceleration) / acc_range,
-            0.0f, 1.0f);
-    } else {
-        match_line.Acceleration = 0.0f;
-    }
-
-    float top_range = upgraded_performance.TopSpeed - stock_performance.TopSpeed;
-    if (top_range > 1e-06f) {
-        match_line.TopSpeed = UMath::Ramp(
-            (matched_performance.TopSpeed - stock_performance.TopSpeed) / top_range,
-            0.0f, 1.0f);
-    } else {
-        match_line.TopSpeed = 0.0f;
-    }
-
-    float hand_range = upgraded_performance.Handling - stock_performance.Handling;
-    if (hand_range > 1e-06f) {
-        match_line.Handling = UMath::Ramp(
-            (matched_performance.Handling - stock_performance.Handling) / hand_range,
-            0.0f, 1.0f);
-    } else {
-        match_line.Handling = 0.0f;
-    }
+    match_line.Acceleration = UMath::Ramp(matched_performance.Acceleration, stock_performance.Acceleration, upgraded_performance.Acceleration);
+    match_line.TopSpeed = UMath::Ramp(matched_performance.TopSpeed, stock_performance.TopSpeed, upgraded_performance.TopSpeed);
+    match_line.Handling = UMath::Ramp(matched_performance.Handling, stock_performance.Handling, upgraded_performance.Handling);
 
     for (int i = 0; i < Physics::Upgrades::PUT_MAX; i++) {
         Physics::Upgrades::Type type = static_cast<Physics::Upgrades::Type>(i);
         float weight;
 
         switch (type) {
-        case Physics::Upgrades::PUT_TIRES:
+        case Physics::Upgrades::PUT_BRAKES:
             weight = match_line.Handling;
             break;
-        case Physics::Upgrades::PUT_BRAKES:
+        case Physics::Upgrades::PUT_TIRES:
+        case Physics::Upgrades::PUT_CHASSIS:
             weight = (match_line.Handling + match_line.TopSpeed) * 0.5f;
             break;
-        case Physics::Upgrades::PUT_CHASSIS:
-            weight = match_line.Handling;
-            break;
-        case Physics::Upgrades::PUT_TRANSMISSION:
-            weight = (match_line.Acceleration + match_line.TopSpeed) * 0.5f;
-            break;
-        case Physics::Upgrades::PUT_ENGINE:
-            weight = (match_line.Acceleration + match_line.TopSpeed) * 0.5f;
-            break;
         case Physics::Upgrades::PUT_INDUCTION:
-            weight = match_line.Acceleration;
-            break;
         case Physics::Upgrades::PUT_NOS:
             weight = match_line.Acceleration;
             break;
+        case Physics::Upgrades::PUT_TRANSMISSION:
+        case Physics::Upgrades::PUT_ENGINE:
+            weight = (match_line.Acceleration + match_line.TopSpeed) * 0.5f;
+            break;
         default:
-            weight = (match_line.Acceleration + match_line.TopSpeed + match_line.Handling) / 3.0f;
+            weight = (match_line.Acceleration + match_line.TopSpeed + match_line.Handling) * 0.33333334f;
             break;
         }
 
@@ -683,8 +664,8 @@ bool Physics::Upgrades::MatchPerformance(Attrib::Gen::pvehicle &vehicle, const P
         if (weight > 0.0f) {
             int max_level = GetMaxLevel(vehicle, type);
             if (max_level > 0) {
-                float f_index = UMath::Ceil(weight * static_cast<float>(max_level));
-                int level = static_cast<int>(f_index);
+                float f_index = static_cast<float>(max_level);
+                int level = static_cast<int>(UMath::Ceil(weight * f_index));
                 if (!UpgradeInternal(newvehicle, type, level, weight)) {
                     return false;
                 }
