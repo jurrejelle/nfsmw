@@ -1167,9 +1167,10 @@ bool PVehicle::SetVehicleOnGround(const UMath::Vector3 &resetPos, const UMath::V
     } else {
         WWorldPos wpos(dim.y);
         wpos.SetTolerance(1.0f);
+        position.y = worldHeight;
+
         UMath::Vector4 plane[4];
         UMath::Vector4 axle_center = UMath::Vector4::kZero;
-        position.y = worldHeight;
         UMath::Vector4 p4 = UMath::Vector4Make(position, 1.0f);
         for (unsigned int i = 0; i < 4; i++) {
             UMath::Vector4 &this_corner = plane[i];
@@ -1183,7 +1184,8 @@ bool PVehicle::SetVehicleOnGround(const UMath::Vector3 &resetPos, const UMath::V
             if (wpos.OnValidFace()) {
                 float compression = mSuspension->GuessCompression(i, load);
                 float ride = mSuspension->GetRideHeight(i);
-                this_corner.y = dim.y + wpos.HeightAtPoint(UMath::Vector4To3(this_corner)) + (ride - compression);
+                float delta = ride - compression;
+                this_corner.y = dim.y + wpos.HeightAtPoint(UMath::Vector4To3(this_corner)) + delta;
             } else {
                 success = false;
             }
