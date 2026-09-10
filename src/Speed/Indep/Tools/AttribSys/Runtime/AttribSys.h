@@ -602,6 +602,17 @@ class Attribute {
         return false;
     }
 
+    template <typename T> bool Set(unsigned int index, const T &input) {
+        T *resultptr = reinterpret_cast<T *>(GetElementPointer(index));
+
+        if (resultptr != nullptr) {
+            *resultptr = input;
+            return true;
+        }
+
+        return false;
+    }
+
   private:
     void *GetInternalPointer(unsigned int index) const;
 
@@ -672,6 +683,19 @@ class Instance {
     unsigned int LocalAttribCount() const;
     bool Add(Key attributeKey, unsigned int count);
     bool Remove(Key attributeKey);
+
+    template <typename T> bool AddAndSet(Key attributeKey, const T *data, unsigned int count) {
+        if (!this->Add(attributeKey, count) && !this->Contains(attributeKey)) {
+            return false;
+        }
+
+        Attribute newattrib = this->Get(attributeKey);
+        for (unsigned int i = 0; i < count; i++) {
+            newattrib.Set(i, data[i]);
+        }
+
+        return true;
+    }
 
     // TODO
     template <typename T> TAttrib<T> GetOrClone(Key attributeKey) {}
