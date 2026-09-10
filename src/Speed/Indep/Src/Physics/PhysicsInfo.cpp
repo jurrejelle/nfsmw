@@ -715,16 +715,17 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
         float gear_ratio = trans.GEAR_RATIO(foward_gear + G_FIRST) * final_gear;
         float gear_eff = trans.GEAR_EFFICIENCY(foward_gear + G_FIRST);
 
+        float force = (avg_torque * gear_ratio * gear_eff) / wheel_radius;
+
         if (gear_ratio <= 0.0f) break;
 
         float speed = (eng.RED_LINE() * RPM2RPS(1.0f) * wheel_radius) / gear_ratio;
-        float force = (avg_torque * gear_ratio * gear_eff) / wheel_radius;
         float drag = speed * speed * chas.DRAG_COEFFICIENT();
         float accel = (force - drag) / mass;
 
         if (accel <= 0.0f) {
             if (prev_accel <= 0.0f) break;
-            speed = UMath::Lerp(prev_speed, speed, prev_accel / (prev_accel - accel));
+            speed = UMath::Lerp(prev_speed, speed, 1.0f - prev_accel / (prev_accel - accel));
             accel = 0.0f;
         }
 
@@ -744,7 +745,7 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
     Graph accel_graph(graph_data, graph_max);
     float max_speed = top_speed;
 
-    if (max_speed <= 0.0f) {
+    if (!(max_speed > 0.0f)) {
         return false;
     }
 
