@@ -584,24 +584,19 @@ bool Physics::Upgrades::SetLevel(Attrib::Gen::pvehicle &vehicle, Physics::Upgrad
 
     if (level < 1) {
         RemovePart(vehicle, type);
-    } else {
-        int max_level = GetMaxLevel(newvehicle, type);
-        if (max_level < 1) {
-            return false;
-        }
-        if (level > max_level) {
-            return false;
-        }
+        return true;
+    }
 
+    int max_level = GetMaxLevel(newvehicle, type);
+    if (max_level >= 1 && level <= max_level) {
         float weight = static_cast<float>(level) / static_cast<float>(max_level);
         if (UpgradeInternal(newvehicle, type, level, weight)) {
             vehicle = newvehicle;
-        } else {
-            return false;
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 void Physics::Upgrades::Clear(Attrib::Gen::pvehicle &vehicle) {
