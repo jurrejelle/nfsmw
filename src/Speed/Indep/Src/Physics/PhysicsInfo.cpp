@@ -667,8 +667,9 @@ void Physics::Info::Init() {
         PerfLevel &p = *iter;
         p.Upgraded = p.Stock;
         for (PerformanceMaps::iterator iter2 = upgraded_cars.begin(); iter2 != upgraded_cars.end(); iter2++) {
-            if (p.Key == (*iter2).Key) {
-                p.Upgraded = (*iter2).Stock;
+            PerfLevel &p2 = *iter2;
+            if (p.Key == p2.Key) {
+                p.Upgraded = p2.Stock;
                 break;
             }
         }
