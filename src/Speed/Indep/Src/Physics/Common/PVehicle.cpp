@@ -511,9 +511,8 @@ void PVehicle::CheckOffWorld() {
     set_false:
         mOffWorld = false;
     } else {
-        WCollisionMgr mgr(0, 3);
         float worldHeight = 0.0f;
-        mOffWorld = !mgr.GetWorldHeightAtPointRigorous(
+        mOffWorld = !WCollisionMgr(0, 3).GetWorldHeightAtPointRigorous(
             static_cast<ISimable *>(this)->GetPosition(), worldHeight, nullptr);
     }
 done:;
