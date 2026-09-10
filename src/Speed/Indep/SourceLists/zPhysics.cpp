@@ -13,4 +13,6 @@
 
 #include "Speed/Indep/Src/Physics/Common/Behavior.cpp"
 
+#include "Speed/Indep/Src/Physics/Common/Bounds.cpp"
+
 #include "Speed/Indep/Src/Physics/PhysicsInfo.cpp"

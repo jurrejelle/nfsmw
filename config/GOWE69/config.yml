@@ -29,6 +29,10 @@ block_relocations:
 # - source: .text:0x800F9368
 #   end: .text:0x800F9370
 
+# The bChunk ID 0x8003B900 that LoaderBounds/UnloaderBounds compare against is a
+# literal, but it collides with the address of a real function.
+- target: .text:0x8003b900
+
 - target: .text:0x80135100
 - target: .text:0x80135000
 - target: .text:0x80134001
