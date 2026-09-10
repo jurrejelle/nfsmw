@@ -8,6 +8,8 @@
 #include "Speed/Indep/bWare/Inc/bMemory.hpp"
 #include "dolphin.h"
 
+#include <dolphin/os/OSFastCast.h>
+
 /* LGWheels is defined later in the unity build, so forward-declare wrappers with asm labels */
 class LGWheels;
 extern LGWheels *plat_lgwheels;
@@ -157,8 +159,8 @@ char g_GC_Disk_GameName[4];
 int snProfilerEnable = 0;
 
 void InitPlatform() {
-    static char profdata[0x2000];
-    FILESYSOPTS opts;
+    FILESYSOPTS fso;
+    static unsigned long profdata[2048];
 
     bWareInit();
     OSInit();
@@ -171,40 +173,22 @@ void InitPlatform() {
     TIMER_init(0x64);
     *reinterpret_cast<unsigned int *>(g_GC_Disk_GameName) = *reinterpret_cast<const unsigned int *>(DVDGetCurrentDiskID());
 
-    opts.size = 0x38;
-    FILE_getopts(&opts);
-    opts.DiscType = 1;
-    opts.allocator = &gMemoryAllocator;
-    opts.MaxOpenFiles = 0x20;
-    opts.MaxFileOps = 0x40;
-    FILE_setopts(&opts);
+    fso.size = 0x38;
+    FILE_getopts(&fso);
+    fso.allocator = &gMemoryAllocator;
+    fso.DiscType = 1;
+    fso.MaxOpenFiles = 0x20;
+    fso.MaxFileOps = 0x40;
+    FILE_setopts(&fso);
 
     FILE_init(nullptr, 0);
     ASYNCFILE_init(0x10, 0);
     SYNCTASK_add(DVDErrorTask, 2, 0, 0);
 
-    asm volatile(
-        "li 3, 4\n\t"
-        "oris 3, 3, 4\n\t"
-        "mtspr 914, 3\n\t"
-        "li 3, 5\n\t"
-        "oris 3, 3, 5\n\t"
-        "mtspr 915, 3\n\t"
-        "li 3, 6\n\t"
-        "oris 3, 3, 6\n\t"
-        "mtspr 916, 3\n\t"
-        "li 3, 7\n\t"
-        "oris 3, 3, 7\n\t"
-        "mtspr 917, 3\n\t"
-        "lis 9, 0x0B07\n\t"
-        "ori 9, 9, 0x0B07\n\t"
-        "mtspr 917, 9\n\t"
-        "lis 11, 0x0704\n\t"
-        "ori 11, 11, 0x0704\n\t"
-        "mtspr 918, 11\n\t"
-        "lis 9, 0x0606\n\t"
-        "ori 9, 9, 0x0606\n\t"
-        "mtspr 919, 9");
+    OSInitFastCast();
+    OSSetGQR5(OS_GQR_S16, 11);
+    OSSetGQR6(OS_GQR_U8, 7);
+    OSSetGQR7(OS_GQR_S8, 6);
 
     if (snProfilerEnable) {
         fn_80311870(0x278D, profdata, 0x2000);
