@@ -11,9 +11,9 @@ inline void bPlatEndianSwap(UMath::Vector4 *v) {
     ::bPlatEndianSwap(&v->w);
 }
 
-namespace CollisionGeometry {
+static CollisionGeometry::Collections TheCollections;
 
-static Collections TheCollections;
+namespace CollisionGeometry {
 
 inline Collection *BoundsPack::Table::Find(UCrc32 name) {
     iterator iter = std::lower_bound(this->begin(), this->end(), Pair(name, nullptr));
@@ -384,7 +384,7 @@ int LoaderBounds(bChunk *chunk) {
     if (chunk->GetID() != 0x8003b900) {
         return 0;
     }
-    CollisionGeometry::TheCollections.AddHead(new CollisionGeometry::BoundsPack(chunk));
+    TheCollections.AddHead(new CollisionGeometry::BoundsPack(chunk));
     return 1;
 }
 
@@ -392,9 +392,9 @@ int UnloaderBounds(bChunk *chunk) {
     if (chunk->GetID() != 0x8003b900) {
         return 0;
     }
-    CollisionGeometry::BoundsPack *pack = CollisionGeometry::TheCollections.Find(chunk);
+    CollisionGeometry::BoundsPack *pack = TheCollections.Find(chunk);
     if (pack != nullptr) {
-        CollisionGeometry::TheCollections.Remove(pack);
+        TheCollections.Remove(pack);
         delete pack;
     }
     return 1;

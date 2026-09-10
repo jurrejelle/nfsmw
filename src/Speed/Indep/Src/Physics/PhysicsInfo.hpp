@@ -137,7 +137,6 @@ bool GetMaximumPerformance(const Attrib::Gen::pvehicle &pvehicle, Performance &p
 bool ComputeAccelerationTable(const Attrib::Gen::pvehicle &pvehicle, float &top_speed, float *table, int num_entries);
 void FindPerformanceCandidates(const Performance &minimum_perf, const Performance &maximum_perf, UTL::Std::list<unsigned int, _type_list> &candidates);
 
-extern Performance PerformanceWeights[7];
 
 } // namespace Info
 } // namespace Physics

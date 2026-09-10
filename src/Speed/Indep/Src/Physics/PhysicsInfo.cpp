@@ -10,7 +10,7 @@
 
 using namespace Attrib::Gen;
 
-Physics::Info::Performance Physics::Info::PerformanceWeights[7] = {
+static Physics::Info::Performance PerformanceWeights[7] = {
     Physics::Info::Performance(0.25f, 1.5f, 0.25f), // PUT_TIRES
     Physics::Info::Performance(0.0f, 0.5f, 0.0f),   // PUT_BRAKES
     Physics::Info::Performance(0.25f, 1.0f, 0.2f),  // PUT_CHASSIS
@@ -541,9 +541,9 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
     float weight_sum = 0.0f;
     int type = Physics::Upgrades::PUT_TIRES;
     do {
-        weight_sum += Physics::Info::PerformanceWeights[type].Handling;
+        weight_sum += PerformanceWeights[type].Handling;
         handling_sum += Physics::Upgrades::GetPercent(vehicle, static_cast<Physics::Upgrades::Type>(type)) *
-                        Physics::Info::PerformanceWeights[type].Handling;
+                        PerformanceWeights[type].Handling;
         type++;
     } while (type < 7);
     if (weight_sum > 1e-6f) {
