@@ -267,13 +267,11 @@ bool Physics::Upgrades::CanInstallJunkman(const Attrib::Gen::pvehicle &vehicle, 
 
     Attrib::Gen::junkman junkman(vehicle.junkman(), 0, nullptr);
     Attribute junk_attribute;
-    if (junkman.Lookup(p->junkkey, junk_attribute)) {
-        if (junk_attribute.GetType() == 0x51ead18d) {
-            return junk_attribute.GetLength() != 0;
-        }
+    if (!junkman.Lookup(p->junkkey, junk_attribute) || junk_attribute.GetType() != 0x51ead18d) {
+        return false;
     }
 
-    return false;
+    return junk_attribute.GetLength() != 0;
 }
 
 bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::Type type) {
@@ -567,26 +565,30 @@ static bool UpgradeInternal(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::T
 
 bool Physics::Upgrades::SetLevel(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::Type type, int level) {
     Attrib::Gen::pvehicle newvehicle(vehicle);
+    int max_level;
+    float weight;
 
-    int cur_level = GetLevel(vehicle, type);
-    if (cur_level == level) {
+    if (GetLevel(vehicle, type) == level) {
         return true;
     }
 
     if (level < 1) {
         RemovePart(vehicle, type);
     } else {
-        int max_level = GetMaxLevel(newvehicle, type);
-        if (max_level < 1 || level > max_level) {
+        max_level = GetMaxLevel(newvehicle, type);
+        if (max_level < 1) {
+            return false;
+        }
+        if (level > max_level) {
             return false;
         }
 
-        float weight = static_cast<float>(level) / static_cast<float>(max_level);
-        if (!UpgradeInternal(newvehicle, type, level, weight)) {
+        weight = static_cast<float>(level) / static_cast<float>(max_level);
+        if (UpgradeInternal(newvehicle, type, level, weight)) {
+            vehicle = newvehicle;
+        } else {
             return false;
         }
-
-        vehicle = static_cast<const Attrib::Instance &>(newvehicle);
     }
 
     return true;
@@ -789,3 +791,13 @@ template void BlendParts<float>(const Attribute &, const Attribute &, unsigned i
 template void ScalePart<AxlePair>(Attribute &, unsigned int, float);
 template void ScalePart<float>(Attribute &, unsigned int, float);
 
+namespace Attrib {
+namespace Gen {
+
+const pvehicle &pvehicle::operator=(const Instance &rhs) {
+    Instance::operator=(rhs);
+    return *this;
+}
+
+} // namespace Gen
+} // namespace Attrib

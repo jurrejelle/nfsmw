@@ -145,10 +145,7 @@ struct pvehicle : Instance {
         operator=(rhs.GetBase());
         return *this;
     }
-    const pvehicle &operator=(const Instance &rhs) {
-        Instance::operator=(rhs);
-        return *this;
-    }
+    const pvehicle &operator=(const Instance &rhs);
     bool BEHAVIOR_MECHANIC_AUDIO(TAttrib<Attrib::StringKey> &result) const;
     bool BEHAVIOR_MECHANIC_AUDIO(Attrib::StringKey &result) const;
     const Attrib::StringKey &BEHAVIOR_MECHANIC_AUDIO() const;
