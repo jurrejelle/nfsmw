@@ -479,8 +479,8 @@ void DVDErrorTask(void *, int) {
                     s_OpenCover_ErrorText[current_language][5],
                     copy_length - strip_chars);
 
-                nextFrame = dvderrorticks + 1;
                 to_copy = bStrLen(the_loading_text);
+                nextFrame = dvderrorticks + 1;
                 while (to_copy <= copy_length) {
                     to_copy = to_copy + 1;
                     bStrCat(the_loading_text, the_loading_text, " ");
