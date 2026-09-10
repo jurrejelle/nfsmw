@@ -16,10 +16,6 @@ using Attrib::RefSpec;
 
 struct PUJunkNode : Attrib::Instance {
     PUJunkNode(const RefSpec &collection, const Attrib::Gen::junkman &junkman, unsigned int junkkey);
-
-    void operator delete(void *ptr, std::size_t bytes) {
-        Attrib::Free(ptr, bytes, "Attrib::Instance");
-    }
 };
 
 struct PUPartNode : Attrib::Instance {
@@ -304,14 +300,17 @@ bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgr
     }
 
     Attribute part_attribute;
-    if (!newvehicle.Lookup(part_key, part_attribute) || part_attribute.GetType() != 0x2b936eb7) {
+    if (!newvehicle.Lookup(part_key, part_attribute)) {
+        return false;
+    }
+    if (part_attribute.GetType() != 0x2b936eb7) {
         return false;
     }
 
     RefSpec basepart(part_attribute.Get< RefSpec >(0));
 
-    Attrib::Gen::junkman junkman_inst(newvehicle.junkman(), 0, nullptr);
-    PUJunkNode node(basepart, junkman_inst, junk_key);
+    Attrib::Gen::junkman junkman(newvehicle.junkman(), 0, nullptr);
+    PUJunkNode node(basepart, junkman, junk_key);
 
     if (!node.IsValid()) {
         return false;
@@ -320,11 +319,10 @@ bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgr
     RefSpec newref;
     newref.SetCollection(node.GetConstCollection());
 
-    if (!(newref == basepart)) {
+    if (newref != basepart) {
         if (!newvehicle.IsDynamic()) {
             const char *name = newvehicle.CollectionName();
-            Key uniqueKey = newvehicle.GenerateUniqueKey(name, false);
-            newvehicle.Modify(uniqueKey, 0);
+            newvehicle.Modify(newvehicle.GenerateUniqueKey(name, false), 0);
         } else {
             newvehicle.Remove(part_key);
         }

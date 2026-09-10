@@ -981,6 +981,10 @@ class RefSpec {
         return mClassKey == rhs.mClassKey && mCollectionKey == rhs.mCollectionKey;
     }
 
+    bool operator!=(const RefSpec &rhs) const {
+        return !(*this == rhs);
+    }
+
   private:
     Key mClassKey;                            // offset 0x0, size 0x4
     Key mCollectionKey;                       // offset 0x4, size 0x4
