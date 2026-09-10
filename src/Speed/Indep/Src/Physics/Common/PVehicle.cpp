@@ -1574,6 +1574,11 @@ const UCrc32 TRACTOR("TRACTOR");
 
 }; // namespace VehicleClass
 
+
+UTL::COM::Factory<Sim::Param, ISimable, UCrc32>::Prototype _PVehicle("PVehicle", PVehicle::Construct);
+
+bTList<PVehicle> PVehicle::mInstances;
+
 AIBehaviors ai_behaviors[] = {
     {DRIVER_NONE, UCrc32::kNull, UCrc32("AIVehicleEmpty")},
     {DRIVER_NIS, UCrc32::kNull, UCrc32("AIVehicleEmpty")},
@@ -1585,7 +1590,3 @@ AIBehaviors ai_behaviors[] = {
     {DRIVER_REMOTE, UCrc32::kNull, UCrc32("AIVehicleHuman")},
     {DRIVER_NONE, UCrc32::kNull, UCrc32::kNull},
 };
-
-UTL::COM::Factory<Sim::Param, ISimable, UCrc32>::Prototype _PVehicle("PVehicle", PVehicle::Construct);
-
-bTList<PVehicle> PVehicle::mInstances;

@@ -118,7 +118,10 @@ template <typename T, int Size> class GarbageNode {
             int refcount; // offset 0x4, size 0x4
         };
 
-        Collector() {}
+        Collector() {
+            _mDirty.reserve(Size);
+            _mClean.reserve(Size);
+        }
 
         // TODO match dwarf
         void Collect() {

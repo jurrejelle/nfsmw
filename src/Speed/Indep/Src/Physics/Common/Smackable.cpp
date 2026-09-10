@@ -44,18 +44,19 @@ namespace DamageZone {
 UCrc32 GetImpactStimulus(unsigned int level);
 } // namespace DamageZone
 
-Attrib::StringKey BEHAVIOR_MECHANIC_EFFECTS;
+unsigned int Smackable_RigidCount;
+Attrib::StringKey Smackable::CYLINDER("CYLINDER");
+Attrib::StringKey Smackable::TUBE("TUBE");
+Attrib::StringKey Smackable::CONE("CONE");
+Attrib::StringKey Smackable::SPHERE("SPHERE");
+
+template <> UTL::Collections::Listable<Smackable, 160>::List UTL::Collections::Listable<Smackable, 160>::_mTable = UTL::Collections::Listable<Smackable, 160>::List();
 
 UTL::COM::Factory<Sim::Param, ISimable, UCrc32>::Prototype _Smackable("Smackable",
                                                                        Smackable::Construct);
 UTL::COM::Factory<const BehaviorParams &, Behavior, UCrc32>::Prototype __RBSmackable(
     "RBSmackable", RBSmackable::Construct);
 
-unsigned int Smackable_RigidCount;
-Attrib::StringKey Smackable::CYLINDER;
-Attrib::StringKey Smackable::TUBE;
-Attrib::StringKey Smackable::CONE;
-Attrib::StringKey Smackable::SPHERE;
 static float Smackable_ManagementRate = 0.125f;
 
 static float GetDropTimer(const Attrib::Gen::smackable &attributes) {
@@ -1063,4 +1064,3 @@ IPlaceableScenery *IPlaceableScenery::CreateInstance(const char *name, unsigned 
 
 PlaceableScenery::~PlaceableScenery() {}
 
-template <> UTL::Collections::Listable<Smackable, 160>::List UTL::Collections::Listable<Smackable, 160>::_mTable = UTL::Collections::Listable<Smackable, 160>::List();
