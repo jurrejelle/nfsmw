@@ -618,9 +618,9 @@ void Physics::Info::Init() {
                     TheStockCars.push_back(performance);
                     all_cars.push_back(performance);
                 }
+                Physics::Upgrades::Flush();
             }
         }
-        Physics::Upgrades::Flush();
         key = aclass->GetNextCollection(key);
     }
 
@@ -633,8 +633,8 @@ void Physics::Info::Init() {
                 upgraded_cars.push_back(performance);
                 all_cars.push_back(performance);
             }
+            Physics::Upgrades::Flush();
         }
-        Physics::Upgrades::Flush();
     }
 
     int count = TheStockCars.size();
