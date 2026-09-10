@@ -213,7 +213,7 @@ class BoundsPack : public bTNode<BoundsPack> {
       public:
         void Add(Collection *collection) {
             Pair pair(collection->fNameHash, collection);
-            this->insert(_STL::upper_bound(this->begin(), this->end(), pair), pair);
+            this->insert(std::upper_bound(this->begin(), this->end(), pair), pair);
         }
 
         Collection *Find(UCrc32 name);
