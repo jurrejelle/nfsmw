@@ -16,7 +16,7 @@ namespace CollisionGeometry {
 static Collections TheCollections;
 
 inline Collection *BoundsPack::Table::Find(UCrc32 name) {
-    Pair *iter = std::lower_bound(this->begin(), this->end(), Pair(name, nullptr));
+    iterator iter = std::lower_bound(this->begin(), this->end(), Pair(name, nullptr));
     if (iter != this->end() && iter->Name == name) {
         return iter->Collection;
     }

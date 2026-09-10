@@ -209,18 +209,18 @@ bool Physics::Upgrades::SetPackage(Attrib::Gen::pvehicle &vehicle, const Package
 
     for (int i = 0; i < Physics::Upgrades::PUT_MAX; i++) {
         Physics::Upgrades::Type type = static_cast<Physics::Upgrades::Type>(i);
-        int mask = 1 << type;
 
         if (!SetLevel(newvehicle, type, package.Part[i])) {
             return false;
         }
 
-        if ((package.Junkman & mask) == 0) {
-            RemoveJunkman(newvehicle, type);
-        } else {
+        int mask = 1 << type;
+        if (package.Junkman & mask) {
             if (!SetJunkman(newvehicle, type)) {
                 return false;
             }
+        } else {
+            RemoveJunkman(newvehicle, type);
         }
     }
 
@@ -250,22 +250,27 @@ bool Physics::Upgrades::CanInstallJunkman(const Attrib::Gen::pvehicle &vehicle, 
         return false;
     }
 
-    if (type == Physics::Upgrades::PUT_INDUCTION) {
-        if (Physics::Info::InductionType(vehicle) == Physics::Info::INDUCTION_NONE) {
-            return false;
-        }
-    } else if (type == Physics::Upgrades::PUT_NOS) {
+    switch (type) {
+    case Physics::Upgrades::PUT_NOS:
         if (!Physics::Info::HasNos(vehicle)) {
             return false;
         }
+        break;
+    case Physics::Upgrades::PUT_INDUCTION:
+        if (Physics::Info::InductionType(vehicle) == Physics::Info::INDUCTION_NONE) {
+            return false;
+        }
+        break;
+    default:
+        break;
     }
 
     Attrib::Gen::junkman junkman(vehicle.junkman(), 0, nullptr);
     Attribute junk_attribute;
-    bool found = junkman.Lookup(p->junkkey, junk_attribute);
-    if (found && junk_attribute.GetType() == 0x51ead18d) {
-        unsigned int len = junk_attribute.GetLength();
-        return len != 0;
+    if (junkman.Lookup(p->junkkey, junk_attribute)) {
+        if (junk_attribute.GetType() == 0x51ead18d) {
+            return junk_attribute.GetLength() != 0;
+        }
     }
 
     return false;
