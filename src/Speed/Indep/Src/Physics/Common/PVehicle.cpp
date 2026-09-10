@@ -1247,12 +1247,11 @@ ISimable *PVehicle::Construct(Sim::Param params) {
     if (!attributes.IsValid()) {
         return nullptr;
     }
-    const char *vehicle_name;
+    const char *vehicle_name = attributes.CollectionName();
     const FECustomizationRecord *customizations = vp.customization;
     if (customizations == nullptr) {
-        vehicle_name = attributes.DefaultPresetRide();
-        if (vehicle_name != nullptr) {
-            PresetCar *preset = FindFEPresetCar(bStringHashUpper(vehicle_name));
+        if (attributes.DefaultPresetRide() != nullptr) {
+            PresetCar *preset = FindFEPresetCar(bStringHashUpper(attributes.DefaultPresetRide()));
             if (preset != nullptr) {
                 static FECustomizationRecord temp_record;
                 temp_record.Default();
