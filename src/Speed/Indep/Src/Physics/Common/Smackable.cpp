@@ -199,9 +199,9 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     }
     bool active = !virginspawn || mPersistant;
     if (simple_physics) {
-        RBSimpleParams rbp(UMath::Vector4To3(matrix.v3), UMath::Vector3::kZero,
-                           UMath::Vector3::kZero, matrix, radius, mass);
-        LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("SimpleRigidBody"), rbp);
+        LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("SimpleRigidBody"),
+                     RBSimpleParams(UMath::Vector4To3(matrix.v3), UMath::Vector3::kZero,
+                                    UMath::Vector3::kZero, matrix, radius, mass));
     } else {
         RBComplexParams rbparams(UMath::Vector4To3(matrix.v3), UMath::Vector3::kZero,
                                  UMath::Vector3::kZero, matrix, mass, inertia, dimension, geoms,
