@@ -466,6 +466,7 @@ void DVDErrorTask(void *, int) {
                     anim_frames = 0x40;
                 }
 
+                nextFrame = dvderrorticks + 1;
                 if ((dvderrorticks & anim_frames) != (last_anim_tick & anim_frames)) {
                     int rem;
 
@@ -488,7 +489,6 @@ void DVDErrorTask(void *, int) {
                     to_copy = to_copy + 1;
                     bStrCat(the_loading_text, the_loading_text, " ");
                 }
-                nextFrame = dvderrorticks + 1;
 
                 FEPrintf("DiscError.fng", 0xEEFFD04F, the_loading_text);
 
