@@ -254,6 +254,17 @@ template <typename T, typename Tag> class Container {
         return e;
     }
 
+    ~Container() {
+        typename Elements::iterator last = _mElements.end();
+        for (typename Elements::iterator first = _mElements.begin(); first != last; ++first) {
+            T *e = *first;
+            if (e != nullptr) {
+                T::Destroy(e);
+            }
+        }
+        _mElements.clear();
+    }
+
     bool DestroyElement(T &el) {
         typename Elements::iterator last = _mElements.end();
         for (typename Elements::iterator first = _mElements.begin(); first != last; first++) {
