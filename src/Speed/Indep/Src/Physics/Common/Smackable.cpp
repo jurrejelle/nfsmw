@@ -992,8 +992,7 @@ PlaceableScenery *PlaceableScenery::Construct(const char *name, unsigned int att
     if (bounds == nullptr) {
         return nullptr;
     }
-    eModel model;
-    model.Init(render_name.GetValue());
+    eModel model(render_name.GetValue());
     if (model.GetSolid() == nullptr) {
         render_name = bHash32(0xc7395a8);
     }
