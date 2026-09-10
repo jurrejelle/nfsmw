@@ -6,7 +6,7 @@
 
 // total size: 0x10
 struct AIParams : public Sim::Param {
-    AIParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<AIParams *>(nullptr)) {}
+    AIParams() : Sim::Param(UCrc32(UCRC32_BASE), this) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "AIParams";
@@ -76,7 +76,7 @@ struct RBSimpleParams : public Sim::Param {
 // total size: 0x10
 struct SuspensionParams : public Sim::Param {
     // TODO
-    SuspensionParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<SuspensionParams *>(nullptr)) {}
+    SuspensionParams() : Sim::Param(UCrc32(UCRC32_BASE), this) {}
 
     // DECLARE_SIM_PARAM, but why does that one have SuspensionParams::TypeName?
     static UCrc32 TypeName() {
@@ -87,7 +87,7 @@ struct SuspensionParams : public Sim::Param {
 
 // total size: 0x10
 struct EngineParams : public Sim::Param {
-    EngineParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<EngineParams *>(nullptr)) {}
+    EngineParams() : Sim::Param(UCrc32(UCRC32_BASE), this) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "EngineParams";
@@ -97,7 +97,7 @@ struct EngineParams : public Sim::Param {
 
 // total size: 0x10
 struct DamageParams : public Sim::Param {
-    DamageParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<DamageParams *>(nullptr)) {}
+    DamageParams() : Sim::Param(UCrc32(UCRC32_BASE), this) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "DamageParams";
