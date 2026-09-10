@@ -155,27 +155,21 @@ int ActualReadJoystickData() {
                         pad_state = 0;
                     }
                     data = pad_state;
-                    if (data > 0xFF) {
-                        data = 0xFF;
-                    }
+                    data = data > 0xFF ? 0xFF : data;
                     joy_data->ThePadData[0].AnalogRightX = data;
                     pad_state = 0x80 - static_cast<int>(joy_data->padSTATUS.substickY * 2.15f);
                     if (pad_state & 0x8000) {
                         pad_state = 0;
                     }
                     data = pad_state;
-                    if (data > 0xFF) {
-                        data = 0xFF;
-                    }
+                    data = data > 0xFF ? 0xFF : data;
                     joy_data->ThePadData[0].AnalogRightY = data;
                     pad_state = static_cast<int>(joy_data->padSTATUS.stickX * 1.75f) + 0x80;
                     if (pad_state & 0x8000) {
                         pad_state = 0;
                     }
                     data = pad_state;
-                    if (data > 0xFF) {
-                        data = 0xFF;
-                    }
+                    data = data > 0xFF ? 0xFF : data;
                     joy_data->ThePadData[0].AnalogLeftX = data;
                     joy_data->ThePadData[0].AnalogLeftY = 0x80 - static_cast<int>(joy_data->padSTATUS.stickY * 1.75f);
                     joy_data->ThePadData[0].LTrigger = static_cast<unsigned char>(static_cast<unsigned int>(joy_data->padSTATUS.triggerLeft) * 1.7f);
