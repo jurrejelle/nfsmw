@@ -376,10 +376,8 @@ void DVDErrorTask(void *, int) {
         }
 
         /* Check for hardware reset button */
-        if (num_queued_resets == 0 && resetMode == -1) {
-            if (OSGetResetSwitchState()) {
-                resetButtonPressed = 1;
-            }
+        if (num_queued_resets == 0 && resetMode == -1 && OSGetResetSwitchState()) {
+            resetButtonPressed = 1;
         } else if (num_queued_resets > 0 || resetButtonPressed) {
             resetMode = 0;
         }
