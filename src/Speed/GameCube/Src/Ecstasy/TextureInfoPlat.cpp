@@ -27,14 +27,16 @@ static inline unsigned int Convert16To32(unsigned short entry) {
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-static inline unsigned int Convert32To16(unsigned int entry) {
-    unsigned int a = entry >> 24;
+static inline unsigned short Convert32To16(unsigned int entry) {
     unsigned int r = (entry >> 16) & 0xFF;
     unsigned int g = (entry >> 8) & 0xFF;
     unsigned int b = entry & 0xFF;
+    unsigned int a = entry >> 24;
+    unsigned int hi;
 
     if (a > 0xEF) {
-        return 0xFFFF8000 | (r >> 3) | ((b >> 3) << 10) | ((g >> 3) << 5);
+        hi = 0xFFFF8000 | ((b >> 3) << 10);
+        return hi | ((g >> 3) << 5) | (r >> 3);
     }
 
     return ((a << 7) & 0x7000) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
