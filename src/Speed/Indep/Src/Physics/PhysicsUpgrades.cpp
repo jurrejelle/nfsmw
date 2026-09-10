@@ -488,8 +488,7 @@ static bool UpgradeInternal(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::T
         return true;
     }
 
-    int max_level = GetMaxLevel(newvehicle, type);
-    if (max_level <= 0 || weight > 1.0f) {
+    if (GetMaxLevel(newvehicle, type) <= 0 || weight > 1.0f) {
         return false;
     }
 
@@ -511,21 +510,25 @@ static bool UpgradeInternal(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::T
         return false;
     }
 
-    if (part_attribute.GetType() != 0x2b936eb7 || part_attribute.GetLength() < 2) {
+    if (part_attribute.GetType() != 0x2b936eb7) {
         return false;
     }
 
-    unsigned int base_index = (part_attribute.GetLength() == 3) ? 1 : 0;
-    unsigned int top_index = (part_attribute.GetLength() == 3) ? 2 : 1;
+    if (part_attribute.GetLength() <= 1) {
+        return false;
+    }
 
-    RefSpec basepart;
-    part_attribute.Get(base_index, basepart);
+    unsigned int base_index = 0;
+    unsigned int top_index = 1;
+    if (part_attribute.GetLength() == 3) {
+        base_index = 1;
+        top_index = 2;
+    }
 
-    RefSpec endpart;
-    part_attribute.Get(top_index, endpart);
+    RefSpec basepart = part_attribute.Get<RefSpec>(base_index);
+    RefSpec endpart = part_attribute.Get<RefSpec>(top_index);
 
-    if (basepart.GetClassKey() == 0 || endpart.GetClassKey() == 0 ||
-        basepart.GetCollectionKey() == 0 || endpart.GetCollectionKey() == 0) {
+    if (basepart.GetClassKey() == 0 || endpart.GetClassKey() == 0 || basepart.GetCollectionKey() == 0 || endpart.GetCollectionKey() == 0) {
         return false;
     }
 
@@ -543,8 +546,7 @@ static bool UpgradeInternal(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::T
 
     if (!newvehicle.IsDynamic()) {
         const char *name = newvehicle.CollectionName();
-        Key uniqueKey = newvehicle.GenerateUniqueKey(name, false);
-        newvehicle.Modify(uniqueKey, newvehicle.LocalAttribCount());
+        newvehicle.Modify(newvehicle.GenerateUniqueKey(name, false), newvehicle.LocalAttribCount());
     }
 
     if (!newvehicle.GetBase().AddAndSet(part_key, &newref, 1)) {
