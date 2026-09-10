@@ -181,7 +181,6 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
             float gravity;
             UMath::Vector4 ppos;
 
-            num_particles -= 1.0f;
             particle = gParticleList.GetNextParticle();
             if (!particle) {
                 break;
