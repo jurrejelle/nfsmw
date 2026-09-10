@@ -49,7 +49,10 @@ class StringKey {
         if (this->mString == nullptr) {
             return false;
         }
-        return this->mString[0] != 0;
+        if (this->mString[0] == 0) {
+            return false;
+        }
+        return true;
     }
 
     bool IsEmpty() const {

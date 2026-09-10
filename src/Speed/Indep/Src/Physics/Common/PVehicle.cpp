@@ -937,9 +937,10 @@ PVehicle::PVehicle(DriverClass dc, const Attrib::Gen::pvehicle &attribs, const U
     mInstances.AddTail(this);
     AITarget::Register(static_cast<ISimable *>(this));
     if (customization != nullptr) {
-        FECustomizationRecord *pFVar = static_cast<FECustomizationRecord *>(operator new(0x198));
-        memcpy(pFVar, customization, 0x198);
-        mCustomization = pFVar;
+        FECustomizationRecord *&record = mCustomization;
+        FECustomizationRecord *copy = static_cast<FECustomizationRecord *>(operator new(0x198));
+        memcpy(copy, customization, 0x198);
+        record = copy;
     }
     mClass = mAttributes.CLASS();
     IVehicle::AddToList(VEHICLE_ALL);
