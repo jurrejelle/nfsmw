@@ -60,6 +60,10 @@ inline void Performance::Default() {
 
 // total size: 0xC
 struct PerfStats {
+    PerfStats() {
+        bMemSet(this, 0, sizeof(PerfStats));
+    }
+
     bool Fetch(const Attrib::Gen::pvehicle &pvehicle, bVector2 *graph_data, int *num_data);
 
     float Time0To100;      // offset 0x0, size 0x4

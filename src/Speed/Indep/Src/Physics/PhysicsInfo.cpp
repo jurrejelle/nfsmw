@@ -643,10 +643,7 @@ void Physics::Info::Init() {
         Physics::Upgrades::Flush();
     }
 
-    int count = 0;
-    for (PerformanceMaps::iterator iter = TheStockCars.begin(); iter != TheStockCars.end(); iter++) {
-        count++;
-    }
+    int count = TheStockCars.size();
 
     if (count == 0) {
         return;
