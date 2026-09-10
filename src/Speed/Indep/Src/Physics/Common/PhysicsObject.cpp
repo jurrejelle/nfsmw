@@ -232,20 +232,24 @@ bool PhysicsObject::IsOwnedByPlayer() const {
 }
 
 bool PhysicsObject::IsOwnedBy(ISimable *queriedOwner) const {
-    if (queriedOwner != nullptr) {
-        HSIMABLE qSig = queriedOwner->GetInstanceHandle();
-        ISimable *potentialOwner = ISimable::FindInstance(mOwner);
-        while (potentialOwner != nullptr) {
-            if (potentialOwner->GetInstanceHandle() == qSig) {
-                return true;
-            }
-            ISimable *newOwner = ISimable::FindInstance(potentialOwner->GetOwnerHandle());
-            if (potentialOwner == newOwner) {
-                return false;
-            }
-            potentialOwner = newOwner;
-        }
+    if (queriedOwner == nullptr) {
+        return false;
     }
+    HSIMABLE qSig = queriedOwner->GetInstanceHandle();
+    ISimable *potentialOwner = ISimable::FindInstance(mOwner);
+    if (potentialOwner == nullptr) {
+        return false;
+    }
+    do {
+        if (potentialOwner->GetInstanceHandle() == qSig) {
+            return true;
+        }
+        ISimable *newOwner = ISimable::FindInstance(potentialOwner->GetOwnerHandle());
+        if (potentialOwner == newOwner) {
+            return false;
+        }
+        potentialOwner = newOwner;
+    } while (potentialOwner != nullptr);
     return false;
 }
 
