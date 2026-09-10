@@ -50,6 +50,8 @@ struct FECustomizationRecord {
 
     USE_FASTALLOC(FECustomizationRecord)
 
+    FECustomizationRecord();
+
     void Default();
     void BecomePreset(PresetCar *preset);
     bool WriteRecordIntoPhysics(Attrib::Gen::pvehicle &vehicle) const;

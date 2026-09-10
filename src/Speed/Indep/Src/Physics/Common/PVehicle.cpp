@@ -1250,7 +1250,7 @@ ISimable *PVehicle::Construct(Sim::Param params) {
     if (customizations == nullptr) {
         vehicle_name = attributes.DefaultPresetRide();
         if (vehicle_name != nullptr) {
-            PresetCar *preset = FindFEPresetCar(bStringHash(vehicle_name));
+            PresetCar *preset = FindFEPresetCar(bStringHashUpper(vehicle_name));
             if (preset != nullptr) {
                 static FECustomizationRecord temp_record;
                 temp_record.Default();
@@ -1301,7 +1301,6 @@ ISimable *PVehicle::Construct(Sim::Param params) {
     UTL::Std::list< Resource, _type_list > resources;
     resources.push_back(resource);
     Attrib::RefSpec trailer_ref = attributes.Trailer();
-    Physics::Info::Performance perf;
     if (trailer_ref.GetCollectionKey() != 0) {
         Attrib::Gen::pvehicle trailerAttribs(trailer_ref, 0, nullptr);
         resources.push_back(Resource(trailerAttribs, spooling_resources, false));
@@ -1310,7 +1309,7 @@ ISimable *PVehicle::Construct(Sim::Param params) {
         return nullptr;
     }
     resources.clear();
-    perf.Default();
+    Physics::Info::Performance perf;
     const Physics::Info::Performance *performance = nullptr;
     if (vp.matched != nullptr) {
         performance = vp.matched;
