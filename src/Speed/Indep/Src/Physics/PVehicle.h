@@ -127,7 +127,11 @@ class PVehicle : public PhysicsObject,
     };
 
     struct ManageNode {
-        ManageNode() {}
+        ManageNode() {
+            result = VCR_DONTCARE;
+            resource.Flags = 0;
+            instancecount = 0;
+        }
         static void print(const ManageNode &n) {}
         static bool sort_remove_resources(const ManageNode &lhs, const ManageNode &rhs) {
             if (rhs.resource.Type != lhs.resource.Type) {

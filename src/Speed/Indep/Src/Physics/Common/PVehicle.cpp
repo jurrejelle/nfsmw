@@ -1394,11 +1394,9 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
     for (PVehicle *vehicle = mInstances.GetHead(); vehicle != mInstances.EndOfList();
          vehicle = vehicle->GetNext()) {
         ManageNode node;
-        node.result = VCR_DONTCARE;
-        node.resource.Flags = 0;
-        node.instancecount = 0;
         node.vehicle = vehicle;
         node.resource = vehicle->mResources;
+        node.result = VCR_DONTCARE;
         vehicle_list.push_back(node);
     }
 
