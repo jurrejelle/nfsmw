@@ -68,7 +68,9 @@ unsigned int CarInfo_GetResourcePool(bool needs_compositing);
 bool IsSplitScreen();
 PresetCar *FindFEPresetCar(unsigned int hash);
 int GetMikeMannBuild();
+namespace Sim {
 bool CanSpawnRigidBody(const UMath::Vector3 &position, bool highPriority);
+} // namespace Sim
 
 namespace Physics { namespace Upgrades {
 void RemoveJunkman(Attrib::Gen::pvehicle &vehicle, Type type);
@@ -1258,11 +1260,8 @@ ISimable *PVehicle::Construct(Sim::Param params) {
                 customizations = &temp_record;
             }
         }
-        if (customizations == nullptr) {
-            return nullptr;
-        }
     }
-    if (!customizations->WriteRecordIntoPhysics(attributes)) {
+    if (customizations != nullptr && !customizations->WriteRecordIntoPhysics(attributes)) {
         return nullptr;
     }
     if (vp.matched != nullptr
@@ -1318,7 +1317,7 @@ ISimable *PVehicle::Construct(Sim::Param params) {
             performance = &perf;
         }
     }
-    if (CanSpawnRigidBody(vp.initialPos, true)) {
+    if (Sim::CanSpawnRigidBody(vp.initialPos, true)) {
         const char *cache_name;
         PVehicle *vehicle;
 #ifndef EA_BUILD_A124
