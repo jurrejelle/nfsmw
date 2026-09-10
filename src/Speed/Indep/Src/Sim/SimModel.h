@@ -144,9 +144,13 @@ class Model : public Sim::Object,
         this->mDistanceToView = distance;
     }
 
-    bool IsRendering() const {}
+    bool IsRendering() const {
+        return mService != nullptr;
+    }
 
-    bool IsSimulating() const {}
+    bool IsSimulating() const {
+        return mSimable != nullptr;
+    }
 
     virtual void OnBeginSimulation() {}
 

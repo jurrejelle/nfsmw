@@ -355,7 +355,6 @@ void SmokeableSpawner::ShowInstance() const {
     SceneryOverrideInfo *info = GetSceneryOverrideInfo(mSceneryOverrideInfoNumber);
     if (info != nullptr) {
         info->EnableRendering();
-        info->AssignOverrides();
     }
 }
 
@@ -371,7 +370,6 @@ void SmokeableSpawner::HideInstance() const {
     SceneryOverrideInfo *info = GetSceneryOverrideInfo(mSceneryOverrideInfoNumber);
     if (info != nullptr) {
         info->DisableRendering();
-        info->AssignOverrides();
     }
 }
 

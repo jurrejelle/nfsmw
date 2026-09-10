@@ -975,7 +975,7 @@ PlaceableScenery::PlaceableScenery(bHash32 rendermesh,
 }
 
 void PlaceableScenery::ReleaseModel() {
-    static_cast<IPlaceableScenery *>(this)->Destroy();
+    static_cast<IPlaceableScenery *>(this)->PickUp();
 }
 
 PlaceableScenery *PlaceableScenery::Construct(const char *name, unsigned int attributes) {
@@ -1016,7 +1016,7 @@ void PlaceableScenery::PickUp() {
 }
 
 bool PlaceableScenery::Place(const UMath::Matrix4 &transform, bool snap_to_ground) {
-    static_cast<IPlaceableScenery *>(this)->Destroy();
+    static_cast<IPlaceableScenery *>(this)->PickUp();
     UMath::Matrix4 mat;
     UMath::Copy(transform, mat);
     if (snap_to_ground) {
