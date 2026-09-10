@@ -31,15 +31,14 @@ Explosion::Explosion(const ExplosionParams &params, Sim::Param sp)
     , mExpansionSpeed(params.fExpansionSpeed) //
     , mExpansionRadius(params.fRadius) //
     , mSource(params.fSource) //
+    , mIRBSimple(nullptr) //
+    , mEffectSource(params.fEffectSource) //
+    , mCausality(nullptr) //
+    , mCauseTime(0.0f) //
     , mDamages(params.fDamage) //
     , mTargets(params.fTargets)
 {
-    mIRBSimple = nullptr;
-    mCausality = nullptr;
-    mCauseTime = 0.0f;
-    mEffectSource = params.fEffectSource;
-
-    float start_radius = UMath::Max(0.0f, params.fStartRadius);
+    float start_radius = UMath::Max(params.fStartRadius, 0.01f);
     LoadBehavior(
         UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), //
         UCrc32("SimpleRigidBody"), //

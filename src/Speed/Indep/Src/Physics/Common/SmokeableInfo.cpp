@@ -220,7 +220,7 @@ void ResetPropTimers() {
     TheSmokeableSections.Reset();
 }
 
-static const Attrib::Class *TheSmackableClass;
+static const Attrib::Class *TheSmackableClass = nullptr;
 
 void SmokeableSpawnerPack::OnUnload() {
     SmokeableSection *section = TheSmokeableSections.FindOrAdd(static_cast<int>(ScenerySectionNumber));
