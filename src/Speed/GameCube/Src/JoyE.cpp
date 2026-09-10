@@ -133,13 +133,14 @@ int ActualReadJoystickData() {
             for (port = 0; port <= 3; port++) {
                 JoyData *joy_data = &PadRingData[port][JoystickRingBufferTop];
                 int slot = 0;
-                short data;
-                unsigned short buttons;
                 int pad_state;
+                unsigned short buttons;
 
                 bMemSet(joy_data, 0xFF, sizeof(JoyData));
 
                 if (HardwarePadStatus[port].err == PAD_ERR_NONE) {
+                    short data;
+
                     joy_data->padSTATUS = HardwarePadStatus[port];
                     joy_data->ThePadData[0].Type = 0x41;
                     joy_data->ThePadData[0].Error = 0;
