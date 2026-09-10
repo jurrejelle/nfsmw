@@ -285,24 +285,28 @@ int DVDValidErrorState(int error) {
 }
 
 void DVDErrorTask(void *, int) {
+    int dvdstatus;
+    int dvderrorhappened = 0;
+    int dvderrormessagehash = 0;
+
     static int resetButtonPressed;
     static int queuedSavingResetButtonPressed;
     static int resetMode = -1;
     static int softwareResetCheckStarted;
     static u32 softwareResetStartTick;
+
+    int softwareResetTriggered = 0;
+    bool cleanUp = false;
+    const int resetButtonCombo = 0x1600;
+    eLanguages current_language = static_cast<eLanguages>(0);
+    int dvderrorticks = 0;
+    int last_anim_tick = 0;
+    int current_anim_tick = 0;
+    char strip_chars = 0;
+
     static int num_queued_resets;
 
-    int errorIndex = 0;
-    unsigned int frame = 0;
-    int scrollIndex = 0;
-    int resetButtonPressedLocal = 0;
-    int language = 0;
-    unsigned int prevButtons = 0;
-    int scrollOffset = 0;
-    int errorState = 0;
     unsigned int nextFrame;
-    int driveStatus;
-    const char *pkgName;
 
     do {
         IOModule::GetIOModule().Update();
@@ -328,7 +332,7 @@ void DVDErrorTask(void *, int) {
                 u32 msElapsed = elapsed / ticksPerMs;
                 if (msElapsed > 500) {
                     resetMode = 0;
-                    resetButtonPressedLocal = 1;
+                    softwareResetTriggered = 1;
                 }
             }
         } else {
@@ -337,23 +341,23 @@ void DVDErrorTask(void *, int) {
 
         if (MemoryCard::IsCardBusy()) {
             /* Card is busy - check for reset button press and queue it */
-            if (OSGetResetSwitchState() || resetButtonPressedLocal) {
+            if (OSGetResetSwitchState() || softwareResetTriggered) {
                 queuedSavingResetButtonPressed = 1;
             } else if (queuedSavingResetButtonPressed) {
                 resetButtonPressed = 1;
                 num_queued_resets = num_queued_resets + 1;
             }
 
-            nextFrame = frame + 1;
+            nextFrame = dvderrorticks + 1;
             if (MemoryCard::GetInstance() != 0) {
                 MemoryCard::GetInstance()->Tick(16);
             }
             goto loop_end;
         }
 
-        if (errorState != 0) {
+        if (dvderrorhappened != 0) {
             unsigned long MotorRumble[4];
-            long port;
+            int port;
 
             /* Error state active - run sync tasks and handle input */
             bSyncTaskRun();
@@ -393,30 +397,30 @@ void DVDErrorTask(void *, int) {
             resetMode = 0;
         }
 
-        driveStatus = DVDGetDriveStatus();
+        dvdstatus = DVDGetDriveStatus();
 
-        if (driveStatus != -1 && resetMode != -1) {
+        if (dvdstatus != -1 && resetMode != -1) {
             int reset_mode = resetMode;
             resetMode = -1;
             CheckReset(reset_mode);
         }
 
         /* Map drive status to error index */
-        switch (driveStatus) {
+        switch (dvdstatus) {
             case 5:
-                errorIndex = 0;
+                dvderrormessagehash = 0;
                 break;
             case 4:
-                errorIndex = 1;
+                dvderrormessagehash = 1;
                 break;
             case 6:
-                errorIndex = 2;
+                dvderrormessagehash = 2;
                 break;
             case 11:
-                errorIndex = 3;
+                dvderrormessagehash = 3;
                 break;
             case -1:
-                errorIndex = 4;
+                dvderrormessagehash = 4;
                 break;
         }
 
@@ -424,11 +428,11 @@ void DVDErrorTask(void *, int) {
             return;
         }
 
-        errorState = DVDValidErrorState(driveStatus);
-        if (errorState != 0) {
+        dvderrorhappened = DVDValidErrorState(dvdstatus);
+        if (dvderrorhappened != 0) {
             /* New error detected */
-            language = GC_GetOSLanguage();
-            g_discErrorNumber = errorState;
+            current_language = GC_GetOSLanguage();
+            g_discErrorNumber = dvderrorhappened;
             g_discErrorOccured = 1;
             if (gMoviePlayer != 0) {
                 gMoviePlayer->Stop();
@@ -440,67 +444,62 @@ void DVDErrorTask(void *, int) {
             }
 
             cFEng *feng = cFEng::Get();
-            pkgName = "DiscError.fng";
-            if (!feng->IsPackagePushed(pkgName)) {
-                feng->PushErrorPackage(pkgName, 0, 0xff);
+            if (!feng->IsPackagePushed("DiscError.fng")) {
+                feng->PushErrorPackage("DiscError.fng", 0, 0xff);
             }
 
-            FEPrintf(pkgName, 0xEEFFD04F,
-                s_OpenCover_ErrorText[language][errorIndex]);
-            nextFrame = frame + 1;
+            FEPrintf("DiscError.fng", 0xEEFFD04F,
+                s_OpenCover_ErrorText[current_language][dvderrormessagehash]);
+            nextFrame = dvderrorticks + 1;
         } else if (g_discErrorOccured == 0) {
-            nextFrame = frame + 1;
+            nextFrame = dvderrorticks + 1;
             goto loop_end;
         } else {
             /* Disc error was active, check if we should service streaming */
-            nextFrame = frame + 1;
-
             if (!TheTrackStreamer.HasUserMemoryAllocations() && TheTrackStreamer.IsLoadingInProgressNonRepeatable()) {
                 ServiceResourceLoading();
-                driveStatus = 1;
+                dvdstatus = 1;
                 TheTrackStreamer.ServiceNonGameState();
                 TheTrackStreamer.ServiceGameState();
             }
 
-            if (driveStatus != 0) {
+            if (dvdstatus != 0) {
                 /* Scrolling text display */
                 char the_loading_text[16];
-                int scrollLen;
-                int buttonMask;
                 int to_copy;
                 char copy_length;
+                int anim_frames;
 
-                scrollLen = (signed char)bStrLen(
-                    s_OpenCover_ErrorText[language][errorIndex]);
+                copy_length = static_cast<char>(bStrLen(
+                    s_OpenCover_ErrorText[current_language][5]));
                 bMemSet(the_loading_text, 0, 16);
 
-                buttonMask = 0x10;
+                anim_frames = 0x10;
                 if (IsGameFlowInGame()) {
-                    buttonMask = 0x40;
+                    anim_frames = 0x40;
                 }
 
-                if ((frame & buttonMask) != (prevButtons & buttonMask)) {
+                if ((dvderrorticks & anim_frames) != (last_anim_tick & anim_frames)) {
                     int rem;
 
-                    rem = scrollIndex;
-                    if (scrollIndex < 0) {
-                        rem = scrollIndex + 3;
+                    rem = current_anim_tick;
+                    if (current_anim_tick < 0) {
+                        rem = current_anim_tick + 3;
                     }
                     rem = rem & ~3;
-                    prevButtons = frame;
-                    scrollOffset = (signed char)(3 - (scrollIndex - rem));
-                    scrollIndex = scrollIndex + 1;
+                    last_anim_tick = dvderrorticks;
+                    strip_chars = (signed char)(3 - (current_anim_tick - rem));
+                    current_anim_tick = current_anim_tick + 1;
                 }
 
-                to_copy = scrollLen - scrollOffset;
                 bStrNCpy(the_loading_text,
-                    s_OpenCover_ErrorText[language][errorIndex],
-                    to_copy);
+                    s_OpenCover_ErrorText[current_language][5],
+                    copy_length - strip_chars);
 
-                nextFrame = frame + 1;
-                copy_length = static_cast<char>(bStrLen(the_loading_text));
-                while (copy_length <= scrollLen) {
-                    copy_length = copy_length + 1;
+                nextFrame = dvderrorticks + 1;
+                to_copy = bStrLen(the_loading_text);
+                while (to_copy <= copy_length) {
+                    to_copy = to_copy + 1;
                     bStrCat(the_loading_text, the_loading_text, " ");
                 }
 
@@ -511,9 +510,9 @@ void DVDErrorTask(void *, int) {
                 }
             } else {
                 /* Error resolved */
-                g_discErrorNumber = 0;
                 g_discErrorOccured = 0;
-                errorState = 0;
+                g_discErrorNumber = 0;
+                dvderrorhappened = 0;
 
                 SoundPause(false, -1);
                 SetSoundControlState(false, 0x10, "GC Error");
@@ -527,21 +526,22 @@ void DVDErrorTask(void *, int) {
                     gMoviePlayer->Stop();
                 }
 
-                cFEng *feng = cFEng::Get();
-                feng->MakeLoadedPackagesDirty();
-                if (feng->IsPackagePushed("DiscError.fng")) {
-                    feng->PopErrorPackage();
+                cFEng *feng;
+
+                cFEng::Get()->MakeLoadedPackagesDirty();
+                if (cFEng::Get()->IsPackagePushed("DiscError.fng")) {
+                    cFEng::Get()->PopErrorPackage();
                 }
-                nextFrame = frame + 1;
+                nextFrame = dvderrorticks + 1;
                 if (wasMovieActive) {
-                    feng->QueueGameMessage(0xC3960EB9, 0, 0xff);
+                    cFEng::Get()->QueueGameMessage(0xC3960EB9, 0, 0xff);
                 }
             }
         }
 
         /* Render error screen if disc error is active */
         if (g_discErrorOccured != 0) {
-            FEngTickSinglePackage(FEngDiscErrorPackage, frame);
+            FEngTickSinglePackage(FEngDiscErrorPackage, dvderrorticks);
             eBeginScene();
             FEManager::Get()->Render();
             eEndScene();
@@ -555,20 +555,22 @@ void DVDErrorTask(void *, int) {
             } else {
                 PADStatus LocalHardwarePadStatus[4];
                 int pad_state_0;
+                int pad_state_1;
 
                 PADRead(LocalHardwarePadStatus);
                 pad_state_0 = LocalHardwarePadStatus[0].err;
+                pad_state_1 = LocalHardwarePadStatus[1].err;
                 if (pad_state_0 == 0) {
                     bMemCpy(&HardwarePadStatus[0], &LocalHardwarePadStatus[0], 0xc);
                 }
-                if (LocalHardwarePadStatus[1].err == 0) {
+                if (pad_state_1 == 0) {
                     bMemCpy(&HardwarePadStatus[1], &LocalHardwarePadStatus[1], 0xc);
                 }
             }
         }
 
     loop_end:
-        frame = nextFrame;
+        dvderrorticks = nextFrame;
     } while (g_discErrorOccured != 0);
 }
 
