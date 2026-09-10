@@ -12,6 +12,12 @@
 
 #include <algorithm>
 
+const UCrc32 UCrc32::kNull;
+
+template <>
+UTL::Collections::GarbageNode<PhysicsObject, 160>::Collector UTL::Collections::GarbageNode<PhysicsObject, 160>::_mCollector =
+    UTL::Collections::GarbageNode<PhysicsObject, 160>::Collector();
+
 void PhysicsObject::Behaviors::Add(Behavior *beh) {
     int pri = beh->GetPriority();
     iterator iter;
