@@ -192,7 +192,7 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
                 break;
             }
 
-            ld = bMin(sparkLength, 1.0f);
+            ld = bMin(sparkLength, 255.0f);
 
             rand.x = 1.0f - (mEmitterDef.VelocityDelta().x - bRandom(mEmitterDef.VelocityDelta().x, &random_seed) * 2.0f);
             rand.y = 1.0f - (mEmitterDef.VelocityDelta().y - bRandom(mEmitterDef.VelocityDelta().y, &random_seed) * 2.0f);
@@ -225,8 +225,8 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
             particle->age = current_particle_age;
             particle->gravity = gravity;
             particle->uv[0] = static_cast<uint8>(mTextureUVs.StartU() * 255.0f);
-            particle->length = static_cast<uint8>(ld * 255.0f);
-            particle->width = static_cast<uint8>(mEmitterDef.HeightStart() * 255.0f);
+            particle->length = static_cast<uint8>(ld);
+            particle->width = static_cast<uint8>(mEmitterDef.HeightStart());
             particle->color = particleColor;
 
             current_particle_age += particle_age_factor;
