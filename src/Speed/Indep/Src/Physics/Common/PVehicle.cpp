@@ -761,15 +761,12 @@ bool PVehicle::SetDynamicData(const EventSequencer::System *system, EventDynamic
     data->fWorldID = static_cast<ISimable *>(this)->GetWorldID();
     IRigidBody *body = static_cast<ISimable *>(this)->GetRigidBody();
     if (body != nullptr) {
-        const UMath::Vector3 &pos = body->GetPosition();
-        data->fPosition = UMath::Vector4Make(pos, 0.0f);
         UMath::Vector3 dir;
+        data->fPosition = UMath::Vector4Make(body->GetPosition(), 0.0f);
         body->GetForwardVector(dir);
         data->fVector = UMath::Vector4Make(dir, 0.0f);
-        const UMath::Vector3 &vel = body->GetLinearVelocity();
-        data->fVelocity = UMath::Vector4Make(vel, 0.0f);
-        const UMath::Vector3 &angvel = body->GetAngularVelocity();
-        data->fAngularVelocity = UMath::Vector4Make(angvel, 0.0f);
+        data->fVelocity = UMath::Vector4Make(body->GetLinearVelocity(), 1.0f);
+        data->fAngularVelocity = UMath::Vector4Make(body->GetAngularVelocity(), 1.0f);
     }
     if (mRenderable != nullptr) {
         data->fhModel = reinterpret_cast<uintptr_t>(mRenderable->GetModelHandle());
