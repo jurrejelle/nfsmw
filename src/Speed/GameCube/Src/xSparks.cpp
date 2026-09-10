@@ -261,30 +261,22 @@ NGEffect::NGEffect(const XenonEffectDef &eDef)
 }
 
 void ParticleList::AgeParticles(float dt) {
-    int numOutParticles = 0;
     NGParticle *inParticle = mParticles;
     NGParticle *outParticle = mParticles;
+    int numOutParticles = 0;
 
-    {
-        int i = 0;
-
-        if (i < static_cast<int>(mNumParticles)) {
-            do {
-                if (static_cast<float>(static_cast<int>(inParticle->life)) < dt * 8191.0f) {
-                    inParticle++;
-                    i++;
-                    continue;
-                }
-
-                numOutParticles++;
-                *outParticle = *inParticle;
-                outParticle->age += dt;
-                outParticle->life = static_cast<uint16>(static_cast<float>(static_cast<int>(inParticle->life)) - dt * 8191.0f);
-                outParticle++;
-                inParticle++;
-                i++;
-            } while (i < static_cast<int>(mNumParticles));
+    for (int i = 0; i < static_cast<int>(mNumParticles); i++) {
+        if (static_cast<float>(static_cast<int>(inParticle->life)) < dt * 8191.0f) {
+            inParticle++;
+            continue;
         }
+
+        *outParticle = *inParticle;
+        outParticle->life = static_cast<uint16>(static_cast<float>(static_cast<int>(inParticle->life)) - dt * 8191.0f);
+        outParticle->age += dt;
+        inParticle++;
+        outParticle++;
+        numOutParticles++;
     }
 
     mNumParticles = numOutParticles;

@@ -288,13 +288,15 @@ bool LGWheels::SameSpringForceParams(long channel, signed char offset, unsigned 
 
 void LGWheels::PlayConstantForce(long channel, short magnitude, unsigned short direction) {
     int ret;
-    Constant *c = &constant;
+    Constant *c;
 
     ret = 0;
     if (wheels.IsConnected(channel)) {
         if (IsAirborne[channel]) {
             return;
         }
+
+        c = &constant;
 
         if (c->Playing[channel][0] != 0) {
             if (SameConstantForceParams(channel, magnitude, direction)) {
