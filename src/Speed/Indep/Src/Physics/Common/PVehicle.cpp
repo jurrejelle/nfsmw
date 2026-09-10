@@ -1084,8 +1084,7 @@ void PVehicle::LoadBehaviors(const UMath::Vector3 &initialPos, const UMath::Matr
     if (mEngine != nullptr) {
         mStartingNOS = mEngine->GetNOSCapacity();
     }
-    UMath::Vector3 linearVel;
-    memset(&linearVel, 0, sizeof(UMath::Vector3));
+    UMath::Vector3 linearVel = UMath::Vector3();
     UMath::Vector3 Dimension;
     mBounds->GetHalfDimensions(Dimension);
     unsigned int collision_mask = 0;
