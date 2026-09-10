@@ -33,6 +33,15 @@ template <typename T, int N> struct BitArray {
         return (Words[index / kBitsPerWord] >> (index % kBitsPerWord)) & 1;
     }
 
+    bool Test() const {
+        for (int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
+            if (Words[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void Set(unsigned int index) {
         Words[index / kBitsPerWord] |= static_cast<T>(1) << (index % kBitsPerWord);
     }

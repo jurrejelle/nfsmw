@@ -21,6 +21,8 @@
 
 #include "Speed/Indep/Src/Physics/Common/Bounds.cpp"
 
+#include "Speed/Indep/Src/Physics/Common/SmokeableInfo.cpp"
+
 #include "Speed/Indep/Src/Physics/PhysicsUpgrades.cpp"
 
 #include "Speed/Indep/Src/Physics/PhysicsInfo.cpp"
