@@ -809,13 +809,11 @@ int HeirarchyModel::FindHeirarchyChild(const UCrc32 &nodename) const {
     if (mHeirarchy == nullptr) {
         return -1;
     }
-    const ModelHeirarchy::Node *nodes = mHeirarchy->GetNodes();
-    const ModelHeirarchy::Node &node = nodes[mHeirarchyNode];
-    unsigned int numChildren = node.mNumChildren;
+    const ModelHeirarchy::Node &node = mHeirarchy->GetNodes()[mHeirarchyNode];
     int childindex = -1;
-    for (unsigned int i = 0; i < numChildren; ++i) {
+    for (unsigned int i = 0; i < node.mNumChildren; ++i) {
         int idx = node.mChildIndex + i;
-        if (nodes[idx].mNodeName == nodename) {
+        if (mHeirarchy->GetNodes()[idx].mNodeName == nodename) {
             childindex = idx;
             break;
         }
