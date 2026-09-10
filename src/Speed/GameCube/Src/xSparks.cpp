@@ -355,10 +355,11 @@ void UpdateXenonEmitters(float dt) {
         iter = gNGEffectList.lists[XenonEffectLists::STAGING].begin();
         while (iter != gNGEffectList.lists[XenonEffectLists::STAGING].end()) {
             eDef = *iter;
-            ++iter;
             if (!eDef.piggyback_effect || eDef.piggyback_effect->IsEnabled()) {
                 NGEffect anEffect(eDef);
             }
+
+            ++iter;
         }
     }
 
