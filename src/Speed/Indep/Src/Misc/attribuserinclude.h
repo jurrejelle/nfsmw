@@ -46,7 +46,10 @@ class StringKey {
     }
 
     bool IsNotEmpty() const {
-        return this->mString != nullptr && this->mString[0] != 0;
+        if (this->mString == nullptr) {
+            return false;
+        }
+        return this->mString[0] != 0;
     }
 
     bool IsEmpty() const {

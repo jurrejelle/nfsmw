@@ -211,8 +211,8 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
         } else {
             LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("RBSmackable"), rbparams);
         }
+        LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_EFFECTS), UCrc32("EffectsSmackable"), Sim::Param());
     }
-    LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_EFFECTS), UCrc32("EffectsSmackable"), Sim::Param());
     for (unsigned int i = 0; i < mAttributes.Num_BEHAVIORS(); ++i) {
         const Attrib::StringKey &key = mAttributes.BEHAVIORS(i);
         if (key.IsNotEmpty()) {
