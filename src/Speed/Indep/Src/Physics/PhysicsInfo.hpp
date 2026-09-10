@@ -53,6 +53,7 @@ void Init();
 
 float AerodynamicDownforce(const Attrib::Gen::chassis &chassis, const float speed);
 float EngineInertia(const Attrib::Gen::engine &engine, const bool loaded);
+eInductionType InductionType(const Attrib::Gen::pvehicle &pvehicle);
 eInductionType InductionType(const Attrib::Gen::induction &induction);
 bool HasNos(const Attrib::Gen::pvehicle &pvehicle);
 bool HasRunflatTires(const Attrib::Gen::pvehicle &pvehicle);
@@ -64,6 +65,11 @@ float InductionBoost(const Attrib::Gen::engine &engine, const Attrib::Gen::induc
 float Torque(const Attrib::Gen::engine &engine, float rpm);
 float MaxTorque(const Attrib::Gen::engine &engine, float &atrpm);
 Meters WheelDiameter(const Attrib::Gen::tires &tires, bool front);
+Meters WheelDiameter(const Attrib::Gen::pvehicle &pvehicle, bool front);
+float Redline(const Attrib::Gen::engine &engine);
+float Redline(const Attrib::Gen::pvehicle &pvehicle);
+unsigned int NumFowardGears(const Attrib::Gen::transmission &transmission);
+unsigned int NumFowardGears(const Attrib::Gen::pvehicle &pvehicle);
 float MaxInductedPower(const Attrib::Gen::pvehicle &pvehicle, const Tunings *tunings);
 FtLbs AvgInductedTorque(const Attrib::Gen::engine &engine, const Attrib::Gen::induction &induction, const Attrib::Gen::transmission &transmission,
                         bool from_peak, const Tunings *tunings);

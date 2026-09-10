@@ -22,6 +22,11 @@ float Physics::Info::EngineInertia(const Attrib::Gen::engine &engine, const bool
     return scale * (engine.FLYWHEEL_MASS() * 0.025f + 0.25f);
 }
 
+Physics::Info::eInductionType Physics::Info::InductionType(const Attrib::Gen::pvehicle &pvehicle) {
+    const Attrib::Gen::induction ind(pvehicle.induction(0), 0, nullptr);
+    return InductionType(ind);
+}
+
 // Credits: Brawltendo
 Physics::Info::eInductionType Physics::Info::InductionType(const Attrib::Gen::induction &induction) {
     if (induction.HIGH_BOOST() > 0.0f || induction.LOW_BOOST() > 0.0f) {
@@ -35,6 +40,15 @@ Physics::Info::eInductionType Physics::Info::InductionType(const Attrib::Gen::in
     } else {
         return INDUCTION_NONE;
     }
+}
+
+bool Physics::Info::HasNos(const Attrib::Gen::pvehicle &pvehicle) {
+    const Attrib::Gen::nos nos(pvehicle.nos(0), 0, nullptr);
+    return nos.TORQUE_BOOST() > 0.0f && nos.NOS_CAPACITY() > 0.0f;
+}
+
+bool Physics::Info::HasRunflatTires(const Attrib::Gen::pvehicle &pvehicle) {
+    return false;
 }
 
 // Credits: Brawltendo
@@ -152,9 +166,145 @@ Meters Physics::Info::WheelDiameter(const Attrib::Gen::tires &tires, bool front)
 
 // Credits: Brawltendo
 // TODO not matching on GC yet
+Meters Physics::Info::WheelDiameter(const Attrib::Gen::pvehicle &pvehicle, bool front) {
+    const Attrib::Gen::tires t(pvehicle.tires(0), 0, nullptr);
+    return WheelDiameter(t, front);
+}
+
+float Physics::Info::MaxInductedPower(const Attrib::Gen::pvehicle &pvehicle, const Tunings *tunings) {
+    Attrib::Gen::engine engine(pvehicle.engine(0), 0, nullptr);
+    Attrib::Gen::induction induction(pvehicle.induction(0), 0, nullptr);
+    unsigned int num_torque = engine.Num_TORQUE();
+
+    if (num_torque < 2) {
+        return 0.0f;
+    }
+
+    float result = 0.0f;
+    float rpm = engine.IDLE();
+    float delta_rpm = (engine.MAX_RPM() - engine.IDLE()) / static_cast<float>(engine.Num_TORQUE() - 1);
+
+    for (unsigned int i = 0; i < engine.Num_TORQUE(); i++) {
+        float pt_torque = engine.TORQUE(i) * (InductionBoost(engine, induction, rpm, 1.0f, tunings, nullptr) + 1.0f);
+        float hp = FTLB2HP(pt_torque, rpm);
+        if (hp > result) {
+            result = hp;
+        }
+        rpm += delta_rpm;
+    }
+
+    return result;
+}
+
+FtLbs Physics::Info::AvgInductedTorque(const Attrib::Gen::engine &engine, const Attrib::Gen::induction &induction,
+                                       const Attrib::Gen::transmission &transmission, bool from_peak, const Tunings *tunings) {
+    unsigned int num_torque = engine.Num_TORQUE();
+    if (num_torque < 2) {
+        return 0.0f;
+    }
+
+    float peak_torque_rpm;
+    float peak_torque = MaxInductedTorque(engine, induction, peak_torque_rpm, tunings);
+    if (!(peak_torque > 0.0f)) {
+        return 0.0f;
+    }
+
+    float torque_converter = transmission.TORQUE_CONVERTER();
+    float torque;
+    float rpm = engine.IDLE();
+    float total_torque = 0.0f;
+    float count = 0.0f;
+    float delta_rpm = (engine.MAX_RPM() - engine.IDLE()) / static_cast<float>(engine.Num_TORQUE() - 1);
+
+    for (unsigned int i = 0; i < engine.Num_TORQUE(); i++) {
+        if (!from_peak || rpm >= peak_torque_rpm) {
+            float converter_ratio = 1.0f + torque_converter * (1.0f - UMath::Ramp(rpm, engine.IDLE(), peak_torque_rpm));
+            torque = converter_ratio * engine.TORQUE(i) * (InductionBoost(engine, induction, rpm, 1.0f, tunings, nullptr) + 1.0f);
+            float torque_pt = torque;
+            total_torque += torque_pt;
+            count += 1.0f;
+        }
+        rpm += delta_rpm;
+        if (rpm >= engine.RED_LINE()) {
+            break;
+        }
+    }
+
+    if (count > 0.0f) {
+        return total_torque / count;
+    }
+    return 0.0f;
+}
+
+FtLbs Physics::Info::MaxInductedTorque(const Attrib::Gen::engine &eng, const Attrib::Gen::induction &ind, float &atrpm, const Tunings *tunings) {
+    if (eng.Num_TORQUE() < 2) {
+        atrpm = eng.IDLE();
+        return 0.0f;
+    }
+
+    float torque = 0.0f;
+    atrpm = eng.IDLE();
+    float rpm = eng.IDLE();
+    float delta_rpm = (eng.MAX_RPM() - eng.IDLE()) / static_cast<float>(eng.Num_TORQUE() - 1);
+
+    for (unsigned int i = 0; i < eng.Num_TORQUE(); i++) {
+        float pt_torque = eng.TORQUE(i) * (InductionBoost(eng, ind, rpm, 1.0f, tunings, nullptr) + 1.0f);
+        if (pt_torque > torque) {
+            atrpm = rpm;
+            torque = pt_torque;
+        }
+        rpm += delta_rpm;
+    }
+
+    atrpm = UMath::Clamp(atrpm, eng.IDLE(), eng.RED_LINE());
+    return torque;
+}
+
+FtLbs Physics::Info::MaxInductedTorque(const Attrib::Gen::pvehicle &pvehicle, Rpm &atrpm, const Tunings *tunings) {
+    const Attrib::Gen::engine eng(pvehicle.engine(0), 0, nullptr);
+    const Attrib::Gen::induction ind(pvehicle.induction(0), 0, nullptr);
+    return MaxInductedTorque(eng, ind, atrpm, tunings);
+}
+
+float Physics::Info::MaxTorque(const Attrib::Gen::engine &eng, float &atrpm) {
+    float torque = 0.0f;
+    int max_pt = 0;
+    unsigned int num_torque = eng.Num_TORQUE();
+
+    if (num_torque == 0) {
+        atrpm = torque;
+    } else {
+        for (unsigned int i = 0; i < eng.Num_TORQUE(); i++) {
+            float pt_torque = eng.TORQUE(i);
+            if (pt_torque > torque) {
+                max_pt = i;
+                torque = pt_torque;
+            }
+        }
+
+        atrpm = eng.IDLE();
+        if (num_torque > 1) {
+            float rpm_ratio = static_cast<float>(max_pt) / static_cast<float>(num_torque - 1);
+            atrpm = rpm_ratio * (eng.MAX_RPM() - eng.IDLE()) + atrpm;
+        }
+
+        atrpm = UMath::Clamp(atrpm, eng.IDLE(), eng.RED_LINE());
+    }
+    return torque;
+}
+
+float Physics::Info::Redline(const Attrib::Gen::engine &engine) {
+    return engine.RED_LINE();
+}
+
+float Physics::Info::Redline(const Attrib::Gen::pvehicle &pvehicle) {
+    const Attrib::Gen::engine eng(pvehicle.engine(0), 0, nullptr);
+    return Redline(eng);
+}
+
 bool Physics::Info::ShiftPoints(const Attrib::Gen::transmission &transmission, const Attrib::Gen::engine &engine,
                                 const Attrib::Gen::induction &induction, float *shift_up, float *shift_down, unsigned int numpts) {
-    for (int i = 0; i < numpts; ++i) {
+    for (unsigned int i = 0; i < numpts; ++i) {
         shift_up[i] = 0.0f;
         shift_down[i] = 0.0f;
     }
@@ -169,13 +319,13 @@ bool Physics::Info::ShiftPoints(const Attrib::Gen::transmission &transmission, c
     for (j = G_FIRST; j < topgear; ++j) {
         float g1 = transmission.GEAR_RATIO(j);
         float g2 = transmission.GEAR_RATIO(j + 1);
-        float rpm = (redline + engine.IDLE()) * 0.5f;
+        float rpm = (engine.IDLE() + redline) * 0.5f;
         float max = rpm;
-        int flag = 0;
+        int flag = 1;
 
         if (rpm < redline) {
             // find the upshift RPM for this gear using predicted engine torque
-            while (!flag) {
+            while (flag) {
                 // seems like the rpm and spool params are swapped in both instances
                 // so either it's a mistake that was copy-pasted or it was a deliberate choice
                 float currenttorque = Torque(engine, max) * (InductionBoost(engine, induction, 1.0f, max, nullptr, nullptr) + 1.0f);
@@ -183,32 +333,32 @@ bool Physics::Info::ShiftPoints(const Attrib::Gen::transmission &transmission, c
                 if (UMath::Abs(g1) > 0.00001f) {
                     float ratio = g2 / g1;
                     float next_rpm = ratio * max;
-                    shiftuptorque = Torque(engine, next_rpm) * (InductionBoost(engine, induction, 1.0f, next_rpm, nullptr, nullptr) + 1.0f) * g2 / g1;
+                    shiftuptorque = Torque(engine, next_rpm) * g2 / g1 * (InductionBoost(engine, induction, 1.0f, next_rpm, nullptr, nullptr) + 1.0f);
                 } else {
                     shiftuptorque = 0.0f;
                 }
 
-                // set the upshift RPM to the current max
-                if (shiftuptorque > currenttorque)
+                if (shiftuptorque > currenttorque) {
+                    // set the upshift RPM to the current max
+                    shift_up[j] = max;
+                    flag = 0;
                     break;
+                }
 
                 max += 50.0f;
-                // set the upshift RPM to the redline RPM
-                flag = static_cast<int>(!(max < redline));
+                if (!(max < redline)) {
+                    break;
+                }
             }
-            if (!flag) {
-                shift_up[j] = max;
-            }
-        } else {
-            flag = 1;
         }
         if (flag) {
+            // set the upshift RPM to the redline RPM
             shift_up[j] = redline - 100.0f;
         }
 
         // calculate downshift RPM for the next gear
         if (UMath::Abs(g1) > 0.00001f) {
-            shift_down[j + 1] = (g2 / g1) * shift_up[j];
+            shift_down[j + 1] = shift_up[j] * g2 / g1;
         } else {
             shift_down[j + 1] = 0.0f;
         }
@@ -218,7 +368,6 @@ bool Physics::Info::ShiftPoints(const Attrib::Gen::transmission &transmission, c
     return true;
 }
 
-// Credits: Brawltendo
 Mps Physics::Info::Speedometer(const Attrib::Gen::transmission &transmission, const Attrib::Gen::engine &engine, const Attrib::Gen::tires &tires,
                                Rpm rpm, GearID gear, const Tunings *tunings) {
     float speed = 0.0f;
@@ -239,4 +388,17 @@ Mps Physics::Info::Speedometer(const Attrib::Gen::transmission &transmission, co
     }
 
     return speed;
+}
+
+unsigned int Physics::Info::NumFowardGears(const Attrib::Gen::transmission &transmission) {
+    unsigned int num_ratios = transmission.Num_GEAR_RATIO();
+    if (num_ratios > 2) {
+        return num_ratios - 2;
+    }
+    return 0;
+}
+
+unsigned int Physics::Info::NumFowardGears(const Attrib::Gen::pvehicle &pvehicle) {
+    const Attrib::Gen::transmission trans(pvehicle.transmission(0), 0, nullptr);
+    return NumFowardGears(trans);
 }
