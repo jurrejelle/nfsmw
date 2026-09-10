@@ -1452,10 +1452,9 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
         for (ManageNode *node_iter = vehicle_list.begin();
              node_iter != vehicle_list.end(); ++node_iter) {
             ManageNode &node = *node_iter;
-            CarType t = node.resource.Type;
-            if (t != type) {
+            if (node.resource.Type != type) {
                 pushresult = node.result;
-                type = t;
+                type = node.resource.Type;
             }
             if (pushresult == VCR_WANT) {
                 node.result = VCR_WANT;
@@ -1463,27 +1462,28 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
         }
     }
 
-    ManageNode *end_iter = std::remove_if(vehicle_list.begin(), vehicle_list.end(),
-                                           ManageNode::is_kept);
-    vehicle_list.erase(end_iter, vehicle_list.end());
-
+    vehicle_list.erase(std::remove_if(vehicle_list.begin(), vehicle_list.end(), ManageNode::is_kept),
+                       vehicle_list.end());
     if (vehicle_list.size() == 0) {
         return false;
     }
+    vehicle_list.print();
 
     UTL::Std::map<CarType, unsigned int, _type_map> type_map;
     for (ManageNode *node_iter = vehicle_list.begin();
          node_iter != vehicle_list.end(); ++node_iter) {
-        type_map[node_iter->resource.Type]++;
+        ManageNode &node = *node_iter;
+        type_map[node.resource.Type]++;
     }
 
     for (ManageNode *node_iter = vehicle_list.begin();
          node_iter != vehicle_list.end(); ++node_iter) {
-        node_iter->instancecount = type_map[node_iter->resource.Type];
+        ManageNode &node = *node_iter;
+        node.instancecount = type_map[node.resource.Type];
     }
 
     unsigned int found_instances = 0;
-    ManageNode *node_iter = vehicle_list.begin();
+    ManageNode *end_iter = vehicle_list.begin();
     if (needed_resources != 0) {
         std::sort(vehicle_list.begin(), vehicle_list.end(),
                   ManageNode::sort_remove_resources);
@@ -1492,18 +1492,17 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
         unsigned int found_resources = 0;
         CarType type = CARTYPE_NONE;
         unsigned int type_cost = 0;
-        for (node_iter = vehicle_list.begin(); node_iter != vehicle_list.end();
-             ++node_iter) {
-            CarType t = node_iter->resource.Type;
-            if (t != type) {
+        for (; end_iter != vehicle_list.end(); ++end_iter) {
+            ManageNode &node = *end_iter;
+            if (node.resource.Type != type) {
                 found_resources += type_cost;
-                type = t;
+                type = node.resource.Type;
             }
             if (found_resources >= needed_resources) {
                 type_cost = 0;
                 break;
             }
-            type_cost = node_iter->resource.Cost;
+            type_cost = node.resource.Cost;
             found_instances++;
         }
 
@@ -1513,11 +1512,11 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
     }
 
     if (found_instances < needed_instances) {
-        std::sort(node_iter, vehicle_list.end(),
+        std::sort(end_iter, vehicle_list.end(),
                   ManageNode::sort_remove_instances);
         vehicle_list.print();
 
-        for (; node_iter != vehicle_list.end(); ++node_iter) {
+        for (; end_iter != vehicle_list.end(); ++end_iter) {
             if (found_instances >= needed_instances) {
                 break;
             }
@@ -1529,7 +1528,7 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
         }
     }
 
-    vehicle_list.erase(node_iter, vehicle_list.end());
+    vehicle_list.erase(end_iter, vehicle_list.end());
 
     vehicle_list.print();
 
