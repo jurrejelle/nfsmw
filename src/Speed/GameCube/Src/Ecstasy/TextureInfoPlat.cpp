@@ -164,6 +164,7 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
         }
     }
 
+    texture_format_IA8 = GX_TL_IA8;
     if (clamp & 2) {
         if (IsPow2(height)) {
             wrap_t = GX_REPEAT;
@@ -171,7 +172,6 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
     }
 
     texture_format = format & 0x7FFFFFFF;
-    texture_format_IA8 = GX_TL_IA8;
     palette_format = format >= static_cast<int>(texture_format_IA8) ? GX_TL_RGB5A3 : GX_TL_IA8;
 
     if (HasClut()) {
