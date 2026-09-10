@@ -29,6 +29,16 @@ struct RBSimpleParams : public Sim::Param {
         return value;
     }
 
+    RBSimpleParams(const UMath::Vector3 &pos, const UMath::Vector3 &vel, const UMath::Vector3 &angvel, const UMath::Matrix4 &mat, float radius,
+                   float mass)
+        : Sim::Param(TypeName(), this), //
+          finitPos(pos),                //
+          finitVel(vel),                //
+          finitAngVel(angvel),          //
+          finitMat(mat),                //
+          finitRadius(radius),          //
+          finitMass(mass) {}
+
     const UMath::Vector3 &finitPos;    // offset 0x10, size 0x4
     const UMath::Vector3 &finitVel;    // offset 0x14, size 0x4
     const UMath::Vector3 &finitAngVel; // offset 0x18, size 0x4
