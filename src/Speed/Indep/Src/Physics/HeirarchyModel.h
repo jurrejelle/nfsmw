@@ -70,6 +70,10 @@ class HeirarchyModel : public Sim::Model, public IBody, public ITriggerableModel
         return mTrigger;
     }
 
+    bool HasAvoidable() const {
+        return mAvoidable != nullptr;
+    }
+
   protected:
     UMath::Vector4 mTriggerAvoid;
     ModelHeirarchy *mHeirarchy;

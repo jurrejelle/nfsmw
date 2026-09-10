@@ -712,16 +712,16 @@ HeirarchyModel::HeirarchyModel(bHash32 rendermesh, const CollisionGeometry::Boun
     , IBody(this) //
     , ITriggerableModel(this) //
     , Attrib::Gen::smackable(attribs, 0, nullptr) //
+    , mTriggerAvoid(UMath::Vector4::kZero) //
+    , mHeirarchy(const_cast<ModelHeirarchy *>(heirarchy)) //
+    , mRenderMesh(rendermesh) //
+    , mTrigger(nullptr) //
+    , mOffScreenTimer(10.0f) //
+    , mHeirarchyNode(static_cast<unsigned short>(child_index)) //
+    , mFlags(0) //
+    , mChildVisibility(0xFFFFFFFF) //
+    , mAvoidable(nullptr) //
 {
-    mTriggerAvoid = UMath::Vector4::kZero;
-    mHeirarchy = const_cast<ModelHeirarchy *>(heirarchy);
-    mHeirarchyNode = static_cast<unsigned short>(child_index);
-    mRenderMesh = rendermesh;
-    mOffScreenTimer = 10.0f;
-    mChildVisibility = 0xFFFFFFFF;
-    mAvoidable = nullptr;
-    mTrigger = nullptr;
-    mFlags = 0;
     Attrib::Gen::smackable smackable(attribs, 0, nullptr);
     if (visible) {
         RenderConn::Pkt_Smackable_Open pkt(mRenderMesh, GetWorldID(), GetCollisionGeometry(),
@@ -729,7 +729,7 @@ HeirarchyModel::HeirarchyModel(bHash32 rendermesh, const CollisionGeometry::Boun
         BeginDraw(UCrc32(0x804c146e), &pkt);
     }
     if (smackable.AI_AVOIDABLE()) {
-        if (mAvoidable == nullptr) {
+        if (HasAvoidable() != true) {
             mAvoidable = new SmackableAvoidable(this);
         }
     }
