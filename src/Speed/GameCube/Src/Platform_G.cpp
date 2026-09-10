@@ -440,7 +440,7 @@ void DVDErrorTask(void *, int) {
             nextFrame = dvderrorticks + 1;
         } else if (g_discErrorOccured == 0) {
             nextFrame = dvderrorticks + 1;
-            goto loop_end;
+            break;
         } else {
             /* Disc error was active, check if we should service streaming */
             if (!TheTrackStreamer.HasUserMemoryAllocations() && TheTrackStreamer.IsLoadingInProgressNonRepeatable()) {
