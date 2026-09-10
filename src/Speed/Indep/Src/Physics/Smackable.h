@@ -33,11 +33,11 @@ struct SmackableParams : public Sim::Param {
     }
 
     SmackableParams(const UMath::Matrix4 &mat, bool virginspawn, IModel *scenery, bool simple_physics)
-        : Sim::Param(UCrc32(UCRC32_BASE), this), //
-          fVirginSpawn(virginspawn),             //
-          fScenery(scenery),                     //
-          fSimplePhysics(simple_physics) {
+        : Sim::Param(UCrc32(UCRC32_BASE), this) {
         UMath::Copy(mat, fMatrix);
+        fVirginSpawn = virginspawn;
+        fScenery = scenery;
+        fSimplePhysics = simple_physics;
     }
 
     struct UMath::Matrix4 fMatrix; // offset 0x10, size 0x40

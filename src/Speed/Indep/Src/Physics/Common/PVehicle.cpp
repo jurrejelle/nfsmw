@@ -509,10 +509,10 @@ void PVehicle::CheckOffWorld() {
     set_false:
         mOffWorld = false;
     } else {
-        float worldHeight = 0.0f;
         WCollisionMgr mgr(0, 3);
-        const UMath::Vector3 &pos = static_cast<ISimable *>(this)->GetPosition();
-        mOffWorld = !mgr.GetWorldHeightAtPointRigorous(pos, worldHeight, nullptr);
+        float worldHeight = 0.0f;
+        mOffWorld = !mgr.GetWorldHeightAtPointRigorous(
+            static_cast<ISimable *>(this)->GetPosition(), worldHeight, nullptr);
     }
 done:;
 }
