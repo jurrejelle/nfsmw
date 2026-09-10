@@ -822,38 +822,38 @@ int HeirarchyModel::FindHeirarchyChild(const UCrc32 &nodename) const {
 }
 
 IModel *HeirarchyModel::SpawnModel(UCrc32 rendernode, UCrc32 collisionnode, UCrc32 attributes) {
-    if (mHeirarchy != nullptr && !IsDirty()) {
-        if (UTL::Collections::Listable< IModel, 434 >::Count() > 434u) {
-            return nullptr;
-        }
-        int childindex = FindHeirarchyChild(rendernode);
-        if (childindex > -1) {
-            const CollisionGeometry::Bounds *geom = GetCollisionGeometry();
-            const CollisionGeometry::Bounds *bounds =
-                geom->GetChild(collisionnode);
-            if (bounds != nullptr) {
-                const Attrib::Collection *attribs =
-                    SmokeableSpawner::FindAttributes(attributes);
-                if (attribs != nullptr) {
-                    const ModelHeirarchy::Node *nodes = mHeirarchy->GetNodes();
-                    eModel *emodel =
-                        reinterpret_cast<eModel *>(nodes[childindex].mModel);
-                    if (emodel != nullptr) {
-                        bHash32 meshname(emodel->GetNameHash());
-                        HeirarchyModel *child = new HeirarchyModel(
-                            meshname, bounds, rendernode, this, attribs, mHeirarchy,
-                            childindex, true);
-                        IModel *result = nullptr;
-                        if (child != nullptr) {
-                            result = static_cast<IModel *>(child);
-                        }
-                        return result;
-                    }
-                }
-            }
-        }
+    if (mHeirarchy == nullptr || IsDirty()) {
+        return nullptr;
     }
-    return nullptr;
+    if (UTL::Collections::Listable< IModel, 434 >::Count() > 434u) {
+        return nullptr;
+    }
+    int childindex = FindHeirarchyChild(rendernode);
+    if (childindex <= -1) {
+        return nullptr;
+    }
+    const CollisionGeometry::Bounds *geom = GetCollisionGeometry();
+    const CollisionGeometry::Bounds *bounds = geom->GetChild(collisionnode);
+    if (bounds == nullptr) {
+        return nullptr;
+    }
+    const Attrib::Collection *attribs = SmokeableSpawner::FindAttributes(attributes);
+    if (attribs == nullptr) {
+        return nullptr;
+    }
+    const ModelHeirarchy::Node *nodes = mHeirarchy->GetNodes();
+    eModel *emodel = reinterpret_cast<eModel *>(nodes[childindex].mModel);
+    if (emodel == nullptr) {
+        return nullptr;
+    }
+    bHash32 meshname(emodel->GetNameHash());
+    HeirarchyModel *child = new HeirarchyModel(meshname, bounds, rendernode, this, attribs,
+                                               mHeirarchy, childindex, true);
+    IModel *result = nullptr;
+    if (child != nullptr) {
+        result = static_cast<IModel *>(child);
+    }
+    return result;
 }
 
 HeirarchyModel::~HeirarchyModel() {
