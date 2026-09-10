@@ -22,6 +22,7 @@ class SubSystem {
           mNext(mHead),        //
           mName(name) {
 #endif
+        mHead = this;
     }
 
     static void Init(const UCrc32 &sig) {
