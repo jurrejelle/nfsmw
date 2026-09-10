@@ -340,33 +340,37 @@ void DVDErrorTask(void *, int) {
 
         if (dvderrorhappened != 0) {
             unsigned long MotorRumble[4];
-            int port;
 
             /* Error state active - run sync tasks and handle input */
             bSyncTaskRun();
             if (MemoryCard::GetInstance() != 0) {
                 MemoryCard::GetInstance()->Tick(16);
             }
-            DVDCheckDisk();
 
-            bMemSet(MotorRumble, 0, 16);
-            MotorRumble[0] = 2;
-            MotorRumble[1] = 2;
-            MotorRumble[2] = 2;
-            MotorRumble[3] = 2;
-            PADControlAllMotors(MotorRumble);
+            {
+                int port;
 
-            LGWheels_ReadAll(plat_lgwheels);
-            for (port = 0; port <= 3; port++) {
-                if (LGWheels_IsConnected(plat_lgwheels, port)) {
-                    LGWheels_StopConstantForce(plat_lgwheels, port);
-                    LGWheels_StopSurfaceEffect(plat_lgwheels, port);
-                    LGWheels_StopDamperForce(plat_lgwheels, port);
-                    LGWheels_StopCarAirborne(plat_lgwheels, port);
-                    LGWheels_StopSlipperyRoadEffect(plat_lgwheels, port);
-                    LGWheels_PlaySpringForce(plat_lgwheels, port,
-                        *(signed char *)((char *)plat_lgwheels + port * 10 + 3),
-                        0xb4, 0xb4);
+                DVDCheckDisk();
+
+                bMemSet(MotorRumble, 0, 16);
+                MotorRumble[0] = 2;
+                MotorRumble[1] = 2;
+                MotorRumble[2] = 2;
+                MotorRumble[3] = 2;
+                PADControlAllMotors(MotorRumble);
+
+                LGWheels_ReadAll(plat_lgwheels);
+                for (port = 0; port <= 3; port++) {
+                    if (LGWheels_IsConnected(plat_lgwheels, port)) {
+                        LGWheels_StopConstantForce(plat_lgwheels, port);
+                        LGWheels_StopSurfaceEffect(plat_lgwheels, port);
+                        LGWheels_StopDamperForce(plat_lgwheels, port);
+                        LGWheels_StopCarAirborne(plat_lgwheels, port);
+                        LGWheels_StopSlipperyRoadEffect(plat_lgwheels, port);
+                        LGWheels_PlaySpringForce(plat_lgwheels, port,
+                            *(signed char *)((char *)plat_lgwheels + port * 10 + 3),
+                            0xb4, 0xb4);
+                    }
                 }
             }
         }
@@ -537,17 +541,18 @@ void DVDErrorTask(void *, int) {
                 HardwarePadStatus[1].button = *(u16 *)((char *)plat_lgwheels + 10);
             } else {
                 PADStatus LocalHardwarePadStatus[4];
-                int pad_state_0;
-                int pad_state_1;
 
                 PADRead(LocalHardwarePadStatus);
-                pad_state_0 = LocalHardwarePadStatus[0].err;
-                pad_state_1 = LocalHardwarePadStatus[1].err;
-                if (pad_state_0 == 0) {
-                    bMemCpy(&HardwarePadStatus[0], &LocalHardwarePadStatus[0], 0xc);
-                }
-                if (pad_state_1 == 0) {
-                    bMemCpy(&HardwarePadStatus[1], &LocalHardwarePadStatus[1], 0xc);
+                {
+                    int pad_state_0 = LocalHardwarePadStatus[0].err;
+                    int pad_state_1 = LocalHardwarePadStatus[1].err;
+
+                    if (pad_state_0 == 0) {
+                        bMemCpy(&HardwarePadStatus[0], &LocalHardwarePadStatus[0], 0xc);
+                    }
+                    if (pad_state_1 == 0) {
+                        bMemCpy(&HardwarePadStatus[1], &LocalHardwarePadStatus[1], 0xc);
+                    }
                 }
             }
         }
