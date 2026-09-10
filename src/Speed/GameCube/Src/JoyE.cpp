@@ -221,10 +221,10 @@ int ActualReadJoystickData() {
                     joy_data->ThePadData[slot].LTrigger = reinterpret_cast<LGPosition *>(plat_lgwheels)[port].triggerLeft;
                     joy_data->ThePadData[slot].RTrigger = reinterpret_cast<LGPosition *>(plat_lgwheels)[port].triggerRight;
                 } else {
-                    joy_data->ThePadData[slot].Type = 0xFF;
                     wasWheelConnected[port] = 0;
                     notYetCalibrating[port] = 1;
                     joy_data->ThePadData[slot].Error = 1;
+                    joy_data->ThePadData[slot].Type = 0xFF;
                     PADReset(PADMASKS[port]);
                     HardwarePadStatus[port].button = 0;
                 }
