@@ -16,7 +16,10 @@ struct SmokeableSection {
     int SectionID;
     BitArray< unsigned int, 256 > Rebuilds;
 
-    SmokeableSection() {}
+    SmokeableSection()
+        : LastLoadTime(0.0f) //
+        , SectionID(-1)
+        , Rebuilds() {}
 
     SmokeableSection(int section_id)
         : LastLoadTime(0.0f) //

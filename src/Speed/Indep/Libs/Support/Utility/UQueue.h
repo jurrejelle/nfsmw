@@ -17,7 +17,7 @@ template <typename T, int U> class UCircularQueue {
         this->Size = 0;
         this->Head = -1;
         this->Tail = 0;
-        this->MaxSize = 50;
+        this->MaxSize = U;
     }
 
     void enqueue(const T &insert) {
