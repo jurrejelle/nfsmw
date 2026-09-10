@@ -57,7 +57,7 @@ UTL::COM::Factory<Sim::Param, ISimable, UCrc32>::Prototype _Smackable("Smackable
 UTL::COM::Factory<const BehaviorParams &, Behavior, UCrc32>::Prototype __RBSmackable(
     "RBSmackable", RBSmackable::Construct);
 
-static float Smackable_ManagementRate = 0.125f;
+static const float Smackable_ManagementRate = 0.125f;
 
 static float GetDropTimer(const Attrib::Gen::smackable &attributes) {
     float result;
@@ -181,11 +181,11 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     dimension.y = UMath::Max(dimension.y, 0.025f);
     dimension.z = UMath::Max(dimension.z, 0.025f);
     float radius = UMath::Length(dimension);
-    float mass = attributes.MASS();
+    float mass = mAttributes.MASS();
     Dynamics::Inertia::Box inertia(mass, dimension.x * 2.0f, dimension.y * 2.0f, dimension.z * 2.0f);
     UMath::Scale(inertia, 2.0f, inertia);
     UMath::Vector3 moment;
-    if (attributes.MOMENT(moment)) {
+    if (mAttributes.MOMENT(moment)) {
         if (moment.x > 0.0f) {
             inertia.x *= moment.x;
         }
