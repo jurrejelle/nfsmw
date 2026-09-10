@@ -13,6 +13,12 @@ template <typename T, int N> struct BitArray {
         }
     }
 
+    BitArray(const BitArray &src) {
+        for (unsigned int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
+            Words[i] = src.Words[i];
+        }
+    }
+
     const BitArray &operator=(const BitArray &src) {
         for (unsigned int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
             Words[i] = src.Words[i];
