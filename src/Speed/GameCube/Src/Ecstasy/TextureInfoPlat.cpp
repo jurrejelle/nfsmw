@@ -168,9 +168,9 @@ unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int 
         }
     }
 
-    texture_format_IA8 = format < 0;
     texture_format = format & 0x7FFFFFFF;
-    palette_format = format > -1 ? GX_TL_RGB5A3 : GX_TL_IA8;
+    texture_format_IA8 = GX_TL_IA8;
+    palette_format = format >= static_cast<int>(texture_format_IA8) ? GX_TL_RGB5A3 : GX_TL_IA8;
 
     if (HasClut()) {
         GXTexObj *obj = &ImageInfos.obj;
