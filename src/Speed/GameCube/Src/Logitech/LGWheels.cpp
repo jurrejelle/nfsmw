@@ -411,28 +411,39 @@ void LGWheels::PlayFrontalCollisionForce(long channel, unsigned char magnitude) 
 
     ret = 0;
     if (wheels.IsConnected(channel)) {
-        c = &periodic;
+        if (periodic.Playing[channel][0] != 0) {
+            c = &periodic;
 
-        if (c->Playing[channel][0] != 0) {
             if (!SameFrontalCollisionForceParams(channel, magnitude)) {
                 ret = c->UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 0, 20, 0, 0);
                 if (ret >= 0) {
                     FrontalCollisionParams[channel].magnitude = magnitude;
                 }
             }
-        } else if (c->EffectID[channel][0] == static_cast<unsigned long>(-1)) {
+
+            c->Start(channel, 0);
+            return;
+        }
+
+        c = &periodic;
+
+        if (c->EffectID[channel][0] == static_cast<unsigned long>(-1)) {
             ret = c->DownloadForce(channel, 0, wheels.WheelHandles[channel], 3, 150, 0, magnitude, 90, 75, 0, 0, 0, 20, 0, 0);
             if (ret >= 0) {
                 FrontalCollisionParams[channel].magnitude = magnitude;
             }
-        } else if (!SameFrontalCollisionForceParams(channel, magnitude)) {
+
+            c->Start(channel, 0);
+        } else if (SameFrontalCollisionForceParams(channel, magnitude)) {
+            c->Start(channel, 0);
+        } else {
             ret = c->UpdateForce(channel, 0, 3, 150, 0, magnitude, 90, 75, 0, 0, 0, 20, 0, 0);
             if (ret >= 0) {
                 FrontalCollisionParams[channel].magnitude = magnitude;
             }
-        }
 
-        c->Start(channel, 0);
+            c->Start(channel, 0);
+        }
     } else {
         OSReport(kPlayForceError, channel);
     }
