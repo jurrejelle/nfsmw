@@ -124,6 +124,10 @@ void TextureInfoPlatInterface::SetAnimData(void *anim_data) {
     plat_info->SetImage(info);
 }
 
+static inline unsigned char IsPow2(int n) {
+    return n == (n & (~n + 1));
+}
+
 unsigned char TextureInfoPlatInfo::HasClut() {
     unsigned int texture_format = this->Format & 0x7FFFFFFF;
     return texture_format >= 8 && texture_format <= 10;
@@ -143,34 +147,37 @@ unsigned char TextureInfoPlatInfo::SetImage(TextureInfo *texture_info) {
 
 unsigned char TextureInfoPlatInfo::SetImage(int width, int height, int mip, int format, void *imageData, void *imagePal,
                                             int alphaUsageType, int clamp) {
-    GXTexWrapMode wrap_s = GX_CLAMP;
-    GXTexWrapMode wrap_t = GX_CLAMP;
-    unsigned int texture_format = format & 0x7FFFFFFF;
-    bool positive = format >= 0;
-    GXTlutFmt tlut_format = static_cast<GXTlutFmt>(positive ? GX_TL_RGB5A3 : GX_TL_IA8);
+    GXTexWrapMode wrap_s;
+    GXTexWrapMode wrap_t;
+    unsigned int texture_format;
+    unsigned int texture_format_IA8;
+    GXTlutFmt palette_format;
+
+    wrap_s = GX_CLAMP;
+    wrap_t = GX_CLAMP;
 
     if (clamp & 1) {
-        int width_lsb = width & (~width + 1);
-
-        if (width == width_lsb) {
+        if (IsPow2(width)) {
             wrap_s = GX_REPEAT;
         }
     }
 
     if (clamp & 2) {
-        int height_lsb = height & (~height + 1);
-
-        if (height == height_lsb) {
+        if (IsPow2(height)) {
             wrap_t = GX_REPEAT;
         }
     }
+
+    texture_format_IA8 = format < 0;
+    texture_format = format & 0x7FFFFFFF;
+    palette_format = format > -1 ? GX_TL_RGB5A3 : GX_TL_IA8;
 
     if (HasClut()) {
         GXTexObj *obj = &ImageInfos.obj;
 
         GXInitTexObjCI(obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXCITexFmt>(texture_format),
                        wrap_s, wrap_t, static_cast<u8>(mip), 0);
-        GXInitTlutObj(&ImageInfos.objClut, imagePal, tlut_format, texture_format == GX_TF_C4 ? 0x10 : 0x100);
+        GXInitTlutObj(&ImageInfos.objClut, imagePal, palette_format, texture_format == GX_TF_C4 ? 0x10 : 0x100);
     } else {
         GXInitTexObj(&ImageInfos.obj, imageData, static_cast<u16>(width), static_cast<u16>(height), static_cast<GXTexFmt>(texture_format),
                      wrap_s, wrap_t, static_cast<u8>(mip));
