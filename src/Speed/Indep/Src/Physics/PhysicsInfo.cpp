@@ -427,43 +427,46 @@ bool Physics::Info::HasPerformanceRatings(const Attrib::Gen::pvehicle &pvehicle)
     return base_handling < top_handling && 0.0f < top_handling;
 }
 
-bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data, int *num_data) {
+bool PerfStats::Fetch(const Attrib::Gen::pvehicle &pvehicle, bVector2 *graph_data, int *num_data) {
     Time0To100 = 0.0f;
     TopSpeed = 0.0f;
     HandlingRating = 0.0f;
 
-    Attrib::Gen::engine eng(vehicle.engine(0), 0, nullptr);
-    Attrib::Gen::induction ind(vehicle.induction(0), 0, nullptr);
-    Attrib::Gen::transmission trans(vehicle.transmission(0), 0, nullptr);
-    Attrib::Gen::chassis chas(vehicle.chassis(0), 0, nullptr);
-    Attrib::Gen::tires tir(vehicle.tires(0), 0, nullptr);
-    Attrib::Gen::brakes bra(vehicle.brakes(0), 0, nullptr);
-    Attrib::Gen::nos n(vehicle.nos(0), 0, nullptr);
+    Attrib::Gen::engine engine(pvehicle.engine(0), 0, nullptr);
+    Attrib::Gen::induction induction(pvehicle.induction(0), 0, nullptr);
+    Attrib::Gen::transmission transmission(pvehicle.transmission(0), 0, nullptr);
+    Attrib::Gen::chassis chassis(pvehicle.chassis(0), 0, nullptr);
+    Attrib::Gen::tires tires(pvehicle.tires(0), 0, nullptr);
+    Attrib::Gen::brakes brakes(pvehicle.brakes(0), 0, nullptr);
+    Attrib::Gen::nos nos(pvehicle.nos(0), 0, nullptr);
 
     float max_torque_rpm;
-    Physics::Info::MaxTorque(eng, max_torque_rpm);
-    float wheel_radius = Physics::Info::WheelDiameter(vehicle, false) * 0.5f;
-    float idle_rpm = eng.IDLE();
-    float redline_rpm = eng.RED_LINE();
-    float min_w = RPM2RPS(idle_rpm);
-    float max_w = RPM2RPS(redline_rpm);
-    float final_gear = trans.FINAL_GEAR();
-    float speed_limiter = MPH2MPS(eng.SPEED_LIMITER(0));
+    float max_torque = Physics::Info::MaxTorque(engine, max_torque_rpm);
+    float wheel_radius = Physics::Info::WheelDiameter(pvehicle, false) * 0.5f;
+    float final_gear = transmission.FINAL_GEAR();
 
     float shift_up[12];
     float shift_down[12];
 
-    if (!Physics::Info::ShiftPoints(trans, eng, ind, shift_up, shift_down, 12) ||
-        wheel_radius <= 0.0f || final_gear <= 0.0f) {
+    float idle = engine.IDLE();
+    float redline = engine.RED_LINE();
+    float min_w = RPM2RPS(idle);
+    float max_w = RPM2RPS(redline);
+    float limiter = MPH2MPS(engine.SPEED_LIMITER(0));
+
+    if (!Physics::Info::ShiftPoints(transmission, engine, induction, shift_up, shift_down, 12)) {
+        return false;
+    }
+    if (wheel_radius <= 0.0f || final_gear <= 0.0f) {
         return false;
     }
 
-    float speed = 0.0f;
     unsigned int gear = 0;
     float time = 0.0f;
-    float mass = vehicle.MASS();
-    float dT;
+    float speed = 0.0f;
     int data_index = 0;
+    float mass = pvehicle.MASS();
+    float dT;
     if (graph_data != nullptr) {
         dT = 1.0f;
     } else {
@@ -473,50 +476,46 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
     if (num_data != nullptr) {
         max_data_index = *num_data;
     }
-    unsigned int num_gears = Physics::Info::NumFowardGears(vehicle);
-    unsigned int last_gear = num_gears - 1;
+    unsigned int topgear = Physics::Info::NumFowardGears(pvehicle) - 1;
 
     while (time < 120.0f) {
-        float total_gear_ratio = trans.GEAR_RATIO(gear + G_FIRST) * final_gear;
-        float differential_rpm = RPS2RPM(min_w + (speed / wheel_radius) * total_gear_ratio * ((max_w - min_w) / max_w));
-        float rpm = UMath::Min(differential_rpm, redline_rpm);
-        rpm = UMath::Max(rpm, idle_rpm);
+        float total_gear_ratio = transmission.GEAR_RATIO(gear + G_FIRST) * final_gear;
+        float differential_w = (speed / wheel_radius) * total_gear_ratio;
+        float power_range = (max_w - min_w) / max_w;
+        float w = min_w + differential_w * power_range;
+        float rpm = UMath::Clamp(RPS2RPM(w), idle, redline);
 
         if (gear == 0) {
             rpm = UMath::Max(rpm, max_torque_rpm);
         }
 
-        float torque = Physics::Info::Torque(eng, rpm);
+        float torque = Physics::Info::Torque(engine, rpm);
 
-        float force = FTLB2NM(torque) * (Physics::Info::InductionBoost(eng, ind, rpm, 1.0f, nullptr, nullptr) + 1.0f);
+        float force = FTLB2NM(torque) * (Physics::Info::InductionBoost(engine, induction, rpm, 1.0f, nullptr, nullptr) + 1.0f);
         force *= total_gear_ratio;
 
-        if (time < Physics::Info::NosCapacity(n, nullptr) && speed > 5.0f) {
-            force *= Physics::Info::NosBoost(n, nullptr);
+        if (time < Physics::Info::NosCapacity(nos, nullptr) && speed > 5.0f) {
+            force *= Physics::Info::NosBoost(nos, nullptr);
         }
-        float accel = (force / wheel_radius) / mass;
+        float acc = (force / wheel_radius) / mass;
 
         if (graph_data != nullptr) {
-            int idx = data_index++;
-            if (max_data_index < idx) {
-                idx = max_data_index;
-            }
-            graph_data[idx] = bVector2(speed, accel);
+            graph_data[bMin(max_data_index, data_index++)] = bVector2(speed, acc);
         }
 
-        float drag = UMath::Abs(speed * (speed * chas.DRAG_COEFFICIENT())) / mass;
-        speed = (speed + accel * dT) - drag * dT;
+        const float dragcoef_spec = chassis.DRAG_COEFFICIENT();
+        float drag = speed * (speed * dragcoef_spec);
+        float dec = UMath::Abs(drag) / mass;
+        speed = (speed + acc * dT) - dec * dT;
 
         if (speed >= MPH2MPS(100.0f) && Time0To100 <= 0.0f) {
             Time0To100 = time;
             dT = 1.0f;
         }
 
-        if (speed_limiter > 0.0f && speed >= speed_limiter) {
-            TopSpeed = speed_limiter;
-        } else if (gear == last_gear &&
-                   (accel < drag || redline_rpm <= rpm) &&
-                   TopSpeed <= 0.0f) {
+        if (limiter > 0.0f && speed >= limiter) {
+            TopSpeed = limiter;
+        } else if (gear == topgear && (acc < dec || redline <= rpm) && TopSpeed <= 0.0f) {
             TopSpeed = speed;
         }
 
@@ -527,39 +526,33 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
         }
 
         if (rpm >= shift_up[gear + G_FIRST]) {
-            gear = UMath::Min(gear + 1, last_gear);
+            gear = UMath::Min(gear + 1, topgear);
         }
     }
 
-    if (gear == last_gear || TopSpeed <= 0.0f) {
+    if (gear == topgear || TopSpeed <= 0.0f) {
         TopSpeed = speed;
     }
 
-    float base_handling = vehicle.HandlingRating(0);
-    float top_handling = vehicle.HandlingRating(1);
-    float handling_sum = 0.0f;
-    float weight_sum = 0.0f;
-    int type = Physics::Upgrades::PUT_TIRES;
-    do {
-        weight_sum += PerformanceWeights[type].Handling;
-        handling_sum += Physics::Upgrades::GetPercent(vehicle, static_cast<Physics::Upgrades::Type>(type)) *
-                        PerformanceWeights[type].Handling;
-        type++;
-    } while (type < 7);
-    if (weight_sum > 1e-6f) {
-        handling_sum /= weight_sum;
+    float base_handling = pvehicle.HandlingRating(0);
+    float top_handling = pvehicle.HandlingRating(1);
+    float ratio = 0.0f;
+    float weights = 0.0f;
+    for (int i = 0; i < 7; i++) {
+        Physics::Upgrades::Type path = static_cast<Physics::Upgrades::Type>(i);
+        weights += PerformanceWeights[i].Handling;
+        ratio += Physics::Upgrades::GetPercent(pvehicle, path) * PerformanceWeights[i].Handling;
     }
-    HandlingRating = UMath::Lerp(base_handling, top_handling, handling_sum);
+    if (weights > 1e-6f) {
+        ratio /= weights;
+    }
+    HandlingRating = UMath::Lerp(base_handling, top_handling, ratio);
 
     if (num_data != nullptr) {
         *num_data = data_index;
     }
 
-    bool success = false;
-    if (TopSpeed > 0.0f) {
-        success = Time0To100 > 0.0f;
-    }
-    return success;
+    return TopSpeed > 0.0f && Time0To100 > 0.0f;
 }
 
 void PerfLevel::Print(const char *) {
