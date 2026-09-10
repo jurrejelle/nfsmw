@@ -2,6 +2,24 @@
 #include "Speed/Indep/Libs/Support/Utility/FastMem.h"
 #include "Speed/Indep/Libs/Support/Utility/UMath.h"
 #include "Speed/Indep/Src/World/WCollisionAssets.h"
+#include "Speed/Indep/Src/Interfaces/SimEntities/IEntity.h"
+#include "Speed/Indep/Src/Interfaces/SimEntities/IPlayer.h"
+#include "Speed/Indep/Src/Interfaces/SimModels/IModel.h"
+#include "Speed/Indep/Src/Interfaces/Simables/ICause.h"
+#include "Speed/Indep/Src/Interfaces/Simables/ICollisionBody.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IDisposable.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IExplosion.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IRecordablePlayer.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IRigidBody.h"
+#include "Speed/Indep/Src/Interfaces/Simables/ISimpleBody.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IVehicle.h"
+#include "Speed/Indep/Src/Physics/PVehicle.h"
+#include "Speed/Indep/Src/Interfaces/SimActivities/IActivity.h"
+#include "Speed/Indep/Src/Interfaces/SimActivities/ITrafficCenter.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IINput.h"
+#include "Speed/Indep/Src/Interfaces/Simables/ISpikeable.h"
+#include "Speed/Indep/Src/AI/AIPursuit.h"
+#include "Speed/Indep/Src/AI/AIRoadBlock.h"
 
 SmackableTrigger::SmackableTrigger(HMODEL hmodel, bool virgin, const UMath::Matrix4 &objectmatrix, const UMath::Vector3 &dim,
                                    unsigned int extra_flags) {
@@ -67,3 +85,39 @@ SmackableTrigger::~SmackableTrigger() {
     this->mTrigger = nullptr;
     this->mEventData = nullptr;
 }
+
+#define IMPL_LISTABLE(TYPE, N)                                                                                                                       \
+    template <> UTL::Collections::Listable<TYPE, N>::List UTL::Collections::Listable<TYPE, N>::_mTable = UTL::Collections::Listable<TYPE, N>::List();
+
+#define IMPL_LISTABLESET(TYPE, N, ENUM, BUCKETS)                                                                                                     \
+    template <>                                                                                                                                      \
+    UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_ListSet UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_mLists =                 \
+        UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_ListSet();
+
+#define IMPL_INSTANCABLE(HANDLE, TYPE, N)                                                                                                            \
+    template <>                                                                                                                                      \
+    UTL::Collections::Instanceable<HANDLE, TYPE, N>::_List UTL::Collections::Instanceable<HANDLE, TYPE, N>::_mList =                                 \
+        UTL::Collections::Instanceable<HANDLE, TYPE, N>::_List();                                                                                     \
+    template <> unsigned int UTL::Collections::Instanceable<HANDLE, TYPE, N>::_mHNext = 0;
+
+IMPL_LISTABLE(IExplosion, 96)
+IMPL_LISTABLE(IDisposable, 160)
+IMPL_LISTABLESET(IVehicle, 10, eVehicleList, 10)
+IMPL_LISTABLE(IRigidBody, 160)
+IMPL_LISTABLE(ICollisionBody, 160)
+IMPL_LISTABLE(ISimpleBody, 96)
+IMPL_LISTABLESET(Sim::IEntity, 8, eEntityList, 4)
+IMPL_LISTABLESET(IPlayer, 8, ePlayerList, 3)
+IMPL_LISTABLE(IRecordablePlayer, 8)
+IMPL_LISTABLE(IInputPlayer, 8)
+IMPL_LISTABLE(IModel, 434)
+IMPL_LISTABLE(IPursuit, 8)
+IMPL_LISTABLE(IRoadBlock, 8)
+IMPL_LISTABLE(IHud, 2)
+IMPL_LISTABLE(IVehicleCache, 18)
+IMPL_LISTABLE(ITrafficCenter, 8)
+IMPL_LISTABLE(ISpikeable, 10)
+IMPL_INSTANCABLE(HSIMABLE, ISimable, 160)
+IMPL_INSTANCABLE(HACTIVITY, Sim::IActivity, 40)
+IMPL_INSTANCABLE(HMODEL, IModel, 434)
+IMPL_INSTANCABLE(HCAUSE, ICause, 10)
