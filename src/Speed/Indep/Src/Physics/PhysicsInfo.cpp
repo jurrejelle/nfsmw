@@ -719,8 +719,9 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
     float prev_speed = 0.0f;
 
     for (unsigned int foward_gear = 0; foward_gear < num_gears; foward_gear++) {
-        float gear_ratio = trans.GEAR_RATIO(foward_gear + G_FIRST) * final_gear;
-        float gear_eff = trans.GEAR_EFFICIENCY(foward_gear + G_FIRST);
+        unsigned int gear = foward_gear + G_FIRST;
+        float gear_ratio = trans.GEAR_RATIO(gear) * final_gear;
+        float gear_eff = trans.GEAR_EFFICIENCY(gear);
 
         float force = (avg_torque * gear_ratio * gear_eff) / wheel_radius;
 
@@ -740,9 +741,9 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
 
         graph_data[graph_max].x = speed;
         graph_data[graph_max].y = accel;
-        graph_max++;
         prev_accel = accel;
         prev_speed = speed;
+        graph_max++;
     }
 
     if (graph_max == 0) {
@@ -752,16 +753,15 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
     Graph accel_graph(graph_data, graph_max);
     float max_speed = top_speed;
 
-    if (!(max_speed > 0.0f)) {
-        return false;
+    if (max_speed > 0.0f) {
+        float inc = max_speed / static_cast<float>(num_entries - 1);
+        for (int i = 0; i < num_entries; i++) {
+            table[i] = accel_graph.GetValue(inc * static_cast<float>(i));
+        }
+        return true;
     }
 
-    float inc = max_speed / static_cast<float>(num_entries - 1);
-    for (int i = 0; i < num_entries; i++) {
-        table[i] = accel_graph.GetValue(inc * static_cast<float>(i));
-    }
-
-    return true;
+    return false;
 }
 
 bool Physics::Info::EstimatePerformance(const Attrib::Gen::pvehicle &vehicle, Performance &perf) {
