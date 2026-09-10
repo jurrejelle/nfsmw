@@ -27,11 +27,13 @@ static void InitializeVehicleGlobals() {
 
 static void InitializeGlobals() {}
 
-static void Init() {
+void Init() {
     InitializeGlobals();
     InitializeVehicleGlobals();
 }
 
-static void Shutdown() {}
+void Shutdown() {}
 
 }; // namespace VehicleSystem
+
+BIND_SIM_SUBSYSTEM(VehicleSystem, VehicleSystem::Init, VehicleSystem::Shutdown)
