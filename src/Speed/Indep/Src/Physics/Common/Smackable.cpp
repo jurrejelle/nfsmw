@@ -184,7 +184,6 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     float mass = mAttributes.MASS();
     Dynamics::Inertia::Box inertia(mass, dimension.x * 2.0f, dimension.y * 2.0f, dimension.z * 2.0f);
     UMath::Vector3 moment;
-    UCrc32 smack_class;
     UMath::Scale(inertia, 2.0f, inertia);
     if (mAttributes.MOMENT(moment)) {
         if (moment.x > 0.0f) {
@@ -198,6 +197,7 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
         }
     }
     bool active = !virginspawn || mPersistant;
+    UCrc32 smack_class;
     if (simple_physics) {
         LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("SimpleRigidBody"),
                      RBSimpleParams(UMath::Vector4To3(matrix.v3), UMath::Vector3::kZero,
