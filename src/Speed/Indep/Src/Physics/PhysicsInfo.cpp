@@ -587,7 +587,6 @@ bool PerfLevel::Analyze(const Attrib::Gen::pvehicle &pvehicle) {
 
 void PerformanceMaps::FindLimits(float direction, PerfStats &out) const {
     PerfStats temp;
-    bMemSet(&temp, 0, sizeof(PerfStats));
     out = temp;
 
     for (const_iterator iter = begin(); iter != end(); iter++) {
