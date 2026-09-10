@@ -144,12 +144,12 @@ int ActualReadJoystickData() {
                     joy_data->padSTATUS = HardwarePadStatus[port];
                     joy_data->ThePadData[0].Error = 0;
                     joy_data->ThePadData[0].Type = 0x41;
-                    buttons = joy_data->padSTATUS.button;
+                    pad_state = joy_data->padSTATUS.button;
                     joy_data->ThePadData[0].DigitalButtons =
-                        ~(((buttons >> 8) & 1) << 0 | ((buttons >> 9) & 1) << 1 | ((buttons >> 10) & 1) << 2 |
-                          ((buttons >> 11) & 1) << 3 | ((buttons >> 4) & 1) << 4 | ((buttons >> 12) & 1) << 5 |
-                          ((buttons >> 3) & 1) << 8 | ((buttons >> 2) & 1) << 9 | ((buttons >> 0) & 1) << 10 |
-                          ((buttons >> 1) & 1) << 11);
+                        ~(((pad_state >> 8) & 1) << 0 | ((pad_state >> 9) & 1) << 1 | ((pad_state >> 10) & 1) << 2 |
+                          ((pad_state >> 11) & 1) << 3 | ((pad_state >> 4) & 1) << 4 | ((pad_state >> 12) & 1) << 5 |
+                          ((pad_state >> 3) & 1) << 8 | ((pad_state >> 2) & 1) << 9 | ((pad_state >> 0) & 1) << 10 |
+                          ((pad_state >> 1) & 1) << 11);
                     pad_state = static_cast<int>(joy_data->padSTATUS.substickX * 2.15f) + 0x80;
                     if (pad_state & 0x8000) {
                         pad_state = 0;
