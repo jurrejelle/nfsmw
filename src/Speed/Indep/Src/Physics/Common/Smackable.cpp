@@ -69,22 +69,26 @@ static float GetDropTimer(const Attrib::Gen::smackable &attributes) {
 }
 
 bool Smackable::Simplify() {
-    if (mCollisionBody != nullptr && !mPersistant) {
-        const UMath::Vector3 &pos = static_cast<ISimable *>(this)->GetPosition();
-        if (Sim::CanSpawnSimpleRigidBody(pos, true)) {
-            IRigidBody *irb = GetRigidBody();
-            UMath::Vector3 position = irb->GetPosition();
-            UMath::Vector3 velocity = irb->GetLinearVelocity();
-            UMath::Vector3 angular = irb->GetAngularVelocity();
-            float radius = irb->GetRadius();
-            float mass = irb->GetMass();
-            UMath::Matrix4 matrix = mCollisionBody->GetMatrix4();
-            RBSimpleParams rbp(position, velocity, angular, matrix, radius, mass);
-            LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("SimpleRigidBody"), rbp);
-            return true;
-        }
+    if (mCollisionBody == nullptr) {
+        return false;
     }
-    return false;
+    if (mPersistant) {
+        return false;
+    }
+    const UMath::Vector3 &pos = static_cast<ISimable *>(this)->GetPosition();
+    if (!Sim::CanSpawnSimpleRigidBody(pos, true)) {
+        return false;
+    }
+    IRigidBody *irb = GetRigidBody();
+    UMath::Vector3 position = irb->GetPosition();
+    UMath::Vector3 velocity = irb->GetLinearVelocity();
+    UMath::Vector3 angular = irb->GetAngularVelocity();
+    float radius = irb->GetRadius();
+    float mass = irb->GetMass();
+    UMath::Matrix4 matrix = mCollisionBody->GetMatrix4();
+    LoadBehavior(UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY), UCrc32("SimpleRigidBody"),
+                 RBSimpleParams(position, velocity, angular, matrix, radius, mass));
+    return true;
 }
 
 bool Smackable::TrySimplify() {
