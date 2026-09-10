@@ -83,7 +83,14 @@ template <typename Handle, typename T, int Size> class Instanceable {
     }
 
   private:
-    class _List : public FixedVector<_KeyedNode, Size, 16> {};
+    class _List : public _Storage<_KeyedNode, Size> {
+      public:
+        _List() {
+            this->reserve(Size);
+        }
+
+        ~_List() override {}
+    };
 
     static uintptr_t _mHNext;
     static _List _mList;

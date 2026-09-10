@@ -458,8 +458,6 @@ void PhysicsObject::Behaviors::Reset() {
     }
 }
 
-template void UTL::Vector<Sim::IEntity *, 16>::reserve(UTL::Vector<Sim::IEntity *, 16>::size_type);
-template void UTL::Vector<IPlayer *, 16>::reserve(UTL::Vector<IPlayer *, 16>::size_type);
 template void UTL::Vector<IModel *, 16>::push_back(IModel *const &);
 template void UTL::Vector<IRigidBody *, 16>::push_back(IRigidBody *const &);
 template const Attrib::RefSpec &Attrib::Attribute::Get<Attrib::RefSpec>(unsigned int) const;
