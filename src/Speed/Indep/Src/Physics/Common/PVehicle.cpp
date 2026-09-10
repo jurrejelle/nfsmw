@@ -1335,9 +1335,11 @@ ISimable *PVehicle::Construct(Sim::Param params) {
         if ((vp.Flags & 2) != 0) {
             vehicle->SetVehicleOnGround(vp.initialPos, vp.initialVec);
         }
+        ISimable *result = nullptr;
         if (vehicle != nullptr) {
-            return static_cast<ISimable *>(vehicle);
+            result = static_cast<ISimable *>(vehicle);
         }
+        return result;
     }
     return nullptr;
 }
