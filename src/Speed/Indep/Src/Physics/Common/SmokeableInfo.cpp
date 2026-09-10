@@ -282,7 +282,8 @@ const Attrib::Collection *SmokeableSpawner::FindAttributes(UCrc32 name) {
 }
 
 void SmokeableSpawner::Init() {
-    TheSmackableClass = Attrib::Database::Get().GetClass(Attrib::Gen::smackable::ClassKey());
+    const Attrib::Class *smackable_class = Attrib::Database::Get().GetClass(Attrib::Gen::smackable::ClassKey());
+    TheSmackableClass = smackable_class;
 }
 
 void SmokeableSpawner::EndianSwap() {
