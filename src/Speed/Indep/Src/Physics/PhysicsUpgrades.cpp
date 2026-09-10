@@ -746,7 +746,7 @@ PUPartNode::PUPartNode(const RefSpec &collection0, const RefSpec &collection1, f
                 Attribute start_attribute = start_instance.Get(key);
                 unsigned int end_count = end_attribute.GetLength();
                 unsigned int start_count = start_attribute.GetLength();
-                unsigned int count = UMath::Max(end_count, start_count);
+                unsigned int count = UMath::Max(start_count, end_count);
                 unsigned int end_type = end_attribute.GetType();
                 unsigned int start_type = start_attribute.GetType();
                 if (end_type != start_type) {
