@@ -435,7 +435,7 @@ inline float ASina(const float x) {
     return VU0_ASin(x);
 }
 
-inline float Atan2d(float o, float a) {
+inline float Atan2d(const float o, const float a) {
     return ANGLE2DEG(VU0_Atan2(o, a));
 }
 

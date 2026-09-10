@@ -1,5 +1,6 @@
 #include "Speed/Indep/Src/Physics/Bounds.h"
 #include "Speed/Indep/Libs/Support/Utility/UMath.h"
+#include "Speed/Indep/Src/Physics/Behaviors/RigidBody.h"
 #include "Speed/Indep/Src/Physics/Dynamics.h"
 #include "Speed/Indep/bWare/Inc/bWare.hpp"
 
@@ -242,6 +243,135 @@ bool Collection::AddNode(IBoundable *iboundable, const Bounds *geom, const SimSu
     }
 
     return result;
+}
+
+bool CreateJoint(IBoundable *ifemale, UCrc32 femalenode_name, IBoundable *imale, UCrc32 malenode_name, UMath::Vector3 *out_female,
+                 UMath::Vector3 *out_male, unsigned int joint_flags) {
+    const Bounds *female_node = ifemale->GetGeometryNode();
+    const Bounds *male_node = imale->GetGeometryNode();
+
+    if (female_node == nullptr || male_node == nullptr) {
+        return false;
+    }
+
+    IDynamicsEntity *ide_female;
+    if (!ifemale->QueryInterface(&ide_female)) {
+        return false;
+    }
+
+    IDynamicsEntity *ide_male;
+    if (!imale->QueryInterface(&ide_male)) {
+        return false;
+    }
+
+    const Bounds *male_connector = nullptr;
+    for (unsigned int i = 0; i < male_node->fNumChildren; i++) {
+        const Bounds *child = male_node->GetChild(i);
+        if (child->fNameHash == malenode_name && (child->fFlags & kBounds_Joint_Male)) {
+            male_connector = child;
+            break;
+        }
+    }
+
+    if (male_connector == nullptr) {
+        return false;
+    }
+
+    const Bounds *female_connector = nullptr;
+    for (unsigned int i = 0; i < female_node->fNumChildren; i++) {
+        const Bounds *child = female_node->GetChild(i);
+        if (child->fNameHash == femalenode_name && (child->fFlags & kBounds_Joint_Female)) {
+            female_connector = child;
+            break;
+        }
+    }
+
+    if (female_connector == nullptr) {
+        return false;
+    }
+
+    UMath::Vector3 lever_male;
+    UMath::Vector3 lever_female;
+    male_connector->GetPosition(lever_male);
+    female_connector->GetPosition(lever_female);
+
+    if (out_female != nullptr) {
+        *out_female = lever_female;
+    }
+    if (out_male != nullptr) {
+        *out_male = lever_male;
+    }
+
+    Dynamics::Articulation::HJOINT__ *hjoint = Dynamics::Articulation::Create(ide_female, lever_female, ide_male, lever_male,
+                                                                             static_cast<Dynamics::Articulation::eJointFlags>(joint_flags));
+    if (hjoint == nullptr) {
+        return false;
+    }
+
+    static UMath::Matrix4 fix;
+    fix.v0 = UMath::Vector4Make(1.0f, 0.0f, 0.0f, 0.0f);
+    fix.v1 = UMath::Vector4Make(0.0f, 0.0f, -1.0f, 0.0f);
+    fix.v2 = UMath::Vector4Make(0.0f, 1.0f, 0.0f, 0.0f);
+    fix.v3 = UMath::Vector4Make(0.0f, 0.0f, 0.0f, 1.0f);
+
+    for (unsigned int i = 0; i < female_connector->fNumChildren; i++) {
+        const Bounds *constraint = female_connector->GetChild(i);
+        if ((constraint->fFlags & (kBounds_Constraint_Conical | kBounds_Constraint_Prismatic)) == 0) {
+            continue;
+        }
+
+        const Bounds *post = nullptr;
+        for (unsigned int j = 0; j < male_connector->fNumChildren; j++) {
+            const Bounds *malechild = male_connector->GetChild(j);
+            if ((malechild->fFlags & kBounds_Male_Post) && malechild->fNameHash == constraint->fNameHash) {
+                post = malechild;
+                break;
+            }
+        }
+
+        if (post == nullptr) {
+            continue;
+        }
+
+        UMath::Vector4 q;
+        UMath::Matrix4 constraint_mat;
+        UMath::Vector3 constraint_dim;
+        UMath::Vector4 constraint_orientation;
+        UMath::Vector4 female_connector_orientation;
+
+        constraint->GetHalfDimensions(constraint_dim);
+        constraint->GetOrientation(constraint_orientation);
+        female_connector->GetOrientation(female_connector_orientation);
+        UMath::Mult(female_connector_orientation, constraint_orientation, q);
+        UMath::QuaternionToMatrix4(q, constraint_mat);
+        UMath::Mult(fix, constraint_mat, constraint_mat);
+
+        UMath::Matrix4 post_mat;
+        UMath::Vector3 post_dim;
+        UMath::Vector4 post_orientation;
+        UMath::Vector4 male_connector_orientation;
+
+        post->GetHalfDimensions(post_dim);
+        post->GetOrientation(post_orientation);
+        male_connector->GetOrientation(male_connector_orientation);
+        UMath::Mult(male_connector_orientation, post_orientation, q);
+        UMath::QuaternionToMatrix4(q, post_mat);
+        UMath::Mult(fix, post_mat, post_mat);
+
+        if (constraint->fFlags & kBounds_Constraint_Conical) {
+            UMath::Vector3 post = UMath::Vector4To3(post_mat.v2);
+            UMath::Scale(post, post_dim.y + post_dim.y);
+            float angle = UMath::Atan2d(constraint_dim.x, constraint_dim.y + constraint_dim.y);
+            Dynamics::Articulation::Constrain(hjoint, ide_female, constraint_mat, angle, angle, post, Dynamics::Articulation::CONICAL);
+        } else if (constraint->fFlags & kBounds_Constraint_Prismatic) {
+            UMath::Vector3 post = UMath::Vector4To3(post_mat.v2);
+            UMath::Scale(post, post_dim.y + post_dim.y);
+            float angle = UMath::Atan2d(constraint_dim.x, constraint_dim.y + constraint_dim.y);
+            Dynamics::Articulation::Constrain(hjoint, ide_female, constraint_mat, angle, angle, post, Dynamics::Articulation::PRISMATIC);
+        }
+    }
+
+    return true;
 }
 
 const Collection *Lookup(UCrc32 object_name_hash) {
