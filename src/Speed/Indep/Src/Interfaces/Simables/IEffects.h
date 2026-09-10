@@ -17,13 +17,13 @@ class IEffects : public UTL::COM::IUnknown {
 
     virtual ~IEffects() {}
 
-    virtual void HitGround();
-    virtual void HitWorld();
-    virtual void HitObject();
-    virtual void ScrapeObject();
-    virtual void ScrapeGround();
-    virtual void ScrapeWorld();
-    virtual void Purge();
+    virtual void HitGround() = 0;
+    virtual void HitWorld() = 0;
+    virtual void HitObject() = 0;
+    virtual void ScrapeObject() = 0;
+    virtual void ScrapeGround() = 0;
+    virtual void ScrapeWorld() = 0;
+    virtual void Purge() = 0;
 };
 
 #endif
