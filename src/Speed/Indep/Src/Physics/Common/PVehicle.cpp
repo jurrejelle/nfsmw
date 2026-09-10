@@ -1166,7 +1166,7 @@ bool PVehicle::SetVehicleOnGround(const UMath::Vector3 &resetPos, const UMath::V
         position.y = worldHeight + dim.y;
     } else {
         WWorldPos wpos(dim.y);
-        wpos.SetTolerance(1.0f);
+        wpos.SetTolerance(dim.y);
         position.y = worldHeight;
 
         UMath::Vector4 plane[4];
