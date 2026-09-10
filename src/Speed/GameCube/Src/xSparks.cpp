@@ -165,74 +165,72 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
         b = static_cast<int>(mEmitterDef.Colour1().z * 255.0f);
         a = static_cast<int>(mEmitterDef.Colour1().w * 255.0f);
         particleColor = a << 24 | b << 16 | g << 8 | r;
-        num_particles = intensity * mEmitterDef.NumParticles();
-        num_particles_variance = num_particles * mEmitterDef.NumParticlesVariance() * 100.0f;
-        num_particles = intensity * mEmitterDef.NumParticles() - num_particles_variance;
+        num_particles_variance = intensity * mEmitterDef.NumParticles() * mEmitterDef.NumParticlesVariance();
+        num_particles = intensity * mEmitterDef.NumParticles() - num_particles_variance * 100.0f;
+
+        particle_age_factor = dt / num_particles;
         current_particle_age = 0.0f;
 
-        if (num_particles != 0.0f) {
-            particle_age_factor = dt / num_particles;
-            while (num_particles != 0.0f) {
-                NGParticle *particle;
-                float sparkLength;
-                float ld;
-                UMath::Vector4 pvel;
-                UMath::Vector4 rand;
-                UMath::Vector4 rotatedVel;
-                float gravity;
-                UMath::Vector4 ppos;
+        while (num_particles != 0.0f) {
+            NGParticle *particle;
+            float sparkLength;
+            float ld;
+            UMath::Vector4 pvel;
+            UMath::Vector4 rand;
+            UMath::Vector4 rotatedVel;
+            float gravity;
+            UMath::Vector4 ppos;
 
-                num_particles -= 1.0f;
-                particle = gParticleList.GetNextParticle();
-                if (!particle) {
-                    break;
-                }
-
-                sparkLength = mEmitterDef.LengthStart();
-                sparkLength += bRandom(mEmitterDef.LengthDelta(), &random_seed);
-                if (sparkLength < 0.0f) {
-                    break;
-                }
-
-                ld = bMin(sparkLength, 1.0f);
-
-                rand.x = 1.0f - (mEmitterDef.VelocityDelta().x - bRandom(mEmitterDef.VelocityDelta().x, &random_seed) * 2.0f);
-                rand.y = 1.0f - (mEmitterDef.VelocityDelta().y - bRandom(mEmitterDef.VelocityDelta().y, &random_seed) * 2.0f);
-                rand.z = 1.0f - (mEmitterDef.VelocityDelta().z - bRandom(mEmitterDef.VelocityDelta().z, &random_seed) * 2.0f);
-
-                Scalexyz(mEmitterDef.VelocityInherit(), mVel, pvel);
-                UMath::Rotate(mEmitterDef.VelocityStart(), mLocalWorld, rotatedVel);
-                UMath::Add(pvel, rotatedVel);
-                Scalexyz(pvel, rand);
-
-                gravity = (mEmitterDef.GravityStart() - mEmitterDef.GravityDelta()) + bRandom(mEmitterDef.GravityDelta(), &random_seed) * 2.0f;
-
-                ppos.x = mEmitterDef.VolumeCenter().x + (bRandom(mEmitterDef.VolumeExtent().x, &random_seed) - mEmitterDef.VolumeExtent().x * 0.5f);
-                ppos.y = mEmitterDef.VolumeCenter().y + (bRandom(mEmitterDef.VolumeExtent().y, &random_seed) - mEmitterDef.VolumeExtent().y * 0.5f);
-                ppos.z = mEmitterDef.VolumeCenter().z + (bRandom(mEmitterDef.VolumeExtent().z, &random_seed) - mEmitterDef.VolumeExtent().z * 0.5f);
-                ppos.w = 1.0f;
-
-                UMath::RotateTranslate(ppos, local_world, ppos);
-                UMath::ScaleAdd(
-                    reinterpret_cast<const UMath::Vector3 &>(pvel),
-                    current_particle_age,
-                    reinterpret_cast<const UMath::Vector3 &>(ppos),
-                    particle->initialPos);
-
-                particle->initialPos.z += gravity * current_particle_age * current_particle_age;
-                particle->vel.x = pvel.x;
-                particle->vel.y = pvel.y;
-                particle->vel.z = pvel.z;
-                particle->age = current_particle_age;
-                particle->gravity = gravity;
-                particle->life = static_cast<uint16>(life * 65535.0f);
-                particle->color = particleColor;
-                particle->length = static_cast<uint8>(ld * 255.0f);
-                particle->uv[0] = static_cast<uint8>(mTextureUVs.StartU() * 255.0f);
-                particle->width = static_cast<uint8>(mEmitterDef.HeightStart() * 255.0f);
-
-                current_particle_age += particle_age_factor;
+            num_particles -= 1.0f;
+            particle = gParticleList.GetNextParticle();
+            if (!particle) {
+                break;
             }
+
+            sparkLength = mEmitterDef.LengthStart();
+            sparkLength += bRandom(mEmitterDef.LengthDelta(), &random_seed);
+            if (sparkLength < 0.0f) {
+                break;
+            }
+
+            ld = bMin(sparkLength, 1.0f);
+
+            rand.x = 1.0f - (mEmitterDef.VelocityDelta().x - bRandom(mEmitterDef.VelocityDelta().x, &random_seed) * 2.0f);
+            rand.y = 1.0f - (mEmitterDef.VelocityDelta().y - bRandom(mEmitterDef.VelocityDelta().y, &random_seed) * 2.0f);
+            rand.z = 1.0f - (mEmitterDef.VelocityDelta().z - bRandom(mEmitterDef.VelocityDelta().z, &random_seed) * 2.0f);
+
+            Scalexyz(mEmitterDef.VelocityInherit(), mVel, pvel);
+            UMath::Rotate(mEmitterDef.VelocityStart(), mLocalWorld, rotatedVel);
+            UMath::Add(pvel, rotatedVel);
+            Scalexyz(pvel, rand);
+
+            gravity = (mEmitterDef.GravityStart() - mEmitterDef.GravityDelta()) + bRandom(mEmitterDef.GravityDelta(), &random_seed) * 2.0f;
+
+            ppos.x = mEmitterDef.VolumeCenter().x + (bRandom(mEmitterDef.VolumeExtent().x, &random_seed) - mEmitterDef.VolumeExtent().x * 0.5f);
+            ppos.y = mEmitterDef.VolumeCenter().y + (bRandom(mEmitterDef.VolumeExtent().y, &random_seed) - mEmitterDef.VolumeExtent().y * 0.5f);
+            ppos.z = mEmitterDef.VolumeCenter().z + (bRandom(mEmitterDef.VolumeExtent().z, &random_seed) - mEmitterDef.VolumeExtent().z * 0.5f);
+            ppos.w = 1.0f;
+
+            UMath::RotateTranslate(ppos, local_world, ppos);
+            UMath::ScaleAdd(
+                reinterpret_cast<const UMath::Vector3 &>(pvel),
+                current_particle_age,
+                reinterpret_cast<const UMath::Vector3 &>(ppos),
+                particle->initialPos);
+
+            particle->initialPos.z += gravity * current_particle_age * current_particle_age;
+            particle->vel.x = pvel.x;
+            particle->vel.y = pvel.y;
+            particle->vel.z = pvel.z;
+            particle->life = static_cast<uint16>(life * 65535.0f);
+            particle->age = current_particle_age;
+            particle->gravity = gravity;
+            particle->uv[0] = static_cast<uint8>(mTextureUVs.StartU() * 255.0f);
+            particle->length = static_cast<uint8>(ld * 255.0f);
+            particle->width = static_cast<uint8>(mEmitterDef.HeightStart() * 255.0f);
+            particle->color = particleColor;
+
+            current_particle_age += particle_age_factor;
         }
 
         randomSeed = random_seed;
