@@ -3,6 +3,7 @@
 
 #include "PhysicsTunings.h"
 #include "PhysicsTypes.h"
+#include "Speed/Indep/Libs/Support/Utility/UStandard.h"
 #include "Speed/Indep/Libs/Support/Utility/UMath.h"
 #include "Speed/Indep/Src/Generated/AttribSys/Classes/chassis.h"
 #include "Speed/Indep/Src/Generated/AttribSys/Classes/engine.h"
@@ -11,6 +12,9 @@
 #include "Speed/Indep/Src/Generated/AttribSys/Classes/pvehicle.h"
 #include "Speed/Indep/Src/Generated/AttribSys/Classes/tires.h"
 #include "Speed/Indep/Src/Generated/AttribSys/Classes/transmission.h"
+#include "Speed/Indep/bWare/Inc/bWare.hpp"
+
+DECLARE_CONTAINER_TYPE(PerformanceMaps);
 
 namespace Physics {
 namespace Info {
@@ -51,6 +55,45 @@ inline void Performance::Default() {
     Acceleration = 0.0f;
 }
 
+} // namespace Info
+} // namespace Physics
+
+// total size: 0xC
+struct PerfStats {
+    bool Fetch(const Attrib::Gen::pvehicle &pvehicle, bVector2 *graph_data, int *num_data);
+
+    float Time0To100;      // offset 0x0, size 0x4
+    float TopSpeed;        // offset 0x4, size 0x4
+    float HandlingRating;  // offset 0x8, size 0x4
+};
+
+// total size: 0x2C
+struct PerfLevel {
+    PerfLevel(unsigned int key)
+        : Stats(),       //
+          Stock(),       //
+          Upgraded(),    //
+          Key(key),      //
+          Analyzed(false) {}
+
+    bool Analyze(const Attrib::Gen::pvehicle &pvehicle);
+    void Rate();
+    void Print(const char * = nullptr);
+
+    PerfStats Stats;                     // offset 0x0, size 0xC
+    Physics::Info::Performance Stock;    // offset 0xC, size 0xC
+    Physics::Info::Performance Upgraded; // offset 0x18, size 0xC
+    unsigned int Key;                    // offset 0x24, size 0x4
+    bool Analyzed;                       // offset 0x28, size 0x4
+};
+
+struct PerformanceMaps : public UTL::Std::list<PerfLevel, _type_PerformanceMaps> {
+    void FindLimits(float direction, PerfStats &out) const;
+};
+
+namespace Physics {
+namespace Info {
+
 void Init();
 
 float AerodynamicDownforce(const Attrib::Gen::chassis &chassis, const float speed);
@@ -88,6 +131,7 @@ bool ComputePerformance(const Attrib::Gen::pvehicle &pvehicle, Performance &perf
 bool GetStockPerformance(const Attrib::Gen::pvehicle &pvehicle, Performance &perf);
 bool GetMaximumPerformance(const Attrib::Gen::pvehicle &pvehicle, Performance &perf);
 bool ComputeAccelerationTable(const Attrib::Gen::pvehicle &pvehicle, float &top_speed, float *table, int num_entries);
+void FindPerformanceCandidates(const Performance &minimum_perf, const Performance &maximum_perf, UTL::Std::list<unsigned int, _type_list> &candidates);
 
 extern Performance PerformanceWeights[7];
 

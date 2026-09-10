@@ -18,3 +18,5 @@
 #include "Speed/Indep/Src/Physics/PhysicsUpgrades.cpp"
 
 #include "Speed/Indep/Src/Physics/PhysicsInfo.cpp"
+
+#include "Speed/Indep/Src/Physics/PhysicsTunings.cpp"
