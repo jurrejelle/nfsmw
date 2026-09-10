@@ -334,11 +334,11 @@ class Pkt_Smackable_Open : public Sim::Packet {
   public:
     DECLARE_RENDERPACKET(Pkt_Smackable_Open, SmackableRenderConn);
 
-    Pkt_Smackable_Open(bHash32 modelhash, WUID worldid, const CollisionGeometry::Bounds *collisionnode, const ModelHeirarchy *heirarchy,
+    Pkt_Smackable_Open(bHash32 rendermesh, WUID objectworldid, const CollisionGeometry::Bounds *collisionNode, const ModelHeirarchy *heirarchy,
                        uint32 rendernode)
-        : mModelHash(modelhash),         //
-          mObjectWUID(worldid),          //
-          mCollisionNode(collisionnode), //
+        : mModelHash(rendermesh),        //
+          mObjectWUID(objectworldid),    //
+          mCollisionNode(collisionNode), //
           mHeirarchy(heirarchy),         //
           mRenderNode(rendernode) {}
 

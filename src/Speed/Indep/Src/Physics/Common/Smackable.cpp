@@ -709,11 +709,11 @@ bool RBSmackable::CanCollideWithWorld() const {
 }
 
 HeirarchyModel::HeirarchyModel(bHash32 rendermesh, const CollisionGeometry::Bounds *geometry,
-                               UCrc32 nodename, HeirarchyModel *parent,
+                               UCrc32 rendernode, HeirarchyModel *parent,
                                const Attrib::Collection *attribs, const ModelHeirarchy *heirarchy,
-                               unsigned int child_index, bool visible)
+                               unsigned int heirarchynode, bool visible)
     : Sim::Model(parent != nullptr ? static_cast<IModel *>(parent) : nullptr, geometry,
-                 nodename, 6) //
+                 rendernode, 6) //
     , IBody(this) //
     , ITriggerableModel(this) //
     , Attrib::Gen::smackable(attribs, 0, nullptr) //
@@ -722,7 +722,7 @@ HeirarchyModel::HeirarchyModel(bHash32 rendermesh, const CollisionGeometry::Boun
     , mRenderMesh(rendermesh) //
     , mTrigger(nullptr) //
     , mOffScreenTimer(10.0f) //
-    , mHeirarchyNode(static_cast<unsigned short>(child_index)) //
+    , mHeirarchyNode(static_cast<unsigned short>(heirarchynode)) //
     , mFlags(0) //
     , mChildVisibility(0xFFFFFFFF) //
     , mAvoidable(nullptr) //
@@ -734,9 +734,7 @@ HeirarchyModel::HeirarchyModel(bHash32 rendermesh, const CollisionGeometry::Boun
         BeginDraw(UCrc32(0x804c146e), &pkt);
     }
     if (smackable.AI_AVOIDABLE()) {
-        if (HasAvoidable() != true) {
-            mAvoidable = new SmackableAvoidable(this);
-        }
+        SetAvoidable(true);
     }
     if (smackable.CAMERA_AVOIDABLE()) {
         SetCameraAvoidable(true);

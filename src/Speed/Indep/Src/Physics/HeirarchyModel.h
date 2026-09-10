@@ -74,6 +74,18 @@ class HeirarchyModel : public Sim::Model, public IBody, public ITriggerableModel
         return mAvoidable != nullptr;
     }
 
+    void SetAvoidable(bool b) {
+        bool isavoidable = mAvoidable != nullptr;
+        if (isavoidable != b) {
+            if (b) {
+                mAvoidable = new SmackableAvoidable(this);
+            } else {
+                delete mAvoidable;
+                mAvoidable = nullptr;
+            }
+        }
+    }
+
   protected:
     UMath::Vector4 mTriggerAvoid;
     ModelHeirarchy *mHeirarchy;
