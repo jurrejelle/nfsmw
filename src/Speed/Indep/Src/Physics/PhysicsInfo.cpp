@@ -666,15 +666,15 @@ void Physics::Info::Init() {
     Physics_Info_initialized = 1;
 }
 
-bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicle, float &top_speed, float *table, int num_entries) {
-    Attrib::Gen::transmission trans(vehicle.transmission(0), 0, nullptr);
-    Attrib::Gen::tires tir(vehicle.tires(0), 0, nullptr);
-    Attrib::Gen::chassis chas(vehicle.chassis(0), 0, nullptr);
-    Attrib::Gen::engine eng(vehicle.engine(0), 0, nullptr);
-    Attrib::Gen::induction ind(vehicle.induction(0), 0, nullptr);
+bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &pvehicle, float &top_speed, float *table, int num_entries) {
+    Attrib::Gen::transmission transmission(pvehicle.transmission(0), 0, nullptr);
+    Attrib::Gen::tires tires(pvehicle.tires(0), 0, nullptr);
+    Attrib::Gen::chassis chassis(pvehicle.chassis(0), 0, nullptr);
+    Attrib::Gen::engine engine(pvehicle.engine(0), 0, nullptr);
+    Attrib::Gen::induction induction(pvehicle.induction(0), 0, nullptr);
 
-    float avg_torque = AvgInductedTorque(eng, ind, trans, true, nullptr);
-    avg_torque = avg_torque * FTLB2NM(1.0f);
+    float ft_lbs = AvgInductedTorque(engine, induction, transmission, true, nullptr);
+    float avg_torque = FTLB2NM(ft_lbs);
 
     if (avg_torque <= 0.0f || num_entries < 2 || table == nullptr) {
         return false;
@@ -682,40 +682,42 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
 
     bVector2 graph_data[10];
 
-    unsigned int num_gears = NumFowardGears(trans);
+    unsigned int num_gears = NumFowardGears(transmission);
     if (num_gears == 0) {
         return false;
     }
 
-    float mass = vehicle.MASS();
-    float final_gear = trans.FINAL_GEAR();
-    float wheel_radius = WheelDiameter(tir, false) * 0.5f;
+    float final_gear = transmission.FINAL_GEAR();
+    float mass = pvehicle.MASS();
+    float wheel_radius = WheelDiameter(tires, false) * 0.5f;
 
     if (wheel_radius <= 0.001f) {
         return false;
     }
 
     top_speed = 0.0f;
-    int graph_max = 0;
+    unsigned int graph_max = 0;
     float prev_accel = 0.0f;
     float prev_speed = 0.0f;
 
     for (unsigned int foward_gear = 0; foward_gear < num_gears; foward_gear++) {
-        unsigned int gear = foward_gear + G_FIRST;
-        float gear_ratio = trans.GEAR_RATIO(gear) * final_gear;
-        float gear_eff = trans.GEAR_EFFICIENCY(gear);
+        GearID gear = static_cast<GearID>(foward_gear + G_FIRST);
+        float gear_ratio = transmission.GEAR_RATIO(gear) * final_gear;
+        float drive_torque = avg_torque * gear_ratio * transmission.GEAR_EFFICIENCY(gear);
+        float force = drive_torque / wheel_radius;
 
-        float force = (avg_torque * gear_ratio * gear_eff) / wheel_radius;
+        if (gear_ratio <= 0.0f) {
+            return false;
+        }
 
-        if (gear_ratio <= 0.0f) break;
-
-        float speed = (eng.RED_LINE() * RPM2RPS(1.0f) * wheel_radius) / gear_ratio;
-        float drag = speed * speed * chas.DRAG_COEFFICIENT();
+        float speed = (engine.RED_LINE() * RPM2RPS(1.0f) * wheel_radius) / gear_ratio;
+        float drag = speed * speed * chassis.DRAG_COEFFICIENT();
         float accel = (force - drag) / mass;
 
         if (accel <= 0.0f) {
             if (prev_accel <= 0.0f) break;
-            speed = UMath::Lerp(prev_speed, speed, 1.0f - prev_accel / (prev_accel - accel));
+            float ratio = 1.0f - prev_accel / (prev_accel - accel);
+            speed = UMath::Lerp(prev_speed, speed, ratio);
             accel = 0.0f;
         }
 
@@ -733,10 +735,9 @@ bool Physics::Info::ComputeAccelerationTable(const Attrib::Gen::pvehicle &vehicl
     }
 
     Graph accel_graph(graph_data, graph_max);
-    float max_speed = top_speed;
 
-    if (max_speed > 0.0f) {
-        float inc = max_speed / static_cast<float>(num_entries - 1);
+    if (top_speed > 0.0f) {
+        float inc = top_speed / static_cast<float>(num_entries - 1);
         for (int i = 0; i < num_entries; i++) {
             table[i] = accel_graph.GetValue(inc * static_cast<float>(i));
         }
