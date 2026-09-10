@@ -12,15 +12,7 @@ void ResetPropTimers();
 
 SmokeableSectionQ TheSmokeableSections;
 
-static void SceneryModel_InitSystem() {
-    SceneryModel::InitSystem();
-}
-
-static void SceneryModel_RestoreSystem() {
-    SceneryModel::RestoreSystem();
-}
-
-static Sim::SubSystem _Physics_System_SceneryModel("SceneryModel", SceneryModel_InitSystem, SceneryModel_RestoreSystem);
+static Sim::SubSystem _Physics_System_SceneryModel("SceneryModel", SceneryModel::InitSystem, SceneryModel::RestoreSystem);
 int SceneryModel::mSceneryCount = 0;
 
 SmokeableSection *SmokeableSectionQ::FindOrAdd(int section_id) {
