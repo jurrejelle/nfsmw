@@ -171,7 +171,7 @@ void CGEmitter::SpawnParticles(float dt, float intensity) {
         particle_age_factor = dt / num_particles;
         current_particle_age = 0.0f;
 
-        while (num_particles != 0.0f) {
+        while (num_particles-- != 0.0f) {
             NGParticle *particle;
             float sparkLength;
             float ld;
