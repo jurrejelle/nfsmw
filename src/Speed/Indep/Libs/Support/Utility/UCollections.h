@@ -5,6 +5,7 @@
 #pragma once
 #endif
 
+#include "Speed/Indep/Libs/Support/Utility/UCrc.h"
 #include "Speed/Indep/Libs/Support/Utility/UTLVector.h"
 #include "UStandard.h"
 
@@ -235,11 +236,35 @@ template <typename T, int Size> class GarbageNode {
 
 template <typename T, typename Tag> class Container {
   public:
-    class Elements {
+    class Elements : public UTL::Std::list<T *, Tag> {
       public:
-        Elements();
-        ~Elements();
+        Elements() {}
+        ~Elements() {}
     };
+
+    void AddElement(T *e) {
+        _mElements.push_back(e);
+    }
+
+    template <typename P> T *BuildElement(UCrc32 sig, const P &parms) {
+        T *e = T::CreateInstance(sig, parms);
+        if (e != nullptr) {
+            _mElements.push_back(e);
+        }
+        return e;
+    }
+
+    bool DestroyElement(T &el) {
+        typename Elements::iterator last = _mElements.end();
+        for (typename Elements::iterator first = _mElements.begin(); first != last; first++) {
+            if (*first == &el) {
+                _mElements.erase(first);
+                T::Destroy(&el);
+                return true;
+            }
+        }
+        return false;
+    }
 
   private:
     Elements _mElements;

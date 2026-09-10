@@ -105,6 +105,10 @@ inline void Clear(Vector3 &r) {
 #endif
 }
 
+inline void Copy(const Vector3 &a, Vector3 &r) {
+    r = a;
+}
+
 inline void Copy(const Matrix4 &a, Matrix4 &r) {
     VU0_MATRIX4Copy(a, r);
 }
@@ -131,6 +135,10 @@ inline void Transpose(const Vector4 &q, Vector4 &r) {
 
 inline const Vector3 &ExtractAxis(const Matrix4 &m, unsigned int row) {
     return *reinterpret_cast<const Vector3 *>(&m[row]);
+}
+
+inline Vector3 &ExtractAxis(Matrix4 &m, unsigned int row) {
+    return *reinterpret_cast<Vector3 *>(&m[row]);
 }
 
 inline void ExtractXAxis(const Vector4 &q, Vector3 &r) {
