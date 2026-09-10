@@ -917,18 +917,17 @@ PVehicle::PVehicle(DriverClass dc, const Attrib::Gen::pvehicle &attribs, const U
     , mStaging(false) //
     , mPerfectLaunch() //
     , mBehaviorOverrides() //
-    , mResources() //
+    , mOverrideDirty(false) //
+    , mBounds(bounds) //
+    , mIsModeling(true) //
+    , mOffScreenTime(0.0f) //
+    , mOnScreenTime(0.0f) //
+    , mOffWorld(false) //
+    , mHasDyno(false) //
+    , mResources(resource) //
+    , mPerformanceValid(false) //
+    , mCacheName(cache_name) //
 {
-    mBounds = bounds;
-    mOnScreenTime = 0.0f;
-    mOverrideDirty = false;
-    mIsModeling = true;
-    mOffScreenTime = 0.0f;
-    mOffWorld = false;
-    mHasDyno = false;
-    mResources = resource;
-    mPerformanceValid = false;
-    mCacheName = cache_name;
     if (performance != nullptr) {
         mPerformance = *performance;
         mPerformanceValid = true;
