@@ -429,17 +429,16 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
     Attrib::Gen::transmission trans(vehicle.transmission(0), 0, nullptr);
     Attrib::Gen::chassis chas(vehicle.chassis(0), 0, nullptr);
     Attrib::Gen::tires tir(vehicle.tires(0), 0, nullptr);
-    Attrib::Gen::brakes bra(vehicle.brakes(0).GetCollection(), 0, nullptr);
+    Attrib::Gen::brakes bra(vehicle.brakes(0), 0, nullptr);
     Attrib::Gen::nos n(vehicle.nos(0), 0, nullptr);
 
     float max_torque_rpm;
     Physics::Info::MaxTorque(eng, max_torque_rpm);
-    float wheel_diameter = Physics::Info::WheelDiameter(vehicle, false);
+    float wheel_radius = Physics::Info::WheelDiameter(vehicle, false) * 0.5f;
     float idle_rpm = eng.IDLE();
     float redline_rpm = eng.RED_LINE();
     float min_w = RPM2RPS(idle_rpm);
     float max_w = RPM2RPS(redline_rpm);
-    float wheel_radius = wheel_diameter * 0.5f;
     float final_gear = trans.FINAL_GEAR();
     float speed_limiter = MPH2MPS(eng.SPEED_LIMITER(0));
 
@@ -455,22 +454,23 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
     unsigned int gear = 0;
     float time = 0.0f;
     float mass = vehicle.MASS();
-    float dT = 0.125f;
+    float dT;
     int data_index = 0;
     if (graph_data != nullptr) {
         dT = 1.0f;
+    } else {
+        dT = 0.125f;
     }
     int max_data_index = 0;
     if (num_data != nullptr) {
         max_data_index = *num_data;
     }
-    float power_range = max_w - min_w;
     unsigned int num_gears = Physics::Info::NumFowardGears(vehicle);
     unsigned int last_gear = num_gears - 1;
 
-    do {
+    while (time < 120.0f) {
         float total_gear_ratio = trans.GEAR_RATIO(gear + G_FIRST) * final_gear;
-        float differential_rpm = RPS2RPM(min_w + (speed / wheel_radius) * total_gear_ratio * (power_range / max_w));
+        float differential_rpm = RPS2RPM(min_w + (speed / wheel_radius) * total_gear_ratio * ((max_w - min_w) / max_w));
         float rpm = UMath::Min(differential_rpm, redline_rpm);
         rpm = UMath::Max(rpm, idle_rpm);
 
@@ -529,7 +529,7 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
                 gear = next_gear;
             }
         }
-    } while (time < 120.0f);
+    }
 
     if (gear == last_gear || TopSpeed <= 0.0f) {
         TopSpeed = speed;
