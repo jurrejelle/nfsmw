@@ -489,16 +489,14 @@ bool PerfStats::Fetch(const Attrib::Gen::pvehicle &vehicle, bVector2 *graph_data
         float accel = (force / wheel_radius) / mass;
 
         if (graph_data != nullptr) {
-            int idx = data_index;
+            int idx = data_index++;
             if (max_data_index < idx) {
                 idx = max_data_index;
             }
-            graph_data[idx].y = accel;
-            graph_data[idx].x = speed;
-            data_index++;
+            graph_data[idx] = bVector2(speed, accel);
         }
 
-        float drag = UMath::Abs(speed * speed * chas.DRAG_COEFFICIENT()) / mass;
+        float drag = UMath::Abs(speed * (speed * chas.DRAG_COEFFICIENT())) / mass;
         speed = (speed + accel * dT) - drag * dT;
 
         if (speed >= MPH2MPS(100.0f) && Time0To100 <= 0.0f) {
