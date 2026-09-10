@@ -21,7 +21,7 @@ template <typename T, int N> struct BitArray {
     }
 
     bool operator!=(const BitArray &other) const {
-        for (int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
+        for (unsigned int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
             if (Words[i] != other.Words[i]) {
                 return true;
             }
@@ -51,7 +51,7 @@ template <typename T, int N> struct BitArray {
     }
 
     void Clear() {
-        for (int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
+        for (unsigned int i = 0; i < NUM_ELEMENTS(this->Words); i++) {
             Words[i] = 0;
         }
     }
