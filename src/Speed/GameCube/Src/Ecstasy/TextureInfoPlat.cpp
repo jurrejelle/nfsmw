@@ -27,17 +27,17 @@ static inline unsigned int Convert16To32(unsigned short entry) {
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-static inline unsigned short Convert32To16(unsigned int entry) {
+static inline unsigned int Convert32To16(unsigned int entry) {
     unsigned int a = entry >> 24;
     unsigned int r = (entry >> 16) & 0xFF;
     unsigned int g = (entry >> 8) & 0xFF;
     unsigned int b = entry & 0xFF;
 
     if (a > 0xEF) {
-        return 0xFFFF8000 | ((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3);
+        return 0xFFFF8000 | (r >> 3) | ((b >> 3) << 10) | ((g >> 3) << 5);
     }
 
-    return ((a >> 5) << 12) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
+    return ((a << 7) & 0x7000) | ((b >> 4) << 8) | ((g >> 4) << 4) | (r >> 4);
 }
 
 void TextureInfoPlatInterface::SetPlatInfo(TextureInfoPlatInfo *info) {
@@ -68,19 +68,21 @@ void TextureInfoPlatInterface::UnlockImage(void *image_lock) {}
 void *TextureInfoPlatInterface::LockPalette(TextureLockType lock) {
     TextureInfo *texture_info = static_cast<TextureInfo *>(this);
     TextureInfoPlatInfo *plat_info = this->GetPlatInfo();
+    void *pTempPal = nullptr;
     unsigned short *gcPal = static_cast<unsigned short *>(texture_info->PaletteData);
-    void *Pal32 = nullptr;
 
     if (gcPal) {
-        Pal32 = new unsigned int[256];
-        if (Pal32) {
+        unsigned int *Pal32 = new unsigned int[256];
+
+        pTempPal = Pal32;
+        if (pTempPal) {
             for (int j = 0; j <= 0xFF; j++) {
-                static_cast<unsigned int *>(Pal32)[j] = Convert16To32(gcPal[j]);
+                Pal32[j] = Convert16To32(gcPal[j]);
             }
         }
     }
 
-    return Pal32;
+    return pTempPal;
 }
 
 void TextureInfoPlatInterface::UnlockPalette(void *palette_lock) {
