@@ -5,6 +5,7 @@
 #pragma once
 #endif
 
+#include "Speed/Indep/Libs/Support/Utility/FastMem.h"
 #include "Speed/Indep/Src/Gameplay/GInfractionManager.h"
 #include "Speed/Indep/Src/Physics/PhysicsTunings.h"
 #include "Speed/Indep/Src/Physics/PhysicsUpgrades.hpp"
@@ -46,6 +47,8 @@ struct FECustomizationRecord {
     Physics::Tunings *GetTunings() {
         return &this->Tunings[this->ActiveTuning];
     }
+
+    USE_FASTALLOC(FECustomizationRecord)
 
     void Default();
     void BecomePreset(PresetCar *preset);

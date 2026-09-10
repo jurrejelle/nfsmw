@@ -921,12 +921,8 @@ void HeirarchyModel::SetTrigger(const UMath::Matrix4 &matrix, bool virgin) {
         mTrigger->Enable();
     }
     mTriggerAvoid = matrix.v3;
-    float zz = dim.y * matrix.v1.z;
-    float zx = dim.y * matrix.v1.x;
-    zz += dim.x * matrix.v0.z;
-    zx += dim.x * matrix.v0.x;
-    zz += dim.z * matrix.v2.z;
-    zx += dim.z * matrix.v2.x;
+    float zx = dim.x * matrix.v0.x + dim.y * matrix.v1.x + dim.z * matrix.v2.x;
+    float zz = dim.x * matrix.v0.z + dim.y * matrix.v1.z + dim.z * matrix.v2.z;
     mTriggerAvoid.w = UMath::Sqrt(zx * zx + zz * zz);
 }
 
