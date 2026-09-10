@@ -142,8 +142,8 @@ int ActualReadJoystickData() {
                     short data;
 
                     joy_data->padSTATUS = HardwarePadStatus[port];
-                    joy_data->ThePadData[0].Type = 0x41;
                     joy_data->ThePadData[0].Error = 0;
+                    joy_data->ThePadData[0].Type = 0x41;
                     buttons = joy_data->padSTATUS.button;
                     joy_data->ThePadData[0].DigitalButtons =
                         ~(((buttons >> 8) & 1) << 0 | ((buttons >> 9) & 1) << 1 | ((buttons >> 10) & 1) << 2 |
@@ -211,9 +211,9 @@ int ActualReadJoystickData() {
                           ((buttons >> 11) & 1) << 3 | ((buttons >> 4) & 1) << 4 | ((buttons >> 12) & 1) << 5 |
                           ((buttons >> 3) & 1) << 8 | ((buttons >> 2) & 1) << 9 | ((buttons >> 0) & 1) << 10 |
                           ((buttons >> 1) & 1) << 11);
-                    joy_data->ThePadData[slot].AnalogRightX = 0;
                     joy_data->ThePadData[slot].AnalogLeftX =
                         reinterpret_cast<LGPosition *>(plat_lgwheels)[port].wheel + 0x80;
+                    joy_data->ThePadData[slot].AnalogRightX = 0;
 
                     if (plat_lgwheels->PedalsConnected(port)) {
                         joy_data->ThePadData[slot].AnalogRightY =
