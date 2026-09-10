@@ -909,7 +909,7 @@ PVehicle::PVehicle(DriverClass dc, const Attrib::Gen::pvehicle &attribs, const U
     , mDriverClass(dc) //
     , mDriverStyle(STYLE_RACING) //
     , mGlareState(0) //
-    , mStartingNOS(0.0f) //
+    , mStartingNOS(1.0f) //
     , mBrakeTime(0.0f) //
     , mForceStop(0) //
     , mPhysicsMode(PHYSICS_MODE_SIMULATED) //
@@ -927,7 +927,6 @@ PVehicle::PVehicle(DriverClass dc, const Attrib::Gen::pvehicle &attribs, const U
     mOffWorld = false;
     mHasDyno = false;
     mResources = resource;
-    mPerformance.Default();
     mPerformanceValid = false;
     mCacheName = cache_name;
     if (performance != nullptr) {
@@ -946,13 +945,13 @@ PVehicle::PVehicle(DriverClass dc, const Attrib::Gen::pvehicle &attribs, const U
     UpdateListing();
     switch (mDriverClass) {
     case DRIVER_HUMAN:
-        mTaskFX = AddTask("FX", 0.0f, 0.0f, Sim::TASK_FRAME_FIXED);
+        mTaskFX = AddTask("FX", 1.0f, 0.0f, Sim::TASK_FRAME_FIXED);
         break;
     case DRIVER_TRAFFIC:
-        mTaskFX = AddTask("FX", 0.05f, 0.0f, Sim::TASK_FRAME_FIXED);
+        mTaskFX = AddTask("FX", 0.25f, 0.0f, Sim::TASK_FRAME_FIXED);
         break;
     default:
-        mTaskFX = AddTask("FX", 0.02f, 0.0f, Sim::TASK_FRAME_FIXED);
+        mTaskFX = AddTask("FX", 0.5f, 0.0f, Sim::TASK_FRAME_FIXED);
         break;
     }
     Debugable::MakeDebugable(DBG_PHYSICS_RACERS);
