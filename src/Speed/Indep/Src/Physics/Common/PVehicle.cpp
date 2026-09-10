@@ -1302,8 +1302,7 @@ ISimable *PVehicle::Construct(Sim::Param params) {
     resources.push_back(resource);
     Attrib::RefSpec trailer_ref = attributes.Trailer();
     if (trailer_ref.GetCollectionKey() != 0) {
-        Attrib::Gen::pvehicle trailerAttribs(trailer_ref, 0, nullptr);
-        resources.push_back(Resource(trailerAttribs, spooling_resources, false));
+        resources.push_back(Resource(Attrib::Gen::pvehicle(trailer_ref, 0, nullptr), spooling_resources, false));
     }
     if (!MakeRoom(vp.VehicleCache, resources)) {
         return nullptr;
