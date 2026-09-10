@@ -32,6 +32,7 @@ struct FECustomizationRecord {
 
     void WriteRecordIntoRide(RideInfo *ride) const;
 
+    // TODO: zPhysics added everything from here to WritePhysicsIntoRecord; re-check against the Frontend work when that branch lands.
     void SetTuning(Physics::Tunings::Path id, float value) {
         this->Tunings[this->ActiveTuning].Value[id] = value;
     }
