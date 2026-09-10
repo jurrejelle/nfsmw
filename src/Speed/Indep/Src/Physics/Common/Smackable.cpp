@@ -177,7 +177,7 @@ Smackable::Smackable(const UMath::Matrix4 &matrix, const Attrib::Gen::smackable 
     dimension.z = UMath::Max(dimension.z, 0.025f);
     float radius = UMath::Length(dimension);
     float mass = attributes.MASS();
-    Dynamics::Inertia::Box inertia(mass, dimension.x, dimension.y, dimension.z);
+    Dynamics::Inertia::Box inertia(mass, dimension.x * 2.0f, dimension.y * 2.0f, dimension.z * 2.0f);
     UMath::Scale(inertia, 2.0f, inertia);
     UMath::Vector3 moment;
     if (attributes.MOMENT(moment)) {

@@ -104,9 +104,7 @@ template <typename T> class BehaviorSpecsPtr : public AttributeStructPtr<T> {
   public:
     BehaviorSpecsPtr(Behavior *behavior, int index) : AttributeStructPtr<T>(LookupKey(behavior->GetOwner(), index)) {}
 
-    BehaviorSpecsPtr(ISimable *owner, int index) : AttributeStructPtr<T>(0) {
-        // TODO
-    }
+    BehaviorSpecsPtr(ISimable *owner, int index) : AttributeStructPtr<T>(LookupKey(owner, index)) {}
 
 
     Attrib::Key LookupKey(const ISimable *owner, int index) {

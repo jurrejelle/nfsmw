@@ -1,11 +1,12 @@
 #ifndef VEHICLEBEHAVIORS_H
 #define VEHICLEBEHAVIORS_H
 
+#include "Speed/Indep/Src/Generated/Hash.hpp"
 #include "Behavior.h"
 
 // total size: 0x10
 struct AIParams : public Sim::Param {
-    AIParams() : Sim::Param(TypeName(), static_cast<AIParams *>(nullptr)) {}
+    AIParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<AIParams *>(nullptr)) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "AIParams";
@@ -23,7 +24,7 @@ struct RBComplexParams : public Sim::Param {
     RBComplexParams(const UMath::Vector3 &pos, const UMath::Vector3 &vel, const UMath::Vector3 &angvel, const UMath::Matrix4 &mat, float mass,
                     const UMath::Vector3 &moment, const UMath::Vector3 &dimension, const CollisionGeometry::Bounds *geoms, bool active,
                     unsigned int collision_mask)
-        : Sim::Param(TypeName(), this), //
+        : Sim::Param(UCrc32(UCRC32_BASE), this), //
           finitPos(pos),                //
           finitVel(vel),                //
           finitAngVel(angvel),          //
@@ -56,7 +57,7 @@ struct RBSimpleParams : public Sim::Param {
 
     RBSimpleParams(const UMath::Vector3 &pos, const UMath::Vector3 &vel, const UMath::Vector3 &angvel, const UMath::Matrix4 &mat, float radius,
                    float mass)
-        : Sim::Param(TypeName(), this), //
+        : Sim::Param(UCrc32(UCRC32_BASE), this), //
           finitPos(pos),                //
           finitVel(vel),                //
           finitAngVel(angvel),          //
@@ -75,7 +76,7 @@ struct RBSimpleParams : public Sim::Param {
 // total size: 0x10
 struct SuspensionParams : public Sim::Param {
     // TODO
-    SuspensionParams() : Sim::Param(TypeName(), static_cast<SuspensionParams *>(nullptr)) {}
+    SuspensionParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<SuspensionParams *>(nullptr)) {}
 
     // DECLARE_SIM_PARAM, but why does that one have SuspensionParams::TypeName?
     static UCrc32 TypeName() {
@@ -86,7 +87,7 @@ struct SuspensionParams : public Sim::Param {
 
 // total size: 0x10
 struct EngineParams : public Sim::Param {
-    EngineParams() : Sim::Param(TypeName(), static_cast<EngineParams *>(nullptr)) {}
+    EngineParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<EngineParams *>(nullptr)) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "EngineParams";
@@ -96,7 +97,7 @@ struct EngineParams : public Sim::Param {
 
 // total size: 0x10
 struct DamageParams : public Sim::Param {
-    DamageParams() : Sim::Param(TypeName(), static_cast<DamageParams *>(nullptr)) {}
+    DamageParams() : Sim::Param(UCrc32(UCRC32_BASE), static_cast<DamageParams *>(nullptr)) {}
 
     static UCrc32 TypeName() {
         static UCrc32 value = "DamageParams";
