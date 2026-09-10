@@ -56,7 +56,7 @@ struct engine : Instance {
         return 0xf1f5fbc7;
     }
     void Modify(Key dynamicCollectionKey, unsigned int spaceForAdditionalAttributes) {
-        ModifyInternal(ClassKey(), dynamicCollectionKey, spaceForAdditionalAttributes);
+        ModifyInternal(ClassKey(), dynamicCollectionKey, LocalAttribCount() + spaceForAdditionalAttributes);
     }
     Key GenerateUniqueKey(const char *name, bool registerName) const {
         return GUKeyInternal(ClassKey(), name, registerName);

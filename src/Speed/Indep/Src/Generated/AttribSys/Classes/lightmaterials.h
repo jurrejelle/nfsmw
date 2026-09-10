@@ -100,7 +100,7 @@ struct lightmaterials : Instance {
         return 0xd32a743f;
     }
     void Modify(Key dynamicCollectionKey, unsigned int spaceForAdditionalAttributes) {
-        ModifyInternal(ClassKey(), dynamicCollectionKey, spaceForAdditionalAttributes);
+        ModifyInternal(ClassKey(), dynamicCollectionKey, LocalAttribCount() + spaceForAdditionalAttributes);
     }
     Key GenerateUniqueKey(const char *name, bool registerName) const {
         return GUKeyInternal(ClassKey(), name, registerName);

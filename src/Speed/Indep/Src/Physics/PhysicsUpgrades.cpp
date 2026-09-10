@@ -324,7 +324,7 @@ bool Physics::Upgrades::SetJunkman(Attrib::Gen::pvehicle &vehicle, Physics::Upgr
         if (!newvehicle.IsDynamic()) {
             const char *name = newvehicle.CollectionName();
             Key uniqueKey = newvehicle.GenerateUniqueKey(name, false);
-            newvehicle.Modify(uniqueKey, newvehicle.LocalAttribCount());
+            newvehicle.Modify(uniqueKey, 0);
         } else {
             newvehicle.Remove(part_key);
         }
@@ -556,7 +556,7 @@ static bool UpgradeInternal(Attrib::Gen::pvehicle &vehicle, Physics::Upgrades::T
 
     if (!newvehicle.IsDynamic()) {
         const char *name = newvehicle.CollectionName();
-        newvehicle.Modify(newvehicle.GenerateUniqueKey(name, false), newvehicle.LocalAttribCount());
+        newvehicle.Modify(newvehicle.GenerateUniqueKey(name, false), 0);
     }
 
     if (!newvehicle.GetBase().AddAndSet(part_key, &newref, 1)) {

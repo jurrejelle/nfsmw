@@ -56,7 +56,7 @@ struct light_flares_cg : Instance {
         return 0xc7c5806d;
     }
     void Modify(Key dynamicCollectionKey, unsigned int spaceForAdditionalAttributes) {
-        ModifyInternal(ClassKey(), dynamicCollectionKey, spaceForAdditionalAttributes);
+        ModifyInternal(ClassKey(), dynamicCollectionKey, LocalAttribCount() + spaceForAdditionalAttributes);
     }
     Key GenerateUniqueKey(const char *name, bool registerName) const {
         return GUKeyInternal(ClassKey(), name, registerName);
