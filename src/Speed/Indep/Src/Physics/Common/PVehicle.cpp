@@ -5,6 +5,9 @@
 #include "Speed/Indep/Src/AI/AITarget.h"
 #include "Speed/Indep/Src/Camera/CameraAI.hpp"
 #include "Speed/Indep/Src/Frontend/Database/VehicleDB.hpp"
+#include "Speed/Indep/Src/Interfaces/SimActivities/IActivity.h"
+#include "Speed/Indep/Src/Interfaces/SimEntities/IEntity.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IDisposable.h"
 #include "Speed/Indep/Src/Interfaces/Simables/IEffects.h"
 #include "Speed/Indep/Src/Generated/Events/EPerfectLaunch.hpp"
 #include "Speed/Indep/Src/Generated/Events/EPlayerAirborne.hpp"
@@ -18,6 +21,9 @@
 #include "Speed/Indep/Src/Interfaces/Simables/IArticulatedVehicle.h"
 #include "Speed/Indep/Src/Interfaces/Simables/ICollisionBody.h"
 #include "Speed/Indep/Src/Interfaces/Simables/IDamageable.h"
+#include "Speed/Indep/Src/Interfaces/SimActivities/IActivity.h"
+#include "Speed/Indep/Src/Interfaces/SimEntities/IEntity.h"
+#include "Speed/Indep/Src/Interfaces/Simables/IDisposable.h"
 #include "Speed/Indep/Src/Interfaces/Simables/IEffects.h"
 #include "Speed/Indep/Src/Interfaces/Simables/IEngine.h"
 #include "Speed/Indep/Src/Interfaces/Simables/IExplosion.h"
@@ -1551,10 +1557,38 @@ bool PVehicle::MakeRoom(IVehicleCache *whosasking, const UTL::Std::list<Resource
     return true;
 }
 
-template void UTL::Vector<ICollisionBody *, 16>::push_back(ICollisionBody *const &);
-template void UTL::Vector<IInputPlayer *, 16>::push_back(IInputPlayer *const &);
-template void UTL::Vector<IRecordablePlayer *, 16>::push_back(IRecordablePlayer *const &);
-template void UTL::Vector<ISpikeable *, 16>::push_back(ISpikeable *const &);
-template UTL::Collections::Listable<ITrafficCenter, 8>::List::~List();
-template UTL::Collections::Listable<ISpikeable, 10>::List::~List();
-template Behavior *UTL::COM::Factory<const BehaviorParams &, Behavior, UCrc32>::CreateInstance(UCrc32, const BehaviorParams &);
+#define IMPL_LISTABLE(TYPE, N)                                                                                                                       \
+    template <> UTL::Collections::Listable<TYPE, N>::List UTL::Collections::Listable<TYPE, N>::_mTable = UTL::Collections::Listable<TYPE, N>::List();
+
+#define IMPL_LISTABLESET(TYPE, N, ENUM, BUCKETS)                                                                                                     \
+    template <>                                                                                                                                      \
+    UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_ListSet UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_mLists =                 \
+        UTL::Collections::ListableSet<TYPE, N, ENUM, BUCKETS>::_ListSet();
+
+#define IMPL_INSTANCABLE(HANDLE, TYPE, N)                                                                                                            \
+    template <>                                                                                                                                      \
+    UTL::Collections::Instanceable<HANDLE, TYPE, N>::_List UTL::Collections::Instanceable<HANDLE, TYPE, N>::_mList =                                 \
+        UTL::Collections::Instanceable<HANDLE, TYPE, N>::_List();                                                                                     \
+    template <> unsigned int UTL::Collections::Instanceable<HANDLE, TYPE, N>::_mHNext = 0;
+
+IMPL_LISTABLE(IExplosion, 96)
+IMPL_LISTABLE(IDisposable, 160)
+IMPL_LISTABLESET(IVehicle, 10, eVehicleList, 10)
+IMPL_LISTABLE(IRigidBody, 160)
+IMPL_LISTABLE(ICollisionBody, 160)
+IMPL_LISTABLE(ISimpleBody, 96)
+IMPL_LISTABLESET(Sim::IEntity, 8, eEntityList, 4)
+IMPL_LISTABLESET(IPlayer, 8, ePlayerList, 3)
+IMPL_LISTABLE(IRecordablePlayer, 8)
+IMPL_LISTABLE(IInputPlayer, 8)
+IMPL_LISTABLE(IModel, 434)
+IMPL_LISTABLE(IPursuit, 8)
+IMPL_LISTABLE(IRoadBlock, 8)
+IMPL_LISTABLE(IHud, 2)
+IMPL_LISTABLE(IVehicleCache, 18)
+IMPL_LISTABLE(ITrafficCenter, 8)
+IMPL_LISTABLE(ISpikeable, 10)
+IMPL_INSTANCABLE(HSIMABLE, ISimable, 160)
+IMPL_INSTANCABLE(HACTIVITY, Sim::IActivity, 40)
+IMPL_INSTANCABLE(HMODEL, IModel, 434)
+IMPL_INSTANCABLE(HCAUSE, ICause, 10)

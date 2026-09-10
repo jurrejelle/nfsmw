@@ -1078,3 +1078,5 @@ IPlaceableScenery *IPlaceableScenery::CreateInstance(const char *name, unsigned 
 }
 
 PlaceableScenery::~PlaceableScenery() {}
+
+template <> UTL::Collections::Listable<Smackable, 160>::List UTL::Collections::Listable<Smackable, 160>::_mTable = UTL::Collections::Listable<Smackable, 160>::List();
