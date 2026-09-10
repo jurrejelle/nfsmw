@@ -10,11 +10,19 @@
 
 using namespace Attrib::Gen;
 
+Physics::Info::Performance Physics::Info::PerformanceWeights[7] = {
+    Physics::Info::Performance(0.25f, 1.5f, 0.25f), // PUT_TIRES
+    Physics::Info::Performance(0.0f, 0.5f, 0.0f),   // PUT_BRAKES
+    Physics::Info::Performance(0.25f, 1.0f, 0.2f),  // PUT_CHASSIS
+    Physics::Info::Performance(1.0f, 0.0f, 0.75f),  // PUT_TRANSMISSION
+    Physics::Info::Performance(0.5f, 0.0f, 1.0f),   // PUT_ENGINE
+    Physics::Info::Performance(0.25f, 0.0f, 1.25f), // PUT_INDUCTION
+    Physics::Info::Performance(0.25f, 0.0f, 1.5f),  // PUT_NOS
+};
 static PerfStats top_stats;
 static PerfStats bottom_stats;
 static PerformanceMaps TheStockCars;
 static int Physics_Info_initialized;
-Physics::Info::Performance Physics::Info::PerformanceWeights[7];
 
 // Credits: Brawltendo
 float Physics::Info::AerodynamicDownforce(const Attrib::Gen::chassis &chassis, const float speed) {
