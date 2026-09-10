@@ -108,6 +108,7 @@ template <typename T> class BehaviorSpecsPtr : public AttributeStructPtr<T> {
         // TODO
     }
 
+
     Attrib::Key LookupKey(const ISimable *owner, int index) {
         const Attrib::Instance &owneratr = owner->GetAttributes();
         if (!owneratr.IsValid()) {

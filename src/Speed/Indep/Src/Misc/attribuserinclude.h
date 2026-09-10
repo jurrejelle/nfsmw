@@ -45,6 +45,13 @@ class StringKey {
         return this->mHash32;
     }
 
+    bool IsNotEmpty() const {
+        if (this->mString != nullptr) {
+            return this->mString[0] != 0;
+        }
+        return false;
+    }
+
     bool IsEmpty() const {
         if (this->mString != nullptr) {
             return this->mString[0] == 0;

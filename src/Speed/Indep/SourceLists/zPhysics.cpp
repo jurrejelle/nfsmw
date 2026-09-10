@@ -9,6 +9,8 @@
 
 #include "Speed/Indep/Src/Physics/Common/PhysicsObject.cpp"
 
+#include "Speed/Indep/Src/Physics/Common/Smackable.cpp"
+
 #include "Speed/Indep/Src/Physics/Common/Wheel.cpp"
 
 #include "Speed/Indep/Src/Physics/Common/VehicleBehaviors.cpp"
