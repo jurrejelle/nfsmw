@@ -847,8 +847,7 @@ IModel *HeirarchyModel::SpawnModel(UCrc32 rendernode, UCrc32 collisionnode, UCrc
     if (emodel == nullptr) {
         return nullptr;
     }
-    bHash32 meshname(emodel->GetNameHash());
-    HeirarchyModel *child = new HeirarchyModel(meshname, bounds, rendernode, this, attribs,
+    HeirarchyModel *child = new HeirarchyModel(bHash32(emodel->GetNameHash()), bounds, rendernode, this, attribs,
                                                mHeirarchy, childindex, true);
     IModel *result = nullptr;
     if (child != nullptr) {
