@@ -250,7 +250,8 @@ void PVehicle::SetTunings(const Physics::Tunings &tunings) {
     }
     for (unsigned int i = 0; i < Physics::Tunings::MAX_TUNINGS; i++) {
         Physics::Tunings::Path path = static_cast<Physics::Tunings::Path>(i);
-        mCustomization->SetTuning(path, tunings.Value[i]);
+        // TODO: Uncomment + add from PR 135
+        // mCustomization->SetTuning(path, tunings.Value[i]);
     }
 }
 
@@ -644,7 +645,8 @@ const Physics::Tunings *PVehicle::GetTunings() const {
         return &tunings;
     }
     if (mCustomization != nullptr) {
-        return static_cast<const FECustomizationRecord *>(mCustomization)->GetTunings();
+        // TODO: Uncomment + add from PR 135
+        // return static_cast<const FECustomizationRecord *>(mCustomization)->GetTunings();
     }
     return nullptr;
 }
@@ -1254,15 +1256,20 @@ ISimable *PVehicle::Construct(Sim::Param params) {
             PresetCar *preset = FindFEPresetCar(bStringHashUpper(attributes.DefaultPresetRide()));
             if (preset != nullptr) {
                 static FECustomizationRecord temp_record;
-                temp_record.Default();
-                temp_record.BecomePreset(preset);
+                // TODO: Uncomment + add from PR 135
+                // temp_record.Default();
+                // TODO: Uncomment + add from PR 135
+                // temp_record.BecomePreset(preset);
                 customizations = &temp_record;
             }
         }
     }
-    if (customizations != nullptr && !customizations->WriteRecordIntoPhysics(attributes)) {
-        return nullptr;
-    }
+    // TODO: Uncomment + add from PR 135
+    // if (customizations != nullptr && !customizations->WriteRecordIntoPhysics(attributes)) {
+    // TODO: Uncomment + add from PR 135
+    //     return nullptr;
+    // TODO: Uncomment + add from PR 135
+    // }
     if (vp.matched != nullptr
         && !Physics::Upgrades::MatchPerformance(attributes, *vp.matched)) {
         return nullptr;

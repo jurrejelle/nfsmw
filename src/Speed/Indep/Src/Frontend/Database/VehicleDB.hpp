@@ -5,13 +5,10 @@
 #pragma once
 #endif
 
-#include "Speed/Indep/Libs/Support/Utility/FastMem.h"
 #include "Speed/Indep/Src/Gameplay/GInfractionManager.h"
 #include "Speed/Indep/Src/Physics/PhysicsTunings.h"
 #include "Speed/Indep/Src/Physics/PhysicsUpgrades.hpp"
 #include "Speed/Indep/Src/World/CarInfo.hpp"
-
-struct PresetCar;
 
 // total size: 0x14
 struct FECarRecord {
@@ -31,32 +28,6 @@ struct FECustomizationRecord {
     }
 
     void WriteRecordIntoRide(RideInfo *ride) const;
-
-    // TODO: zPhysics added everything from here to WritePhysicsIntoRecord; re-check against the Frontend work when that branch lands.
-    void SetTuning(Physics::Tunings::Path id, float value) {
-        this->Tunings[this->ActiveTuning].Value[id] = value;
-    }
-
-    float GetTuning(Physics::Tunings::Path id) const {
-        return this->Tunings[this->ActiveTuning].Value[id];
-    }
-
-    const Physics::Tunings *GetTunings() const {
-        return &this->Tunings[this->ActiveTuning];
-    }
-
-    Physics::Tunings *GetTunings() {
-        return &this->Tunings[this->ActiveTuning];
-    }
-
-    USE_FASTALLOC(FECustomizationRecord)
-
-    FECustomizationRecord();
-
-    void Default();
-    void BecomePreset(PresetCar *preset);
-    bool WriteRecordIntoPhysics(Attrib::Gen::pvehicle &vehicle) const;
-    bool WritePhysicsIntoRecord(const Attrib::Gen::pvehicle &vehicle);
 
     short InstalledPartIndices[139];             // offset 0x0, size 0x116
     Physics::Upgrades::Package InstalledPhysics; // offset 0x118, size 0x20
