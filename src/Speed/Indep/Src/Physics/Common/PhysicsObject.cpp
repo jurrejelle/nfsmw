@@ -20,13 +20,15 @@ UTL::Collections::GarbageNode<PhysicsObject, 160>::Collector UTL::Collections::G
 
 void PhysicsObject::Behaviors::Add(Behavior *beh) {
     int pri = beh->GetPriority();
-    iterator iter;
-    for (iter = begin(); iter != end(); ++iter) {
+    iterator iter = begin();
+    while (iter != end()) {
         if ((*iter)->GetPriority() > pri) {
-            break;
+            insert(iter, beh);
+            return;
         }
+        iter++;
     }
-    insert(iter, beh);
+    insert(end(), beh);
 }
 
 void PhysicsObject::Behaviors::Remove(Behavior *beh) {
@@ -234,21 +236,15 @@ bool PhysicsObject::IsOwnedBy(ISimable *queriedOwner) const {
     if (queriedOwner != nullptr) {
         HSIMABLE qSig = queriedOwner->GetInstanceHandle();
         ISimable *potentialOwner = ISimable::FindInstance(mOwner);
-        if (potentialOwner != nullptr) {
-            do {
-                if (potentialOwner->GetInstanceHandle() == qSig) {
-                    return true;
-                }
-                HSIMABLE ownerHandle = potentialOwner->GetOwnerHandle();
-                if (ownerHandle == nullptr) {
-                    return false;
-                }
-                ISimable *newOwner = ISimable::FindInstance(ownerHandle);
-                if (potentialOwner == newOwner) {
-                    return false;
-                }
-                potentialOwner = newOwner;
-            } while (potentialOwner != nullptr);
+        while (potentialOwner != nullptr) {
+            if (potentialOwner->GetInstanceHandle() == qSig) {
+                return true;
+            }
+            ISimable *newOwner = ISimable::FindInstance(potentialOwner->GetOwnerHandle());
+            if (potentialOwner == newOwner) {
+                return false;
+            }
+            potentialOwner = newOwner;
         }
     }
     return false;
@@ -260,10 +256,8 @@ void PhysicsObject::DebugObject() {
 
 void PhysicsObject::OnBehaviorChange(const UCrc32 &mechanic) {
     if (mechanic == UCrc32(BEHAVIOR_MECHANIC_RIGIDBODY)) {
-        IRigidBody *irb = nullptr;
-        static_cast<ISimable *>(this)->QueryInterface(&irb);
-        mRigidBody = irb;
-        if (mBodyService == nullptr && irb != nullptr) {
+        static_cast<ISimable *>(this)->QueryInterface(&mRigidBody);
+        if (mBodyService == nullptr && mRigidBody != nullptr) {
             UMath::Matrix4 mat;
             mRigidBody->GetMatrix4(mat);
             UMath::Copy(mRigidBody->GetPosition(), UMath::ExtractAxis(mat, 3));
@@ -284,7 +278,7 @@ bool PhysicsObject::IsBehaviorActive(const UCrc32 &mechanic) const {
     if (beh == nullptr) {
         return false;
     }
-    return !beh->IsPaused();
+    return beh->IsPaused() == false;
 }
 
 void PhysicsObject::PauseBehavior(const UCrc32 &mechanic, bool pause) {
