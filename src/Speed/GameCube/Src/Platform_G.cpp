@@ -484,11 +484,11 @@ void DVDErrorTask(void *, int) {
                     copy_length - strip_chars);
 
                 to_copy = bStrLen(the_loading_text);
-                nextFrame = dvderrorticks + 1;
                 while (to_copy <= copy_length) {
                     to_copy = to_copy + 1;
                     bStrCat(the_loading_text, the_loading_text, " ");
                 }
+                nextFrame = dvderrorticks + 1;
 
                 FEPrintf("DiscError.fng", 0xEEFFD04F, the_loading_text);
 
