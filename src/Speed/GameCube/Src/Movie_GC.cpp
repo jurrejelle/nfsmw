@@ -117,22 +117,24 @@ void GCHW_VD::iDraw() {
         float u1;
         float v0;
         float v1;
-        float m_l;
-        float m_t;
-        float m_r;
-        float m_b;
-        float m_z;
 
         if (mIsVP6) {
-            w += 0x60;
-            h += 0x60;
-            int uvOfs = (w / 2) * 0x18;
+            const int vp6Border = 0x60;
+            int dataOfs;
+
+            w += vp6Border;
+            h += vp6Border;
 
             cb = y + w * h;
-            y += w * 0x30;
-            cr = cb + (w / 2) * (h / 2) + uvOfs;
-            cb += uvOfs;
-            h -= 0x60;
+            cr = cb + (w / 2) * (h / 2);
+
+            dataOfs = w * 0x30;
+            y += dataOfs;
+            h -= vp6Border;
+
+            dataOfs = (w / 2) * 0x18;
+            cb += dataOfs;
+            cr += dataOfs;
         } else {
             cb = y + w * h;
             cr = cb + (w / 2) * (h / 2);
@@ -177,26 +179,28 @@ void GCHW_VD::iDraw() {
             v1 = 1.0f;
         }
 
-        m_l = 0.0f;
-        m_t = 0.0f;
-        m_r = static_cast<float>(ScreenWidth) - 1.0f;
-        m_b = static_cast<float>(ScreenHeight) - 1.0f;
-        m_z = 0.0f;
+        {
+            float m_l = 0.0f;
+            float m_t = 0.0f;
+            float m_r = static_cast<float>(ScreenWidth) - 1.0f;
+            float m_b = static_cast<float>(ScreenHeight) - 1.0f;
+            float m_z = 0.0f;
 
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(m_l, m_t, m_z);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u0, v0);
-        GXPosition3f32(m_r, m_t, m_z);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v0);
-        GXPosition3f32(m_r, m_b, m_z);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u1, v1);
-        GXPosition3f32(m_l, m_b, m_z);
-        GXColor1u32(0xFFFFFFFF);
-        GXTexCoord2f32(u0, v1);
-        GXEnd();
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(m_l, m_t, m_z);
+            GXColor1u32(0xFFFFFFFF);
+            GXTexCoord2f32(u0, v0);
+            GXPosition3f32(m_r, m_t, m_z);
+            GXColor1u32(0xFFFFFFFF);
+            GXTexCoord2f32(u1, v0);
+            GXPosition3f32(m_r, m_b, m_z);
+            GXColor1u32(0xFFFFFFFF);
+            GXTexCoord2f32(u1, v1);
+            GXPosition3f32(m_l, m_b, m_z);
+            GXColor1u32(0xFFFFFFFF);
+            GXTexCoord2f32(u0, v1);
+            GXEnd();
+        }
 
         GXSetNumIndStages(0);
         GXSetTevSwapModeTable(static_cast<GXTevSwapSel>(0), static_cast<GXTevColorChan>(0), static_cast<GXTevColorChan>(1),
