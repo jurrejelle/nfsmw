@@ -244,6 +244,10 @@ class TrackStreamer {
 
     void FreeUserMemory(void *mem);
 
+    bool HasMemoryPool() {
+        return pMemoryPoolMem != nullptr;
+    }
+
     bool IsUserMemory(void *mem);
 
     bool MakeSpaceInPool(int size, bool force_unloading);
@@ -321,6 +325,10 @@ class TrackStreamer {
 
     bool IsPermFileLoading() {
         return this->PermFileLoading;
+    }
+
+    bool HasUserMemoryAllocations() {
+        return UserMemoryAllocationSize > 0;
     }
 
   private:
